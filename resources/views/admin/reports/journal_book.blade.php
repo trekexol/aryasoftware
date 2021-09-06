@@ -58,10 +58,10 @@
           </table>
           <table style="width: 100%;">
             <tr>
-              <td style="text-align: center; width: 30%;">Descripción</td>
-              <td style="text-align: center; width: 30%;">{{ $detail->header_description ?? '' }}</td>
-              <td style="text-align: center; width: 20%;">{{ number_format($total_debe ?? 0, 2, ',', '.')}}</td>
-              <td style="text-align: center; width: 20%;">{{ number_format($total_haber ?? 0, 2, ',', '.')}}</td>
+              <td style="text-align: center; width: 20%;">Descripción</td>
+              <td style="text-align: left; width: 40%;">{{ $detail->header_description ?? '' }}</td>
+              <td style="text-align: right; width: 20%;">{{ number_format($total_debe ?? 0, 2, ',', '.')}}</td>
+              <td style="text-align: right; width: 20%;">{{ number_format($total_haber ?? 0, 2, ',', '.')}}</td>
             </tr>
           </table>
             <?php 
@@ -77,9 +77,9 @@
 
         <table style="width: 100%;">
           <tr>
-            <th style="text-align: center; width: 20%;">Fecha</th>
-            <th style="text-align: center; width: 10%;">Ref</th>
-            <th style="text-align: center; width: 30%;">Cuenta</th>
+            <th style="text-align: center; width: 15%;">Fecha</th>
+            <th style="text-align: center; width: 5%;">Ref</th>
+            <th style="text-align: center; width: 40%;">Cuenta</th>
             <th style="text-align: center; width: 20%;">Debe</th>
             <th style="text-align: center; width: 20%;">Haber</th>
           </tr>
@@ -88,9 +88,9 @@
         <tr>
           <td style="text-align: center;">{{ $detail->date ?? ''}}</td>
           <td style="text-align: center;">{{ $detail->id_header ?? ''}}</td>
-          <td style="text-align: center;">{{ $detail->account_description ?? ''}}</td>
-          <td style="text-align: center;">{{ number_format($detail->debe ?? 0, 2, ',', '.')}}</td>
-          <td style="text-align: center;">{{ number_format($detail->haber ?? 0, 2, ',', '.')}}</td>
+          <td style="text-align: left;">{{ $detail->account_description ?? ''}}</td>
+          <td style="text-align: right;">{{ number_format($detail->debe ?? 0, 2, ',', '.')}}</td>
+          <td style="text-align: right;">{{ number_format($detail->haber ?? 0, 2, ',', '.')}}</td>
         </tr>
         <?php 
           $marcador = false;
@@ -102,10 +102,10 @@
     @endforeach
     <table style="width: 100%;">
       <tr>
-        <td style="text-align: center; width: 30%;">Descripción</td>
-        <td style="text-align: center; width: 30%;">{{ $description_final ?? '' }}</td>
-        <td style="text-align: center; width: 20%;">{{ number_format($total_debe ?? 0, 2, ',', '.')}}</td>
-        <td style="text-align: center; width: 20%;">{{ number_format($total_haber ?? 0, 2, ',', '.')}}</td>
+        <td style="text-align: center; width: 20%;">Descripción</td>
+        <td style="text-align: center; width: 40%;">{{ $description_final ?? '' }}</td>
+        <td style="text-align: right; width: 20%;">{{ number_format($total_debe ?? 0, 2, ',', '.')}}</td>
+        <td style="text-align: right; width: 20%;">{{ number_format($total_haber ?? 0, 2, ',', '.')}}</td>
       </tr>
     </table>
   @endif

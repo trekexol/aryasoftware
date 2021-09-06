@@ -5,7 +5,7 @@
     <div class="row justify-content-center">
         <div class="col-sm-12">
             <div class="card">
-                <form method="POST" action="{{ route('balancegenerals.store') }}">
+                <form method="POST" action="{{ route('balanceingresos.store') }}">
                     @csrf
 
                 <div class="card-header text-center h4">
@@ -14,8 +14,6 @@
 
                 <div class="card-body">
                         <div class="form-group row">
-                            <label for="date_end" class="col-sm-1 col-form-label text-md-right">Desde</label>
-
                             <div class="col-sm-3">
                                 <input id="date_begin" type="date" class="form-control @error('date_begin') is-invalid @enderror" name="date_begin" value="{{  date('Y-m-d', strtotime($detail_old->created_at ?? $date_begin ??'')) }}" required autocomplete="date_begin">
 
@@ -56,7 +54,20 @@
                                     
                                
                                 </select>
-                                </div>
+                            </div>
+                            <div class="col-sm-2">
+                                <select class="form-control" name="coin" id="coin">
+                                    @if(isset($coin))
+                                        <option disabled selected value="{{ $coin }}">{{ $coin }}</option>
+                                        <option disabled  value="{{ $coin }}">-----------</option>
+                                    @else
+                                        <option disabled selected value="bolivares">Moneda</option>
+                                    @endif
+                                    
+                                    <option  value="bolivares">Bolívares</option>
+                                    <option value="dolares">Dólares</option>
+                                </select>
+                            </div>
                             <div class="col-sm-1">
                             <button type="submit" class="btn btn-primary ">
                                 Buscar
@@ -65,7 +76,7 @@
                         </div>
                     </form>
                         <div class="embed-responsive embed-responsive-16by9">
-                            <iframe class="embed-responsive-item" src="{{ route('balanceingresos.balance_pdf',[$date_begin ?? '',$date_end ?? '',$level ?? '']) }}" allowfullscreen></iframe>
+                            <iframe class="embed-responsive-item" src="{{ route('balanceingresos.balance_pdf',[$datebeginyear ?? $date_begin ?? $datenow,$date_end ?? $datenow,$level ?? 5,$coin ?? 'bolivares']) }}" allowfullscreen></iframe>
                           </div>
                         
                         </div>

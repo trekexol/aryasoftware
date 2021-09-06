@@ -39,10 +39,10 @@
                         <div class="col-sm-3">
                           <div class="list-group" id="list-tab" role="tablist">
                             <li class="list-group-item list-group-item-action list-group-item-danger text-center" style="padding: 0;" id="list-home-list" data-bs-toggle="list" role="tab" aria-controls="home"><font size="-1">Ganancias y Pérdidas</font></li>
-                            <li class="list-group-item list-group-item-action list-group-item-light text-center" style="padding: 5% 0;" id="list-profile-list" data-bs-toggle="list"  role="tab" aria-controls="profile"><font size="-1">Ingresos {{ number_format($account_ingresos, 2, ',', '.')}}</font></li>
+                            <li class="list-group-item list-group-item-action list-group-item-light text-center" style="padding: 5% 0;" id="list-profile-list" data-bs-toggle="list"  role="tab" aria-controls="profile"><font size="-1">Ingresos {{ number_format(($account_ingresos * -1), 2, ',', '.')}}</font></li>
                             <li class="list-group-item list-group-item-action list-group-item-ligh text-center" style="padding: 5% 0;" id="list-messages-list" data-bs-toggle="list"  role="tab" aria-controls="messages"><font size="-1">Costos {{ number_format($account_costos, 2, ',', '.')}}</font></li>
                             <li class="list-group-item list-group-item-action list-group-item-light text-center" style="padding: 5% 0;" id="list-settings-list" data-bs-toggle="list" role="tab" aria-controls="settings"><font size="-1">Gastos {{ number_format($account_gastos, 2, ',', '.')}}</font></li>
-                            <li class="list-group-item list-group-item-action list-group-item-warning text-center" style="padding: 5% 0;" id="list-messages-list" data-bs-toggle="list"  role="tab" aria-controls="messages"><font size="-1">Total {{ number_format($account_ingresos-$account_costos-$account_gastos, 2, ',', '.')}}</font></li>
+                            <li class="list-group-item list-group-item-action list-group-item-warning text-center" style="padding: 5% 0;" id="list-messages-list" data-bs-toggle="list"  role="tab" aria-controls="messages"><font size="-1">Total {{ number_format(($account_ingresos * -1)-$account_costos-$account_gastos, 2, ',', '.')}}</font></li>
                           </div>
                         </div>
                         <div class="col-sm-3">

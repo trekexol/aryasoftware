@@ -36,7 +36,7 @@
 <table>
   <tr>
     <th style="text-align: center; font-weight: normal; width: 58%; border-color: white; font-weight: bold;"></th>
-    <th style="text-align: center; font-weight: normal; width: 21%; border-color: white; font-weight: bold;">BsS</th>
+    <th style="text-align: right; font-weight: normal; width: 21%; border-color: white; font-weight: bold;">{{ $coin ?? 'Bs' }}</th>
     <th style="text-align: center; font-weight: normal; width: 21%; border-color: white; font-weight: bold;">Petro</th>
   </tr> 
   <?php 

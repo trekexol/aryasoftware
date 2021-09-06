@@ -870,6 +870,12 @@
                 coin = $(this).val();
                 window.location = "{{route('quotations.createfacturar', [$quotation->id,''])}}"+"/"+coin;
             });
+
+            $("body").toggleClass("sidebar-toggled");
+        $(".sidebar").toggleClass("toggled");
+        if ($(".sidebar").hasClass("toggled")) {
+            $('.sidebar .collapse').collapse('hide');
+        };
     </script>
     <script type="text/javascript">
 

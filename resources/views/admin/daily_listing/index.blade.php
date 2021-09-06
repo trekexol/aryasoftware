@@ -21,7 +21,7 @@
             
         </div>
         <div class="col-sm-3">
-            <a href="{{ route('accounts') }}" class="btn btn-light2"><i class="fas fa-eye" ></i>
+            <a href="#" data-toggle="modal" data-target="#libroModal" class="btn btn-light2"><i class="fas fa-eye" ></i>
                 &nbsp Imprimir Libro Diario
             </a>
         </div>

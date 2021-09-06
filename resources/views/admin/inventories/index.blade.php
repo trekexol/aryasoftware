@@ -19,8 +19,8 @@
     <!-- Page Heading -->
     <div class="row py-lg-2">
        
-        <div class="col-md-3">
-            <a href="{{ route('products.create')}}" class="btn btn-warning  float-md-right " role="button" aria-pressed="true">Registrar un Producto Nuevo</a>
+        <div class="col-md-4">
+            <a href="{{ route('products.create')}}" class="btn btn-warning  float-md-center" role="button" aria-pressed="true">Registrar un Producto Nuevo</a>
           </div>
        
         <div class="col-md-2 dropdown mb-4">
@@ -126,12 +126,19 @@
                 var nuevaVentanainventory = window.open("{{ route('pdf.inventory')}}","ventana","left=800,top=800,height=800,width=1000,scrollbar=si,location=no ,resizable=si,menubar=no");
         
             }
-    </script>
-     <script>
+     
         $('#dataTable').DataTable({
             "ordering": false,
             "order": [],
             'aLengthMenu': [[50, 100, 150, -1], [50, 100, 150, "All"]]
         });
+
+        $("body").toggleClass("sidebar-toggled");
+        $(".sidebar").toggleClass("toggled");
+        if ($(".sidebar").hasClass("toggled")) {
+            $('.sidebar .collapse').collapse('hide');
+        };
+    
+
         </script> 
 @endsection
