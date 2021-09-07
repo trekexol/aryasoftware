@@ -26,7 +26,8 @@
 
 <body>
 
-
+  <img src="{{ asset(Auth::user()->company->foto_company ?? 'img/northdelivery.jpg') }}" width="90" height="30" class="d-inline-block align-top" alt="">                
+  <h4>{{Auth::user()->company->code_rif ?? ''}} </h4>
   <br><br>
   <h2 style="color: black; text-align: center; font-weight: bold;">Balance General</h2>
 

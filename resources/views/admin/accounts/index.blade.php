@@ -19,7 +19,6 @@
             <div class="dropdown-menu animated--fade-in"
                 aria-labelledby="dropdownMenuButton">
                 <a class="dropdown-item" href="{{ route('accounts.index_previous_exercise') }}">Ver Ejercicios Anteriores</a>
-                <a class="dropdown-item" href="#">Imprimir Cuentas</a>
             </div>
         </div> 
        

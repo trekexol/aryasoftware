@@ -42,7 +42,7 @@
                     @foreach ($account_historial as $var)
                     <tr>
                     <td class="text-center">
-                        <a href="#" onclick="pdf();" title="Crear">{{$var->date_begin ?? ''}}</a>
+                        <a href="#" onclick="pdf({{ $var->date_begin }},{{ $var->date_end }});" title="Crear">{{$var->date_begin ?? ''}}</a>
                     </td>
                     <td class="text-center">{{$var->date_end ?? ''}}</td>
                     </tr>
@@ -63,9 +63,9 @@
         'aLengthMenu': [[50, 100, 150, -1], [50, 100, 150, "All"]]
     });
 
-    function pdf() {
+    function pdf(date_begin,date_end) {
 
-        var nuevaVentana= window.open("{{ route('pdf.previousexercise',[$var->date_begin,$var->date_end])}}","ventana","left=800,top=800,height=800,width=1000,scrollbar=si,location=no ,resizable=si,menubar=no");
+        var nuevaVentana= window.open("{{ route('pdf.previousexercise',['',''])}}" + '/' + date_begin + '/' + date_end,"ventana","left=800,top=800,height=800,width=1000,scrollbar=si,location=no ,resizable=si,menubar=no");
  
     }
     </script> 

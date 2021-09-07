@@ -27,18 +27,22 @@ class AccountController extends Controller
    {
        $user       =   auth()->user();
        $users_role =   $user->role_id;
-       if($users_role == '1'){
-        
-        
+       
         if($coin == null){
             $coin = 'bolivares';
         }
-            $accounts = $this->calculation($coin);
+        
+        $accounts = $this->calculation($coin);
 
-        }else if($users_role == '2'){
-           return view('admin.index');
-       }
+        /*foreach($accounts as $account){
 
+            if($account->code_one == 3 && $account->code_two == 2 && $account->code_three == 1 && $account->code_four == 1 && $account->code_five == 0){
+                dd($account);
+            }
+        }*/
+
+
+        
        return view('admin.accounts.index',compact('accounts','coin','level'));
    }
 
@@ -58,7 +62,7 @@ class AccountController extends Controller
    }
 
 
-   public function movements($id_account,$coin = null)
+    public function movements($id_account,$coin = null)
     {
         
 
@@ -806,7 +810,7 @@ class AccountController extends Controller
 
         //$total_balance = $total_balance[0]->balance;
 
-        //$var->balance = $total_balance;
+        $var->balance = $var->balance_previus;
 
         return $var;
 
@@ -1057,13 +1061,8 @@ class AccountController extends Controller
 
                     $var->balance_previous = $account->balance_previus;
 
-                    if(isset($account->coin) && isset($account->rate)){
                         $var->coin =  $account->coin;
                         $var->rate =  $account->rate;
-                    }else{
-                        $var->coin =  $coin;
-                    }
-                    
                         $var->balance_current = $account->balance_previus + $account->debe - $account->haber;
                         
                         $var->debe =  $account->debe ?? 0;

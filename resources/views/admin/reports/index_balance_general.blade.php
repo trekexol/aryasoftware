@@ -76,7 +76,7 @@
                         </div>
                     </form>
                         <div class="embed-responsive embed-responsive-16by9">
-                            <iframe class="embed-responsive-item" src="{{ route('balancegenerals.balance_pdf',[$datebeginyear ?? $date_begin ?? $datenow,$date_end ?? $datenow,$level ?? 5,$coin ?? 'bolivares']) }}" allowfullscreen></iframe>
+                            <iframe class="embed-responsive-item" src="{{ route('balancegenerals.balance_pdf',[$coin ?? 'bolivares',$datebeginyear ?? $date_begin ?? $datenow,$date_end ?? $datenow,$level ?? 5]) }}" allowfullscreen></iframe>
                           </div>
                         
                         </div>

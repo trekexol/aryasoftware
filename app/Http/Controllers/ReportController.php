@@ -186,7 +186,7 @@ class ReportController extends Controller
         return view('admin.reports.index_debtstopay',compact('date_end','provider'));
     }
 
-    function balance_pdf($date_begin = null,$date_end = null,$level = null,$coin = null)
+    function balance_pdf($coin = null,$date_begin = null,$date_end = null,$level = null)
     {
       
         $pdf = App::make('dompdf.wrapper');
@@ -234,6 +234,9 @@ class ReportController extends Controller
             }
             
         });
+
+        /*$foto = auth()->user()->company->foto_company;
+        $code_rif = auth()->user()->company->code_rif;*/
 
         
         $pdf = $pdf->loadView('admin.reports.balance_general',compact('coin','datenow','accounts','level','detail_old','date_begin','date_end'));
@@ -952,7 +955,10 @@ class ReportController extends Controller
                                             , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,$var->code_five,'C']);
     
                                            
-                                            
+                                            if(($var->balance_previus != 0) && ($var->rate !=0)){
+                                                $var->balance =  $var->balance_previus / ($var->rate ?? 1);
+                                                $var->balance_previus = $var->balance;
+                                            }
                                             
                                         }
                                         $total_debe = $total_debe[0]->debe;
@@ -969,9 +975,7 @@ class ReportController extends Controller
                                         $var->debe = $total_debe;
                                         $var->haber = $total_haber;
 
-                                        if(($var->balance_previus != 0) && ($var->rate !=0)){
-                                            $var->balance =  $var->balance_previus;
-                                        }
+                                       
                                     }
 
                                 }else{
@@ -1090,6 +1094,7 @@ class ReportController extends Controller
 
                                     $total_balance = $total_balance[0]->balance;
                                     $var->balance = $total_balance;
+                                    $var->balance_previus = $total_balance;
                                 }  
                             }else{          
                             
@@ -1169,7 +1174,7 @@ class ReportController extends Controller
 
                                     $total_balance = $total_balance[0]->balance;
                                     $var->balance = $total_balance;
-                                      
+                                    $var->balance_previus = $total_balance;
                                             
                             }           
                         }else{
@@ -1240,6 +1245,7 @@ class ReportController extends Controller
 
                                 $total_balance = $total_balance[0]->balance;
                                 $var->balance = $total_balance;
+                                $var->balance_previus = $total_balance;
                         }
                     }else{
                         //Calcular patrimonio con las cuentas mayores o iguales a 3.0.0.0.0
@@ -1305,6 +1311,7 @@ class ReportController extends Controller
                                 $total_balance = $total_balance[0]->balance;
     
                                 $var->balance = $total_balance;
+                                $var->balance_previus = $total_balance;
                         }
                     }
                 }else{
@@ -1381,6 +1388,7 @@ class ReportController extends Controller
             $total_balance = $total_balance[0]->balance;
 
             $var->balance = $total_balance;
+            $var->balance_previus = $total_balance;
 
             return $var;
     }
@@ -1427,12 +1435,20 @@ class ReportController extends Controller
             , [$code,'C']);
 
 
+            // por ahora se dejara el balance aqui en cero, ya que asi cuadra
+            $var->balance = 0;
+            $var->balance_previus = 0;
+            /*if(($var->balance_previus != 0) && ($var->rate !=0)){
+            $var->balance =  $var->balance_previus / ($var->rate ?? 1);
+            $var->balance_previus = $var->balance;
+            }*/
         }
         $total_debe = $total_debe[0]->debe;
         $total_haber = $total_haber[0]->haber;
         $var->debe = $total_debe;
         $var->haber = $total_haber;
 
+       
         //$total_balance = $total_balance[0]->balance;
 
         //$var->balance = $total_balance;
