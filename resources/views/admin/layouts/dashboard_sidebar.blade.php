@@ -233,6 +233,8 @@
             </a>
             <div id="collapseReportes" class="collapse" aria-labelledby="headingReportes" data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
+                    <a  class="collapse-header text-danger" href="{{ route('accounts') }}">Contabilidad</a> 
+                    <a class="collapse-item" href="{{ route('reports.accounts')}}" > <i class="fas fa-coins fa-sm fa-fw mr-2 text-black-400"></i><strong>Listado de Cuentas</strong></a>
                     <a class="collapse-item" href="{{ route('reports.accounts_receivable')}}" > <i class="fas fa-hand-holding-usd fa-sm fa-fw mr-2 text-black-400"></i><strong>Cuentas por Cobrar</strong></a>
                     <a class="collapse-item" href="{{ route('reports.debtstopay')}}" > <i class="fas fa-coins fa-sm fa-fw mr-2 text-black-400"></i><strong>Cuentas por Pagar</strong></a>
                 </div>

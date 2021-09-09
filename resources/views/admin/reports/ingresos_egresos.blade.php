@@ -27,12 +27,17 @@
 <body>
 
 
-  <img src="{{ asset($foto ?? 'img/northdelivery.jpg') }}" width="120" height="40" class="d-inline-block align-top" alt="">                
-  <h4>{{$code_rif ?? ''}} </h4>
+  <table>
+    <tr>
+      <th style="text-align: left; font-weight: normal; width: 15%; border-color: white; font-weight: bold;"> <img src="{{ asset(Auth::user()->company->foto_company ?? 'img/northdelivery.jpg') }}" width="90" height="30" class="d-inline-block align-top" alt="">
+      </th>
+      <th style="text-align: left; font-weight: normal; width: 85%; border-color: white; font-weight: bold;"><h4>{{Auth::user()->company->code_rif ?? ''}} </h4></th>
+    </tr> 
+  </table>
   
-  <h2 style="color: black; text-align: center; font-weight: bold;">Ingresos y Egresos</h2>
+  <h4 style="color: black; text-align: center; font-weight: bold;">Ingresos y Egresos</h4>
 
-  <h4 style="color: black; text-align: center; font-weight: bold;">Periodo desde {{ date('d-m-Y', strtotime( $date_begin ?? $detail_old->created_at ?? '')) }} al {{ date('d-m-Y', strtotime( $date_end ?? $datenow)) }}</h4>
+  <h5 style="color: black; text-align: center; font-weight: bold;">Periodo desde {{ date('d-m-Y', strtotime( $date_begin ?? $detail_old->created_at ?? '')) }} al {{ date('d-m-Y', strtotime( $date_end ?? $datenow)) }}</h5>
    
  
 <table>
@@ -258,22 +263,24 @@
 </table>
 
 <br><br>
-<table>
+<table style="width: 79%;">
   <tr>
-    <th style="text-align: left; font-weight: normal; width: 58%; border-color: white; font-weight: bold;">Utilidad de Operación: {{ number_format(($utilidad ?? 0) + ($islr ?? 0), 2, ',', '.') ?? ''}}</th>
-    
+    <th style="text-align: left; font-weight: normal; width: 29%; border-color: white; font-weight: bold;background-color: #FFCCFD;">UTILIDAD DE OPERACIÓN:</th>
+    <th style="text-align: right; font-weight: normal; width: 50%; border-color: white; font-weight: bold; background-color: #FFCCFD;">{{ number_format(($utilidad ?? 0) + ($islr ?? 0), 2, ',', '.') ?? ''}}</th>
   </tr> 
   <tr>
       <td style="text-align: left; font-weight: normal; width: 58%; border-color: white; font-weight: bold;"></td>
   </tr>   
   <tr>
-    <td style="text-align: left; font-weight: normal; width: 58%; border-color: white; font-weight: bold;">ISLR: {{ number_format(($islr ?? 0), 2, ',', '.') ?? ''}}</td>
+    <td style="text-align: left; font-weight: normal; width: 29%; border-color: white; font-weight: bold;background-color: #FFCCFD">IMPUESTO SOBRE LA RENTA: </td>
+    <td style="text-align: right; font-weight: normal; width: 50%; border-color: white; font-weight: bold;background-color: #FFCCFD">{{ number_format(($islr ?? 0), 2, ',', '.') ?? ''}}</td>
   </tr> 
   <tr>
-      <td style="text-align: left; font-weight: normal; width: 58%; border-color: white; font-weight: bold;"></td>
+      <td style="text-align: center; font-weight: normal; width: 58%; border-color: white; font-weight: bold;"></td>
   </tr>   
   <tr>
-    <td style="text-align: left; font-weight: normal; width: 58%; border-color: white; font-weight: bold;">Utilidad del Ejercicio: {{ number_format((($utilidad ?? 0)), 2, ',', '.') ?? ''}}</td>
+    <td style="text-align: left; font-weight: normal; width: 29%; border-color: white; font-weight: bold;background-color: #FFCCFD">RESULTADO DEL EJERCICIO:</td>
+    <td style="text-align: right; font-weight: normal; width: 50%; border-color: white; font-weight: bold;background-color: #FFCCFD">{{ number_format((($utilidad ?? 0)), 2, ',', '.') ?? ''}}</td>
   </tr> 
 </table>
 

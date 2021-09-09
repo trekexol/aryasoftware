@@ -124,6 +124,27 @@ class ReportController extends Controller
       
     }
 
+    public function index_accounts()
+    {
+        
+        $user       =   auth()->user();
+        $users_role =   $user->role_id;
+        if($users_role == '1'){
+            $date = Carbon::now();
+            $datenow = $date->format('Y-m-d');    
+            
+            $datebeginyear = $date->firstOfYear()->format('Y-m-d');
+
+        }elseif($users_role == '2'){
+            return view('admin.index');
+        }
+
+        
+    
+        return view('admin.reports.index_accounts',compact('datebeginyear','datenow'));
+      
+    }
+
     public function store(Request $request)
     {
         
@@ -242,8 +263,7 @@ class ReportController extends Controller
         
         $foto = auth()->user()->company->foto_company ?? '';
         $code_rif = auth()->user()->company->code_rif ?? '';
-        
-        
+
         
         $pdf = $pdf->loadView('admin.reports.balance_general',compact('foto','code_rif','coin','datenow','accounts','level','detail_old','date_begin','date_end'));
         return $pdf->stream();
@@ -518,6 +538,65 @@ class ReportController extends Controller
                  
     }
 
+    function accounts_pdf($coin,$level,$date_begin = null,$date_end = null)
+    {
+        
+        $pdf = App::make('dompdf.wrapper');
+
+        
+        $date = Carbon::now();
+        $datenow = $date->format('Y-m-d'); 
+        $period = $date->format('Y'); 
+        $detail_old = DetailVoucher::on(Auth::user()->database_name)->orderBy('created_at','asc')->first();
+        
+        
+        if(isset($date_begin)){
+            $from = $date_begin;
+        }else{
+            $from = $detail_old->created_at->format('Y-m-d');
+            
+        }
+        if(isset($date_end)){
+            $to = $date_end;
+        }else{
+            $to = $datenow;
+        }
+
+        if(empty($level)){
+            $level = 5;
+        }
+
+
+        if(isset($coin) && ($coin == "bolivares")){
+            $accounts_all = $this->calculation($from,$to);
+        }else{
+            $accounts_all = $this->calculation_dolar("dolares");
+        }
+     
+        $accounts = $accounts_all->filter(function($account) use ($level)
+        {
+          
+            if($account->level <= $level){
+                //aqui se valida que la cuentas de code_one de 4 para arriba no se toma en cuenta el balance previo
+                if($account->code_one <= 3){
+                    $total = $account->balance_previus + $account->debe - $account->haber;
+                }else{
+                    $total = $account->debe - $account->haber;
+                }
+                
+                if ($total != 0) {
+                    return $account;
+                }
+            }
+            
+        });
+
+        
+        
+        $pdf = $pdf->loadView('admin.reports.accounts',compact('coin','datenow','accounts','level','detail_old','date_begin','date_end'))->setPaper('a4', 'landscape');;
+        return $pdf->stream();
+                 
+    }
 
     function retencion_iva_expense($date_begin = null,$date_end = null,$level = null)
     {
@@ -878,7 +957,8 @@ class ReportController extends Controller
 
         $var->debe = $total_debe;
         $var->haber = $total_haber;    
-        
+        //asi cuadra el balance
+        $var->balance_previus = 0;   
  
          return $var;
  

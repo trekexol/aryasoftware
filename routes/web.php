@@ -785,4 +785,7 @@ Route::group(["prefix"=>'reports'],function(){
     Route::post('storeledger','ReportController@store_ledger')->name('reports.store_ledger');
     Route::get('ledgerpdf/{date_begin}/{date_end}','ReportController@ledger_pdf')->name('reports.ledger_pdf');
    
+    Route::get('accounts','ReportController@index_accounts')->name('reports.accounts');
+    Route::post('storeaccounts','ReportController@store_accounts')->name('reports.store_accounts');
+    Route::get('accountspdf/{coin?}/{level?}/{date_begin?}/{date_end?}','ReportController@accounts_pdf')->name('reports.accounts_pdf');
 });

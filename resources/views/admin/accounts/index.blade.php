@@ -5,6 +5,23 @@
 <!-- container-fluid -->
 <div class="container-fluid">
 
+    <div class="row py-lg-2">
+        <div class="col-sm-2" style="background: rgb(146, 23, 146); color: white;">
+                Totales Generales:
+        </div>
+        <div class="col-sm-2" style="background: rgb(216, 216, 216); color: rgb(0, 0, 0);">
+            Saldo Anterior: {{ number_format($total_saldo_anterior ?? 0, 2, ',', '.')}}
+        </div>
+        <div class="col-sm-3" style="background: rgb(216, 216, 216); color: rgb(0, 0, 0);">
+            Débitos: {{ number_format($total_debe ?? 0, 2, ',', '.')}}
+        </div>
+        <div class="col-sm-3" style="background: rgb(216, 216, 216); color: rgb(0, 0, 0);">
+            Créditos: {{ number_format($total_haber ?? 0, 2, ',', '.')}}
+        </div>
+        <div class="col-sm-2" style="background: rgb(216, 216, 216); color: rgb(0, 0, 0);">
+            Saldo Actual: {{ number_format(($total_saldo_anterior ?? 0) + ($total_debe ?? 0) - ($total_haber), 2, ',', '.')}}
+        </div>
+    </div>
     <!-- Page Heading -->
     <div class="row py-lg-2">
         
@@ -116,7 +133,7 @@
                     @if(isset($level))
                         @if($level >= $account->level)
                         <tr>
-                            <td style="text-align:right; color:black; font-weight: bold;">{{$account->code_one}}.{{$account->code_two}}.{{$account->code_three}}.{{$account->code_four}}.{{ str_pad($account->code_five, 3, "0", STR_PAD_LEFT)}}</td>
+                            <td style="text-align:left; color:black; font-weight: bold;">{{$account->code_one}}{{ ($account->code_two == 0) ? '' : '.'.$account->code_two }}{{ ($account->code_three == 0) ? '' : '.'.$account->code_three }}{{ ($account->code_four == 0) ? '' : '.'.$account->code_four }}{{ ($account->code_five == 0) ? '' : '.'.str_pad($account->code_five, 3, "0", STR_PAD_LEFT) }}</td>
                             <td style="text-align:right; color:black;">
                                 @if(isset($account->coin))
                                     <a href="{{ route('accounts.edit',$account->id) }}" style="color: black; font-weight: bold;" title="Ver Movimientos">{{$account->description}} ({{ $account->coin }})</a>
@@ -280,7 +297,7 @@
 
                     @else
                     <tr>
-                        <td style="text-align:right; color:black; font-weight: bold;">{{$account->code_one}}.{{$account->code_two}}.{{$account->code_three}}.{{$account->code_four}}.{{ str_pad($account->code_five, 3, "0", STR_PAD_LEFT)}}</td>
+                        <td style="text-align:left; color:black; font-weight: bold;">{{$account->code_one}}{{ ($account->code_two == 0) ? '' : '.'.$account->code_two }}{{ ($account->code_three == 0) ? '' : '.'.$account->code_three }}{{ ($account->code_four == 0) ? '' : '.'.$account->code_four }}{{ ($account->code_five == 0) ? '' : '.'.str_pad($account->code_five, 3, "0", STR_PAD_LEFT) }}</td>
                         <td style="text-align:right; color:black;">
                             @if(isset($account->coin))
                                 <a href="{{ route('accounts.edit',$account->id) }}" style="color: black; font-weight: bold;" title="Ver Movimientos">{{$account->description}} ({{ $account->coin }})</a>
