@@ -748,7 +748,7 @@ Route::group(["prefix"=>'threesubsegments'],function(){
 Route::group(["prefix"=>'balanceingresos'],function(){
     Route::get('balance','ReportController@index_ingresos')->name('balanceingresos');
     Route::post('store','ReportController@store_ingresos')->name('balanceingresos.store');
-    Route::get('balancepdf/{date_begin?}/{date_end?}/{level?}/{coin?}','ReportController@balance_ingresos_pdf')->name('balanceingresos.balance_pdf');
+    Route::get('balancepdf/{coin?}/{date_begin?}/{date_end?}/{level?}','ReportController@balance_ingresos_pdf')->name('balanceingresos.balance_pdf');
    
 });
 

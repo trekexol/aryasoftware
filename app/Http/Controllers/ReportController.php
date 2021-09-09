@@ -51,12 +51,14 @@ class ReportController extends Controller
             $datenow = $date->format('Y-m-d');    
             $detail_old = DetailVoucher::on(Auth::user()->database_name)->orderBy('created_at','asc')->first();
             $datebeginyear = $date->firstOfYear()->format('Y-m-d');
+            
+            $coin = 'bolivares';
 
         }elseif($users_role == '2'){
             return view('admin.index');
         }
 
-        return view('admin.reports.index_ingresos_egresos',compact('datebeginyear','datenow','detail_old'));
+        return view('admin.reports.index_ingresos_egresos',compact('coin','datebeginyear','datenow','detail_old'));
       
     }
     
@@ -188,7 +190,7 @@ class ReportController extends Controller
 
     function balance_pdf($coin = null,$date_begin = null,$date_end = null,$level = null)
     {
-      
+        
         $pdf = App::make('dompdf.wrapper');
 
         
@@ -217,6 +219,8 @@ class ReportController extends Controller
             $level = 5;
         }
 
+        
+
         if(isset($coin) && ($coin == "bolivares")){
             $accounts_all = $this->calculation($from,$to);
         }else{
@@ -235,11 +239,13 @@ class ReportController extends Controller
             
         });
 
-        /*$foto = auth()->user()->company->foto_company;
-        $code_rif = auth()->user()->company->code_rif;*/
-
         
-        $pdf = $pdf->loadView('admin.reports.balance_general',compact('coin','datenow','accounts','level','detail_old','date_begin','date_end'));
+        $foto = auth()->user()->company->foto_company ?? '';
+        $code_rif = auth()->user()->company->code_rif ?? '';
+        
+        
+        
+        $pdf = $pdf->loadView('admin.reports.balance_general',compact('foto','code_rif','coin','datenow','accounts','level','detail_old','date_begin','date_end'));
         return $pdf->stream();
                  
     }
@@ -438,10 +444,11 @@ class ReportController extends Controller
     }
 
 
-    function balance_ingresos_pdf($date_begin = null,$date_end = null,$level = null,$coin = null){
+    function balance_ingresos_pdf($coin = null,$date_begin = null,$date_end = null,$level = null){
       
         $pdf = App::make('dompdf.wrapper');
-
+        $utilidad = null;
+        $islr = null;
         
         $date = Carbon::now();
         $datenow = $date->format('Y-m-d'); 
@@ -465,12 +472,48 @@ class ReportController extends Controller
         }
 
         if(isset($coin) && ($coin == "bolivares")){
-            $accounts = $this->calculation($from,$to);
+            $accounts_all = $this->calculation($from,$to);
         }else{
-            $accounts = $this->calculation_dolar("dolares");
+            $accounts_all = $this->calculation_dolar("dolares");
         }
+        
+        foreach($accounts_all as $account){
+            if(($account->code_one == 3) && ($account->code_two == 2) && ($account->code_three == 1) && ($account->code_four == 1) && ($account->code_five == 1)){
+                 
+                $utilidad = ($account->debe - $account->haber) * -1;
+                
+            }
+             if(($account->code_one == 2) && ($account->code_two == 1) && ($account->code_three == 3) && ($account->code_four == 1) && ($account->code_five == 8)){
+                 
+                $islr = ($account->debe - $account->haber) * -1;
+                
+            }
+        }
+        
+       
+        $accounts = $accounts_all->filter(function($account)
+        {
+             
+            if($account->code_one >= 4){
+                $total = $account->debe - $account->haber;
+                if ($total != 0) {
+                    $account->balance = 0;
+                    $account->balance_previus = 0;
+                    return $account;
+                }
+            }
+            
+           
+            
+        });
+        
+        
+        
+        $foto = auth()->user()->company->foto_company ?? '';
+        $code_rif = auth()->user()->company->code_rif ?? '';
+        
 
-        $pdf = $pdf->loadView('admin.reports.ingresos_egresos',compact('coin','datenow','accounts','level','detail_old','date_begin','date_end'));
+        $pdf = $pdf->loadView('admin.reports.ingresos_egresos',compact('islr','utilidad','foto','code_rif','coin','datenow','accounts','level','detail_old','date_begin','date_end'));
         return $pdf->stream();
                  
     }
@@ -1433,15 +1476,15 @@ class ReportController extends Controller
             d.status = ?
             '
             , [$code,'C']);
-
-
-            // por ahora se dejara el balance aqui en cero, ya que asi cuadra
-            $var->balance = 0;
-            $var->balance_previus = 0;
-            /*if(($var->balance_previus != 0) && ($var->rate !=0)){
+        
+        //Por ahora tomare el balance como 0 ya que algun movimiento hicieron y todo cuadra si el balance aqui es cero
+        $var->balance_previus = 0;
+        $var->balance = 0;
+        /*if(($var->balance_previus != 0) && ($var->rate !=0)){
             $var->balance =  $var->balance_previus / ($var->rate ?? 1);
             $var->balance_previus = $var->balance;
-            }*/
+        }*/
+
         }
         $total_debe = $total_debe[0]->debe;
         $total_haber = $total_haber[0]->haber;
@@ -1456,6 +1499,8 @@ class ReportController extends Controller
         return $var;
 
    }
+   
+    
 
 
     public function select_client()

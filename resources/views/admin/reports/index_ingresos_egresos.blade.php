@@ -15,7 +15,7 @@
                 <div class="card-body">
                         <div class="form-group row">
                             <div class="col-sm-3">
-                                <input id="date_begin" type="date" class="form-control @error('date_begin') is-invalid @enderror" name="date_begin" value="{{  date('Y-m-d', strtotime($detail_old->created_at ?? $date_begin ??'')) }}" required autocomplete="date_begin">
+                                <input id="date_begin" type="date" class="form-control @error('date_begin') is-invalid @enderror" name="date_begin" value="{{  date('Y-m-d', strtotime($datebeginyear ?? $date_begin ??'')) }}" required autocomplete="date_begin">
 
                                 @error('date_begin')
                                     <span class="invalid-feedback" role="alert">
@@ -76,7 +76,7 @@
                         </div>
                     </form>
                         <div class="embed-responsive embed-responsive-16by9">
-                            <iframe class="embed-responsive-item" src="{{ route('balanceingresos.balance_pdf',[$datebeginyear ?? $date_begin ?? $datenow,$date_end ?? $datenow,$level ?? 5,$coin ?? 'bolivares']) }}" allowfullscreen></iframe>
+                            <iframe class="embed-responsive-item" src="{{ route('balanceingresos.balance_pdf',[$coin ?? 'bolivares',$datebeginyear ?? $date_begin ?? $datenow,$date_end ?? $datenow,$level ?? 5]) }}" allowfullscreen></iframe>
                           </div>
                         
                         </div>
