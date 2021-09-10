@@ -788,4 +788,10 @@ Route::group(["prefix"=>'reports'],function(){
     Route::get('accounts','ReportController@index_accounts')->name('reports.accounts');
     Route::post('storeaccounts','ReportController@store_accounts')->name('reports.store_accounts');
     Route::get('accountspdf/{coin?}/{level?}/{date_begin?}/{date_end?}','ReportController@accounts_pdf')->name('reports.accounts_pdf');
+
+    Route::get('bankmovements','ReportController@index_bankmovements')->name('reports.bankmovements');
+    Route::post('storebankmovements','ReportController@store_bankmovements')->name('reports.store_bankmovements');
+    Route::get('bankmovementspdf/{type?}/{date_begin?}/{date_end?}/{id_account?}','ReportController@bankmovements_pdf')->name('reports.bankmovements_pdf');
+
+
 });

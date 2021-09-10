@@ -28,27 +28,7 @@
    
     <link href="{{asset('vendor/sb-admin/vendor/datatables/dataTables.bootstrap4.min.css')}}" rel="stylesheet">
     <!--End TABLES-->   
-    <style>
-    .navbar .megamenu{ padding: 1rem; }
-
-/* ============ desktop view ============ */
-@media all and (min-width: 992px) {
-
-  .navbar .has-megamenu{position:static!important;}
-  .navbar .megamenu{left:0; right:0; width:100%; margin-top:0;  }
-
-}	
-/* ============ desktop view .end// ============ */
-
-/* ============ mobile view ============ */
-@media(max-width: 991px){
-  .navbar.fixed-top .navbar-collapse, .navbar.sticky-top .navbar-collapse{
-    overflow-y: auto;
-      max-height: 90vh;
-      margin-top:10px;
-  }
-}
-    </style>
+    
 </head>
 
 <body id="page-top">
@@ -127,7 +107,7 @@
         <script src="{{asset('vendor/sb-admin/vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
 
         <!-- Core plugin JavaScript-->
-        <script src="v{{asset('vendor/sb-admin/endor/jquery-easing/jquery.easing.min.js')}}"></script>
+        <script src="{{asset('vendor/sb-admin/vendor/jquery-easing/jquery.easing.min.js')}}"></script>
 
         <!-- Custom scripts for all pages-->
         <script src="{{asset('vendor/sb-admin/js/sb-admin-2.min.js')}}"></script>

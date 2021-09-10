@@ -512,9 +512,6 @@
             $('.sidebar .collapse').collapse('hide');
         };
     
-
-
-
     </script> 
 
 @endsection

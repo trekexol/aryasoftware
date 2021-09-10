@@ -145,6 +145,30 @@ class ReportController extends Controller
       
     }
 
+    public function index_bankmovements()
+    {
+        
+        $user       =   auth()->user();
+        $users_role =   $user->role_id;
+        
+        $date = Carbon::now();
+        $datenow = $date->format('Y-m-d');   
+        $datebeginyear = $date->firstOfYear()->format('Y-m-d');
+
+        $accounts_banks = DB::connection(Auth::user()->database_name)->table('accounts')
+                            ->where('code_one', 1)
+                            ->where('code_two', 1)
+                            ->where('code_three', 1)
+                            ->where('code_four', 2)
+                            ->where('code_five', '<>',0)
+                            ->where('description','not like', 'Punto de Venta%')
+                            ->get();
+
+        return view('admin.reports.index_bankmovements',compact('accounts_banks','datebeginyear','datenow'));
+      
+    }
+
+
     public function store(Request $request)
     {
         
@@ -207,6 +231,18 @@ class ReportController extends Controller
         }
 
         return view('admin.reports.index_debtstopay',compact('date_end','provider'));
+    }
+
+    public function store_bankmovements(Request $request)
+    {
+        
+        $date_begin = request('date_begin');
+        $date_end = request('date_end');
+        $level = request('level');
+        $coin = request('coin');
+        
+        
+        return view('admin.reports.index_bankmovements',compact('date_begin','date_end','level','coin'));
     }
 
     function balance_pdf($coin = null,$date_begin = null,$date_end = null,$level = null)
@@ -594,6 +630,47 @@ class ReportController extends Controller
         
         
         $pdf = $pdf->loadView('admin.reports.accounts',compact('coin','datenow','accounts','level','detail_old','date_begin','date_end'))->setPaper('a4', 'landscape');;
+        return $pdf->stream();
+                 
+    }
+
+    function bankmovements_pdf($type,$coin,$date_begin = null,$date_end = null,$id_account = null)
+    {
+        
+        $pdf = App::make('dompdf.wrapper');
+
+        
+        $date = Carbon::now();
+        $datenow = $date->format('Y-m-d'); 
+        $period = $date->format('Y'); 
+        $details_banks = DB::connection(Auth::user()->database_name)->table('detail_vouchers')
+                            ->join('header_vouchers', 'header_vouchers.id', '=', 'detail_vouchers.id_header_voucher')
+                            ->join('accounts', 'accounts.id', '=', 'detail_vouchers.id_account')
+                            ->where('header_vouchers.description','LIKE','Deposito%')
+                            ->orwhere('header_vouchers.description','LIKE','Retiro%')
+                            ->orwhere('header_vouchers.description','LIKE','Transferencia%')
+                            ->select('detail_vouchers.*','header_vouchers.description as header_description','header_vouchers.id as header_id', 
+                            'header_vouchers.reference as header_reference','header_vouchers.date as header_date',
+                            'accounts.description as account_description','accounts.code_one as account_code_one',
+                            'accounts.code_two as account_code_two','accounts.code_three as account_code_three',
+                            'accounts.code_four as account_code_four','accounts.code_five as account_code_five')
+                            ->orderBy('header_vouchers.id','desc')
+                            ->get();
+        
+        if(isset($date_begin)){
+            $from = $date_begin;
+        }else{
+          //  $from = $detail_old->created_at->format('Y-m-d');
+            
+        }
+        if(isset($date_end)){
+            $to = $date_end;
+        }else{
+            $to = $datenow;
+        }
+
+        
+        $pdf = $pdf->loadView('admin.reports.bankmovements',compact('details_banks','coin','datenow','date_begin','date_end'))->setPaper('a4', 'landscape');;
         return $pdf->stream();
                  
     }
