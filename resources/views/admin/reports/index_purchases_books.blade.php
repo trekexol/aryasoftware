@@ -5,13 +5,13 @@
     <div class="row justify-content-center">
         <div class="col-sm-12">
             <div class="card">
-                <form method="POST" action="{{ route('reports.store_bankmovements') }}">
+                <form method="POST" action="{{ route('reports.store_purchases_books') }}">
                     @csrf
 
-                <input type="hidden" name="id_bank" value="{{$bank->id ?? null}}" readonly>
+                <input type="hidden" name="id_client" value="{{$client->id ?? null}}" readonly>
 
                 <div class="card-header text-center h4">
-                        Movimientos Bancarios
+                        Libro de Ventas
                 </div>
 
                 <div class="card-body">
@@ -25,7 +25,8 @@
                                     </span>
                                 @enderror
                             </div>
-                           
+                            <label for="date_end" class="col-sm-1 col-form-label text-md-right">hasta </label>
+
                             <div class="col-sm-3">
                                 <input id="date_end" type="date" class="form-control @error('date_end') is-invalid @enderror" name="date_end" value="{{ date('Y-m-d', strtotime($date_end ?? $datenow))}}" required autocomplete="date_end">
 
@@ -35,6 +36,7 @@
                                     </span>
                                 @enderror
                             </div>
+                           
                             <div class="col-sm-2">
                                 <select class="form-control" name="coin" id="coin">
                                     @if(isset($coin))
@@ -48,45 +50,15 @@
                                     <option value="dolares">Dólares</option>
                                 </select>
                             </div>
-                            <div class="col-sm-2">
-                                <button type="submit" class="btn btn-primary ">
-                                    Buscar 
-                                 </button>
-                                </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-sm-3">
-                                <select class="form-control" name="account_bank" id="account_bank">
-                                @if (isset($account_bank))
-                                    <option selected value="{{ $account_bank->id }}">{{ $account_bank->description }}</option>
-                                    <option disabled value="">---------</option>
-                                @else
-                                    <option selected >Seleccione un Banco</option>
-                                @endif
-                                
-                                @foreach ($accounts_banks as $accounts_bank)
-                                    <option value="{{ $accounts_bank->id }}">{{ $accounts_bank->description }}</option>
-                                @endforeach
-                                </select>
+                            <div class="col-sm-1">
+                            <button type="submit" class="btn btn-primary ">
+                                Buscar
+                             </button>
                             </div>
-                            <div class="col-sm-2">
-                                <select class="form-control" name="type" id="type">
-                                    @if(isset($type))
-                                        <option disabled selected value="{{ $type }}">{{ $type }}</option>
-                                        <option disabled  value="{{ $type }}">-----------</option>
-                                    @endif
-                                    <option value="Todo">Todo</option>
-                                    <option value="Deposito">Deposito</option>
-                                    <option value="Retiro">Retiro</option>
-                                    <option value="Transferencia">Transferencia</option>
-                                </select>
-                            </div>
-                            
                         </div>
-                    </div>
                     </form>
                         <div class="embed-responsive embed-responsive-16by9">
-                            <iframe class="embed-responsive-item" src="{{ route('reports.bankmovements_pdf',[$type ?? 'Todo',$coin ?? 'bolivares',$datebeginyear ?? $date_begin ?? $datenow,$date_end ?? $datenow,$account_bank ?? null]) }}" allowfullscreen></iframe>
+                            <iframe class="embed-responsive-item" src="{{ route('reports.purchases_books_pdf',[$coin ?? 'bolivares',$datebeginyear ?? $date_begin ?? $datenow,$date_end ?? $datenow]) }}" allowfullscreen></iframe>
                           </div>
                         
                         </div>

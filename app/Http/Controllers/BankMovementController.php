@@ -96,7 +96,8 @@ class BankMovementController extends Controller
             $contrapartidas     = Account::on(Auth::user()->database_name)->where('code_one', '<>',0)
                                             ->where('code_two', '<>',0)
                                             ->where('code_three', '<>',0)
-                                            ->where('code_four', '=',0)
+                                            ->where('code_four', '<>',0)
+                                            ->where('code_five', '=',0)
                                         ->orderBY('description','asc')->pluck('description','id')->toArray();
             $date = Carbon::now();
             $datenow = $date->format('Y-m-d');  
@@ -126,7 +127,8 @@ class BankMovementController extends Controller
             $contrapartidas     = Account::on(Auth::user()->database_name)->where('code_one', '<>',0)
                                             ->where('code_two', '<>',0)
                                             ->where('code_three', '<>',0)
-                                            ->where('code_four', '=',0)
+                                            ->where('code_four', '<>',0)
+                                            ->where('code_five', '=',0)
                                         ->orderBY('description','asc')->pluck('description','id')->toArray();
             $date = Carbon::now();
             $datenow = $date->format('Y-m-d');  
@@ -1579,7 +1581,8 @@ class BankMovementController extends Controller
             $subcontrapartidas = Account::on(Auth::user()->database_name)->select('id','description')->where('code_one',$account->code_one)
                                                                     ->where('code_two',$account->code_two)
                                                                     ->where('code_three',$account->code_three)
-                                                                    ->where('code_four','<>',0)
+                                                                    ->where('code_four',$account->code_four)
+                                                                    ->where('code_five', '<>',0)
                                                                     ->orderBy('description','asc')->get();
             return response()->json($subcontrapartidas,200);
         }catch(Throwable $th){

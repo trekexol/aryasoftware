@@ -791,7 +791,14 @@ Route::group(["prefix"=>'reports'],function(){
 
     Route::get('bankmovements','ReportController@index_bankmovements')->name('reports.bankmovements');
     Route::post('storebankmovements','ReportController@store_bankmovements')->name('reports.store_bankmovements');
-    Route::get('bankmovementspdf/{type?}/{date_begin?}/{date_end?}/{id_account?}','ReportController@bankmovements_pdf')->name('reports.bankmovements_pdf');
+    Route::get('bankmovementspdf/{type}/{coin}/{date_begin}/{date_end}/{account_bank?}','ReportController@bankmovements_pdf')->name('reports.bankmovements_pdf');
 
-
+    Route::get('sales_books','ReportController@index_sales_books')->name('reports.sales_books');
+    Route::post('storesales_books','ReportController@store_sales_books')->name('reports.store_sales_books');
+    Route::get('sales_bookspdf/{coin}/{date_begin}/{date_end}','ReportController@sales_books_pdf')->name('reports.sales_books_pdf');
+    
+    Route::get('purchases_book','ReportController@index_purchases_book')->name('reports.purchases_book');
+    Route::post('storepurchases_book','ReportController@store_purchases_book')->name('reports.store_purchases_book');
+    Route::get('purchases_bookpdf/{coin}/{date_begin}/{date_end}','ReportController@purchases_book_pdf')->name('reports.purchases_book_pdf');
+    
 });

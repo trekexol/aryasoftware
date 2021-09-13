@@ -59,7 +59,7 @@
           <table style="width: 100%;">
             <tr>
               <td style="text-align: center; width: 20%;">Descripción</td>
-              <td style="text-align: left; width: 40%;">{{ $detail->header_description ?? '' }}</td>
+              <td style="text-align: left; width: 40%;">{{ $description_final ?? '' }}</td>
               <td style="text-align: right; width: 20%;">{{ number_format($total_debe ?? 0, 2, ',', '.')}}</td>
               <td style="text-align: right; width: 20%;">{{ number_format($total_haber ?? 0, 2, ',', '.')}}</td>
             </tr>

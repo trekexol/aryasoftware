@@ -58,11 +58,20 @@
       <td style="text-align: center; ">{{ $details_banks[$i]->account_description ?? '' }}</td>
       <td style="text-align: center; ">{{ $details_banks[$i]->header_description ?? '' }}</td>
       <td style="text-align: center; ">{{ $details_banks[$i]->header_id ?? '' }}</td>
-      @if ($details_banks[$i]->debe != 0)
-        <td style="text-align: center; ">{{ $details_banks[$i]->debe ?? '' }}</td>
+      @if (isset($coin) && ($coin == 'bolivares'))
+        @if ($details_banks[$i]->debe != 0)
+        <td style="text-align: center; ">{{ number_format(($details_banks[$i]->debe ?? 0), 2, ',', '.')}}</td>
+        @else
+          <td style="text-align: center; ">{{ number_format(($details_banks[$i]->haber ?? 0), 2, ',', '.')}}</td>
+        @endif
       @else
-        <td style="text-align: center; ">{{ $details_banks[$i]->haber ?? '' }}</td>
+        @if ($details_banks[$i]->debe != 0)
+          <td style="text-align: center; ">{{ number_format(($details_banks[$i]->debe / $details_banks[$i]->tasa), 2, ',', '.')}}</td>
+        @else
+          <td style="text-align: center; ">{{ number_format(($details_banks[$i]->haber / $details_banks[$i]->tasa), 2, ',', '.')}}</td>
+        @endif
       @endif
+      
       
     </tr> 
   @endfor

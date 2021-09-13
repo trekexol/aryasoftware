@@ -103,7 +103,7 @@ class DailyListingController extends Controller
                             ,'header_vouchers.description as header_description')->get();
 
         
-        //dd($detailvouchers);
+        
         $date_begin = Carbon::parse($date_begin)->format('d-m-Y');
 
         $date_end = Carbon::parse($date_end)->format('d-m-Y');

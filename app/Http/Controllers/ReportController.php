@@ -11,6 +11,7 @@ use App\Account;
 use App\Client;
 use App\Company;
 use App\DetailVoucher;
+use App\ExpensesAndPurchase;
 use App\Provider;
 use App\Quotation;
 use Illuminate\Support\Facades\DB;
@@ -129,18 +130,13 @@ class ReportController extends Controller
         
         $user       =   auth()->user();
         $users_role =   $user->role_id;
-        if($users_role == '1'){
-            $date = Carbon::now();
-            $datenow = $date->format('Y-m-d');    
-            
-            $datebeginyear = $date->firstOfYear()->format('Y-m-d');
-
-        }elseif($users_role == '2'){
-            return view('admin.index');
-        }
-
         
-    
+        $date = Carbon::now();
+        $datenow = $date->format('Y-m-d');    
+        
+        $datebeginyear = $date->firstOfYear()->format('Y-m-d');
+
+       
         return view('admin.reports.index_accounts',compact('datebeginyear','datenow'));
       
     }
@@ -159,7 +155,7 @@ class ReportController extends Controller
                             ->where('code_one', 1)
                             ->where('code_two', 1)
                             ->where('code_three', 1)
-                            ->where('code_four', 2)
+                            ->whereIn('code_four', [1,2])
                             ->where('code_five', '<>',0)
                             ->where('description','not like', 'Punto de Venta%')
                             ->get();
@@ -168,6 +164,35 @@ class ReportController extends Controller
       
     }
 
+    public function index_sales_books()
+    {
+        
+        $user       =   auth()->user();
+        $users_role =   $user->role_id;
+        
+        $date = Carbon::now();
+        $datenow = $date->format('Y-m-d');    
+        
+        $datebeginyear = $date->firstOfYear()->format('Y-m-d');
+
+        return view('admin.reports.index_sales_books',compact('datebeginyear','datenow'));
+      
+    }
+
+    public function index_purchases_books()
+    {
+        
+        $user       =   auth()->user();
+        $users_role =   $user->role_id;
+        
+        $date = Carbon::now();
+        $datenow = $date->format('Y-m-d');    
+        
+        $datebeginyear = $date->firstOfYear()->format('Y-m-d');
+
+        return view('admin.reports.index_purchases_books',compact('datebeginyear','datenow'));
+      
+    }
 
     public function store(Request $request)
     {
@@ -236,13 +261,50 @@ class ReportController extends Controller
     public function store_bankmovements(Request $request)
     {
         
+        $id_bank = request('id_bank');
+        $coin = request('coin');
         $date_begin = request('date_begin');
         $date_end = request('date_end');
-        $level = request('level');
+        $account_bank = request('account_bank');
+
+        if(isset($account_bank)){
+            $account_bank = Account::on(Auth::user()->database_name)->find($account_bank);
+        }
+        $type = request('type');
+        
+        $accounts_banks = DB::connection(Auth::user()->database_name)->table('accounts')
+                            ->where('code_one', 1)
+                            ->where('code_two', 1)
+                            ->where('code_three', 1)
+                            ->whereIn('code_four', [1,2])
+                            ->where('code_five', '<>',0)
+                            ->where('description','not like', 'Punto de Venta%')
+                            ->get();
+        
+        
+        return view('admin.reports.index_bankmovements',compact('coin','accounts_banks','id_bank','date_begin','date_end','account_bank','type'));
+    }
+
+    public function store_sales_books(Request $request)
+    {
+        
+       
         $coin = request('coin');
+        $date_begin = request('date_begin');
+        $date_end = request('date_end');
         
+        return view('admin.reports.index_sales_books',compact('coin','date_begin','date_end'));
+    }
+
+    public function store_purchases_books(Request $request)
+    {
         
-        return view('admin.reports.index_bankmovements',compact('date_begin','date_end','level','coin'));
+       
+        $coin = request('coin');
+        $date_begin = request('date_begin');
+        $date_end = request('date_end');
+        
+        return view('admin.reports.index_purchases_books',compact('coin','date_begin','date_end'));
     }
 
     function balance_pdf($coin = null,$date_begin = null,$date_end = null,$level = null)
@@ -634,43 +696,157 @@ class ReportController extends Controller
                  
     }
 
-    function bankmovements_pdf($type,$coin,$date_begin = null,$date_end = null,$id_account = null)
+    function bankmovements_pdf($type,$coin,$date_begin,$date_end,$account_bank = null)
+    {
+        
+        $pdf = App::make('dompdf.wrapper');
+        
+        $date = Carbon::now();
+        $datenow = $date->format('Y-m-d'); 
+        $period = $date->format('Y'); 
+
+        
+        if(isset($account_bank)){
+
+            if(isset($type) && ($type == 'Todo')){
+                
+                    $details_banks =   DB::connection(Auth::user()->database_name)->select(
+                        'SELECT d.* ,h.description as header_description,h.id as header_id, 
+                        h.reference as header_reference,h.date as header_date,
+                        a.description as account_description,a.code_one as account_code_one,
+                        a.code_two as account_code_two,a.code_three as account_code_three,
+                        a.code_four as account_code_four,a.code_five as account_code_five
+                        FROM header_vouchers h
+                        INNER JOIN detail_vouchers d 
+                            ON d.id_header_voucher = h.id
+                        INNER JOIN accounts a
+                            ON d.id_account = a.id
+
+
+                        WHERE d.id_header_voucher IN ( SELECT de.id_header_voucher FROM detail_vouchers de WHERE de.id_account = ? ) AND
+                        (DATE_FORMAT(d.created_at, "%Y-%m-%d") >= ? AND DATE_FORMAT(d.created_at, "%Y-%m-%d") <= ?) AND
+                        (h.description LIKE "Deposito%" OR
+                        h.description LIKE "Retiro%" OR
+                        h.description LIKE "Transferencia%")'
+                        , [$account_bank,$date_begin, $date_end]);
+                
+
+            }else if (isset($type)){
+               
+                $details_banks =   DB::connection(Auth::user()->database_name)->select(
+                    'SELECT d.* ,h.description as header_description,h.id as header_id, 
+                    h.reference as header_reference,h.date as header_date,
+                    a.description as account_description,a.code_one as account_code_one,
+                    a.code_two as account_code_two,a.code_three as account_code_three,
+                    a.code_four as account_code_four,a.code_five as account_code_five
+                    FROM header_vouchers h
+                    INNER JOIN detail_vouchers d 
+                        ON d.id_header_voucher = h.id
+                    INNER JOIN accounts a
+                        ON d.id_account = a.id
+    
+    
+                    WHERE d.id_header_voucher IN ( SELECT de.id_header_voucher FROM detail_vouchers de WHERE de.id_account = ? ) AND
+                    (DATE_FORMAT(d.created_at, "%Y-%m-%d") >= ? AND DATE_FORMAT(d.created_at, "%Y-%m-%d") <= ?) AND
+                    (h.description LIKE ?)'
+                    , [$account_bank,$date_begin, $date_end,$type."%"]);
+                
+            }
+            
+        }else{
+            if(isset($type) && ($type == 'Todo')){
+                $details_banks = DB::connection(Auth::user()->database_name)->table('detail_vouchers')
+                ->join('header_vouchers', 'header_vouchers.id', '=', 'detail_vouchers.id_header_voucher')
+                ->join('accounts', 'accounts.id', '=', 'detail_vouchers.id_account')
+                ->whereRaw(
+                    "(DATE_FORMAT(detail_vouchers.created_at, '%Y-%m-%d') >= ? AND DATE_FORMAT(detail_vouchers.created_at, '%Y-%m-%d') <= ?)", 
+                    [$date_begin, $date_end])
+                ->where(function($query) {
+                    $query->where('header_vouchers.description','LIKE','Deposito%')
+                        ->orwhere('header_vouchers.description','LIKE','Retiro%')
+                        ->orwhere('header_vouchers.description','LIKE','Transferencia%');
+                })
+                ->select('detail_vouchers.*','header_vouchers.description as header_description','header_vouchers.id as header_id', 
+                'header_vouchers.reference as header_reference','header_vouchers.date as header_date',
+                'accounts.description as account_description','accounts.code_one as account_code_one',
+                'accounts.code_two as account_code_two','accounts.code_three as account_code_three',
+                'accounts.code_four as account_code_four','accounts.code_five as account_code_five')
+                ->orderBy('header_vouchers.id','desc')
+                ->get();
+            }else if (isset($type)){
+                $details_banks = DB::connection(Auth::user()->database_name)->table('detail_vouchers')
+                ->join('header_vouchers', 'header_vouchers.id', '=', 'detail_vouchers.id_header_voucher')
+                ->join('accounts', 'accounts.id', '=', 'detail_vouchers.id_account')
+                ->whereRaw(
+                    "(DATE_FORMAT(detail_vouchers.created_at, '%Y-%m-%d') >= ? AND DATE_FORMAT(detail_vouchers.created_at, '%Y-%m-%d') <= ?)", 
+                    [$date_begin, $date_end])
+                ->where('header_vouchers.description','LIKE',$type.'%')
+                ->select('detail_vouchers.*','header_vouchers.description as header_description','header_vouchers.id as header_id', 
+                'header_vouchers.reference as header_reference','header_vouchers.date as header_date',
+                'accounts.description as account_description','accounts.code_one as account_code_one',
+                'accounts.code_two as account_code_two','accounts.code_three as account_code_three',
+                'accounts.code_four as account_code_four','accounts.code_five as account_code_five')
+                ->orderBy('header_vouchers.id','desc')
+                ->get();
+            }
+        }
+        
+       
+        
+        $pdf = $pdf->loadView('admin.reports.bankmovements',compact('details_banks','coin','datenow','date_begin','date_end'))->setPaper('a4', 'landscape');;
+        return $pdf->stream();
+                 
+    }
+
+    function sales_books_pdf($coin,$date_begin,$date_end)
     {
         
         $pdf = App::make('dompdf.wrapper');
 
         
         $date = Carbon::now();
-        $datenow = $date->format('Y-m-d'); 
+        $datenow = $date->format('d-m-Y'); 
         $period = $date->format('Y'); 
-        $details_banks = DB::connection(Auth::user()->database_name)->table('detail_vouchers')
-                            ->join('header_vouchers', 'header_vouchers.id', '=', 'detail_vouchers.id_header_voucher')
-                            ->join('accounts', 'accounts.id', '=', 'detail_vouchers.id_account')
-                            ->where('header_vouchers.description','LIKE','Deposito%')
-                            ->orwhere('header_vouchers.description','LIKE','Retiro%')
-                            ->orwhere('header_vouchers.description','LIKE','Transferencia%')
-                            ->select('detail_vouchers.*','header_vouchers.description as header_description','header_vouchers.id as header_id', 
-                            'header_vouchers.reference as header_reference','header_vouchers.date as header_date',
-                            'accounts.description as account_description','accounts.code_one as account_code_one',
-                            'accounts.code_two as account_code_two','accounts.code_three as account_code_three',
-                            'accounts.code_four as account_code_four','accounts.code_five as account_code_five')
-                            ->orderBy('header_vouchers.id','desc')
-                            ->get();
-        
-        if(isset($date_begin)){
-            $from = $date_begin;
-        }else{
-          //  $from = $detail_old->created_at->format('Y-m-d');
-            
-        }
-        if(isset($date_end)){
-            $to = $date_end;
-        }else{
-            $to = $datenow;
-        }
+        $quotations = Quotation::on(Auth::user()->database_name)
+                                    ->where('date_billing','<>',null)
+                                    ->whereRaw(
+                                        "(DATE_FORMAT(date_billing, '%Y-%m-%d') >= ? AND DATE_FORMAT(date_billing, '%Y-%m-%d') <= ?)", 
+                                        [$date_begin, $date_end])
+                                    ->orderBy('date_billing','desc')->get();
 
+        $date_begin = Carbon::parse($date_begin);
+        $date_begin = $date_begin->format('d-m-Y');
+        $date_end = Carbon::parse($date_end);
+        $date_end = $date_end->format('d-m-Y');
+
+
+        $pdf = $pdf->loadView('admin.reports.sales_books',compact('coin','quotations','datenow','date_begin','date_end'))->setPaper('a4', 'landscape');;
+        return $pdf->stream();
+                 
+    }
+
+    function purchases_books_pdf($coin,$date_begin,$date_end)
+    {
         
-        $pdf = $pdf->loadView('admin.reports.bankmovements',compact('details_banks','coin','datenow','date_begin','date_end'))->setPaper('a4', 'landscape');;
+        $pdf = App::make('dompdf.wrapper');
+
+        $date = Carbon::now();
+        $datenow = $date->format('d-m-Y'); 
+        $period = $date->format('Y'); 
+        $expenses = ExpensesAndPurchase::on(Auth::user()->database_name)
+                                    ->where('amount','<>',null)
+                                    ->whereRaw(
+                                        "(DATE_FORMAT(date_billing, '%Y-%m-%d') >= ? AND DATE_FORMAT(date_billing, '%Y-%m-%d') <= ?)", 
+                                        [$date_begin, $date_end])
+                                    ->orderBy('date','desc')->get();
+
+        $date_begin = Carbon::parse($date_begin);
+        $date_begin = $date_begin->format('d-m-Y');
+        $date_end = Carbon::parse($date_end);
+        $date_end = $date_end->format('d-m-Y');
+
+
+        $pdf = $pdf->loadView('admin.reports.purchases_books',compact('coin','expenses','datenow','date_begin','date_end'))->setPaper('a4', 'landscape');;
         return $pdf->stream();
                  
     }
