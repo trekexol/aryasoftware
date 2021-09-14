@@ -16,6 +16,12 @@ class Product extends Model
     public function subsegments(){
         return $this->belongsTo('App\Permission\Models\SubSegment','subsegment_id');
     }
+    public function twosubsegments(){
+        return $this->belongsTo('App\TwoSubSegment','twosubsegment_id');
+    }
+    public function threesubsegments(){
+        return $this->belongsTo('App\ThreeSubSegment','threesubsegment_id');
+    }
 
     public function unitofmeasures(){
         return $this->belongsTo('App\Permission\Models\UnitOfMeasure','unit_of_measure_id');

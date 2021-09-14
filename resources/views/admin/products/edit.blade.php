@@ -69,7 +69,39 @@
                                             </select>
                                         </div> 
                                 </div>
-               
+                                <div class="form-group row">
+                                    <label for="twosubsegment" class="col-md-2 col-form-label text-md-right">Segundo Sub Segmento</label>
+                                    <div class="col-md-4">
+                                        <select id="twosubsegment" name="twoSubsegment" class="form-control" >
+                                                @if ( isset($product->twosubsegment_id) )
+                                                    <option  selected style="backgroud-color:blue;" value="{{ $product->twosubsegments['id'] }}"><strong>{{ $product->twosubsegments['description']}}</strong></option>
+                                                @else
+                                                    <option  selected style="backgroud-color:blue;"><strong>No tiene</strong></option>
+                                                @endif
+                                                <option disabled  style="backgroud-color:blue;"><strong>------------</strong></option>
+                                                <option style="backgroud-color:blue;" value="null"><strong>Ninguno</strong></option>
+                                                @foreach($twosubsegments as $twosubsegment)
+                                                    <option style="backgroud-color:blue;" value="{{ $twosubsegment->id }}"><strong>{{ $twosubsegment->description }}</strong></option>
+                                                @endforeach
+                                        </select>
+                                    </div> 
+                                    <label for="threesubsegment" class="col-md-2 col-form-label text-md-right">Tercer Sub Segmento</label>
+                                    <div class="col-md-4">
+                                        <select id="threesubsegment" name="threeSubsegment" class="form-control" >
+                                                @if ( isset($product->threesubsegments['id']) )
+                                                    <option  selected style="backgroud-color:blue;" value="{{ $product->threesubsegments['id'] }}"><strong>{{ $product->threesubsegments['description']}}</strong></option>
+                                                @else
+                                                    <option  selected style="backgroud-color:blue;"><strong>No tiene</strong></option>
+                                                @endif
+                                                <option disabled  style="backgroud-color:blue;"><strong>------------</strong></option>
+                                                <option style="backgroud-color:blue;" value="null"><strong>Ninguno</strong></option>
+                                                @foreach($threesubsegments as $threesubsegment)
+                                                    <option style="backgroud-color:blue;" value="{{ $threesubsegment->id }}"><strong>{{ $threesubsegment->description }}</strong></option>
+                                                @endforeach
+                                        </select>
+                                    </div> 
+                            </div>
+           
         
                                 <div class="form-group row">
                                     <label for="unitofmeasure" class="col-md-2 col-form-label text-md-right">Unidad de Medida</label>
@@ -309,10 +341,8 @@
             });
 
         function getSubsegment(segment_id){
-            // alert(`../subsegment/list/${segment_id}`);
+            
             $.ajax({
-                //url:`../subsegment/list/${segment_id}`,
-               
                 url:"{{ route('subsegment.list') }}" + '/' + segment_id,
              
                 beforSend:()=>{
@@ -345,13 +375,84 @@
 
         $("#subsegment").on('change',function(){
                 var subsegment_id = $(this).val();
-                var segment_id    = document.getElementById("segment").value;
-                
+                //$("#twosubsegment option").remove();
+                getTwoSubsegment(subsegment_id);
             });
 
      
     
- 
+            function getTwoSubsegment(subsegment_id){
+            $.ajax({
+                url:"{{ route('products.listtwosubsegment','') }}" + '/' + subsegment_id,
+             
+                beforSend:()=>{
+                    alert('consultando datos');
+                },
+                success:(response)=>{
+                    let twosubsegment = $("#twosubsegment");
+                    let htmlOptions = `<option value='' >Seleccione..</option>`;
+                    // console.clear();
+                    if(response.length > 0){
+                        response.forEach((item, index, object)=>{
+                            let {id,description} = item;
+                            htmlOptions += `<option value='${id}' {{ old('TwoSubsegment') == '${id}' ? 'selected' : '' }}>${description}</option>`
+
+                        });
+                    }
+                    //console.clear();
+                    // console.log(htmlOptions);
+                    twosubsegment.html('');
+                    twosubsegment.html(htmlOptions);
+                
+                    
+                
+                },
+                error:(xhr)=>{
+                    alert('Presentamos inconvenientes al consultar los datos');
+                }
+            })
+        }
+        $("#twosubsegment").on('change',function(){
+                var twosubsegment_id = $(this).val();
+                $("#threesubsegment").val("");
+
+                getThreeSubsegment(twosubsegment_id);
+            });
+
+     
+    
+            function getThreeSubsegment(twosubsegment_id){
+            
+            $.ajax({
+                url:"{{ route('products.listthreesubsegment','') }}" + '/' + twosubsegment_id,
+             
+                beforSend:()=>{
+                    alert('consultando datos');
+                },
+                success:(response)=>{
+                    let subsegment = $("#threesubsegment");
+                    let htmlOptions = `<option value='' >Seleccione..</option>`;
+                    // console.clear();
+                    if(response.length > 0){
+                        response.forEach((item, index, object)=>{
+                            let {id,description} = item;
+                            htmlOptions += `<option value='${id}' {{ old('ThreeSubsegment') == '${id}' ? 'selected' : '' }}>${description}</option>`
+
+                        });
+                    }
+                    //console.clear();
+                    // console.log(htmlOptions);
+                    subsegment.html('');
+                    subsegment.html(htmlOptions);
+                
+                    
+                
+                },
+                error:(xhr)=>{
+                    alert('Presentamos inconvenientes al consultar los datos');
+                }
+            })
+        }
 
 
 

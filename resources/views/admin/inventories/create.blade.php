@@ -51,7 +51,8 @@
                                         <strong>{{ $message }}</strong>
                                     </span>
                                 @enderror
-                            </div> <label for="cantidad" class="col-md-2 col-form-label text-md-right">Cantidad</label>
+                            </div> 
+                            <label for="cantidad" class="col-md-2 col-form-label text-md-right">Cantidad</label>
                             <div class="col-md-4">
                                 <input id="amount" type="text" class="form-control @error('amount') is-invalid @enderror" name="amount" value="{{ old('amount') }}" required autocomplete="amount">
 

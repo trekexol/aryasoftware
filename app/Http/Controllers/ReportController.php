@@ -12,6 +12,7 @@ use App\Client;
 use App\Company;
 use App\DetailVoucher;
 use App\ExpensesAndPurchase;
+use App\Product;
 use App\Provider;
 use App\Quotation;
 use Illuminate\Support\Facades\DB;
@@ -194,6 +195,36 @@ class ReportController extends Controller
       
     }
 
+    public function index_inventory()
+    {
+        
+        $user       =   auth()->user();
+        $users_role =   $user->role_id;
+        
+        $date = Carbon::now();
+        $datenow = $date->format('Y-m-d');    
+        
+        $datebeginyear = $date->firstOfYear()->format('Y-m-d');
+
+        return view('admin.reports.index_inventory',compact('datebeginyear','datenow'));
+      
+    }
+
+    public function index_operating_margin()
+    {
+        
+        $user       =   auth()->user();
+        $users_role =   $user->role_id;
+        
+        $date = Carbon::now();
+        $datenow = $date->format('Y-m-d');    
+        
+        $datebeginyear = $date->firstOfYear()->format('Y-m-d');
+
+        return view('admin.reports.index_operating_margin',compact('datebeginyear','datenow'));
+      
+    }
+
     public function store(Request $request)
     {
         
@@ -305,6 +336,27 @@ class ReportController extends Controller
         $date_end = request('date_end');
         
         return view('admin.reports.index_purchases_books',compact('coin','date_begin','date_end'));
+    }
+
+    public function store_inventory(Request $request)
+    {
+        
+       
+        $coin = request('coin');
+        $date_begin = request('date_begin');
+        $date_end = request('date_end');
+        $name = request('name');
+        
+        return view('admin.reports.index_inventory',compact('name','coin','date_begin','date_end'));
+    }
+
+    public function store_operating_margin(Request $request)
+    {
+        $coin = request('coin');
+        $date_begin = request('date_begin');
+        $date_end = request('date_end');
+        
+        return view('admin.reports.index_operating_margin',compact('coin','date_begin','date_end'));
     }
 
     function balance_pdf($coin = null,$date_begin = null,$date_end = null,$level = null)
@@ -850,6 +902,107 @@ class ReportController extends Controller
         return $pdf->stream();
                  
     }
+
+    function inventory_pdf($coin,$date_begin,$date_end,$name = null)
+    {
+        
+        $pdf = App::make('dompdf.wrapper');
+
+        $date = Carbon::now();
+        $datenow = $date->format('d-m-Y'); 
+        $period = $date->format('Y'); 
+
+
+        if(isset($name)){
+            $products = Product::on(Auth::user()->database_name)
+            ->join('inventories', 'inventories.product_id', '=', 'products.id')
+            ->where('products.description','LIKE',$name.'%')
+            ->whereRaw(
+                "(DATE_FORMAT(products.created_at, '%Y-%m-%d') >= ? AND DATE_FORMAT(products.created_at, '%Y-%m-%d') <= ?)", 
+                [$date_begin, $date_end])
+            ->orderBy('products.description','asc')->get();
+        }else{
+            $products = Product::on(Auth::user()->database_name)
+            ->join('inventories', 'inventories.product_id', '=', 'products.id')
+            ->whereRaw(
+                "(DATE_FORMAT(products.created_at, '%Y-%m-%d') >= ? AND DATE_FORMAT(products.created_at, '%Y-%m-%d') <= ?)", 
+                [$date_begin, $date_end])
+            ->orderBy('products.description','asc')->get();
+        }
+        
+
+        $date_begin = Carbon::parse($date_begin);
+        $date_begin = $date_begin->format('d-m-Y');
+
+        $date_end = Carbon::parse($date_end);
+        $date_end = $date_end->format('d-m-Y');
+
+        $company = Company::on(Auth::user()->database_name)->find(1);
+        //Si la taza es automatica
+        if($company->tiporate_id == 1){
+            $rate = $this->search_bcv();
+        }else{
+            //si la tasa es fija
+            $rate = $company->rate;
+        }
+
+        $pdf = $pdf->loadView('admin.reports.inventory',compact('rate','coin','products','datenow','date_begin','date_end'))->setPaper('a4', 'landscape');;
+        return $pdf->stream();
+                 
+    }
+
+    function operating_margin_pdf($coin,$date_begin,$date_end)
+    {
+        
+        $pdf = App::make('dompdf.wrapper');
+
+        $date = Carbon::now();
+        $datenow = $date->format('d-m-Y'); 
+        $period = $date->format('Y'); 
+
+        $date_begin = Carbon::parse($date_begin);
+        $from = $date_begin->format('Y-m-d');
+        $date_begin = $date_begin->format('d-m-Y');
+
+        $date_end = Carbon::parse($date_end);
+        $to = $date_end->format('Y-m-d');
+        $date_end = $date_end->format('d-m-Y');
+
+        $company = Company::on(Auth::user()->database_name)->find(1);
+        //Si la taza es automatica
+        if($company->tiporate_id == 1){
+            $rate = $this->search_bcv();
+        }else{
+            //si la tasa es fija
+            $rate = $company->rate;
+        }
+
+
+        if(isset($coin) && ($coin == "bolivares")){
+            $accounts_all = $this->calculation($from,$to);
+        }else{
+            $accounts_all = $this->calculation_dolar("dolares");
+        }
+      
+
+        $accounts = $accounts_all->filter(function($account)
+        {
+            if($account->code_one <= 3){
+                $total = $account->balance_previus + $account->debe - $account->haber;
+                if ($total != 0) {
+                    return $account;
+                }
+            }
+            
+        });
+
+        $pdf = $pdf->loadView('admin.reports.inventory',compact('rate','coin','products','datenow','date_begin','date_end'))->setPaper('a4', 'landscape');;
+        return $pdf->stream();
+                 
+    }
+
+
+
 
     function retencion_iva_expense($date_begin = null,$date_end = null,$level = null)
     {

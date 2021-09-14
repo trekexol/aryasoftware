@@ -6,6 +6,7 @@ use App\Inventory;
 use App\Product;
 use App\Segment;
 use App\Subsegment;
+use App\ThreeSubsegment;
 use App\TwoSubSegment;
 use App\UnitOfMeasure;
 use Illuminate\Http\Request;
@@ -166,10 +167,16 @@ class ProductController extends Controller
         $segments     = Segment::on(Auth::user()->database_name)->orderBY('description','asc')->get();
        
         $subsegments  = Subsegment::on(Auth::user()->database_name)->orderBY('description','asc')->get();
+
+        $twosubsegments  = TwoSubsegment::on(Auth::user()->database_name)->where('subsegment_id',$product->subsegment_id)->orderBY('description','asc')->get();
+     
+        $threesubsegments  = ThreeSubsegment::on(Auth::user()->database_name)->where('twosubsegment_id',$product->twosubsegment_id)->orderBY('description','asc')->get();
      
         $unitofmeasures   = UnitOfMeasure::on(Auth::user()->database_name)->orderBY('description','asc')->get();
+
+        //dd($product->subsegment_id);
        
-        return view('admin.products.edit',compact('product','segments','subsegments','unitofmeasures'));
+        return view('admin.products.edit',compact('threesubsegments','twosubsegments','product','segments','subsegments','unitofmeasures'));
   
    }
 
@@ -215,6 +222,19 @@ class ProductController extends Controller
 
     $var->segment_id = request('segment');
     $var->subsegment_id= request('Subsegment');
+    if(request('twoSubsegment') == 'null'){
+        $var->twosubsegment_id= null;
+    }else{
+        $var->twosubsegment_id= request('twoSubsegment');
+    }
+
+    if(request('threeSubsegment') == 'null'){
+        $var->threesubsegment_id= null;
+    }else{
+        $var->threesubsegment_id= request('threeSubsegment');
+    }
+    
+    
     $var->unit_of_measure_id = request('unit_of_measure_id');
 
     $var->code_comercial = request('code_comercial');

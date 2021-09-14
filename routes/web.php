@@ -282,6 +282,10 @@ Route::group(["prefix"=>'products'],function(){
     Route::patch('{id}/update','ProductController@update')->name('products.update');
 
     Route::get('listtwosubsegment/{id_subsegment}','TwoSubSegmentController@list2subsegment')->name('products.list2subsegment');
+    
+    
+    Route::get('listtwosubsegment/{id_subsegment}','TwoSubSegmentController@list')->name('products.listtwosubsegment');
+    Route::get('listthreesubsegment/{id_subsegment}','ThreeSubSegmentController@list')->name('products.listthreesubsegment');
 
 });
 
@@ -800,5 +804,13 @@ Route::group(["prefix"=>'reports'],function(){
     Route::get('purchases_book','ReportController@index_purchases_book')->name('reports.purchases_book');
     Route::post('storepurchases_book','ReportController@store_purchases_book')->name('reports.store_purchases_book');
     Route::get('purchases_bookpdf/{coin}/{date_begin}/{date_end}','ReportController@purchases_book_pdf')->name('reports.purchases_book_pdf');
+    
+    Route::get('inventory','ReportController@index_inventory')->name('reports.inventory');
+    Route::post('storeinventory','ReportController@store_inventory')->name('reports.store_inventory');
+    Route::get('inventorypdf/{coin}/{date_begin}/{date_end}/{name?}','ReportController@inventory_pdf')->name('reports.inventory_pdf');
+    
+    Route::get('operating_margin','ReportController@index_operating_margin')->name('reports.operating_margin');
+    Route::post('storeoperating_margin','ReportController@store_operating_margin')->name('reports.store_operating_margin');
+    Route::get('operating_marginpdf/{coin}/{date_begin}/{date_end}/{name?}','ReportController@operating_margin_pdf')->name('reports.operating_margin_pdf');
     
 });

@@ -50,7 +50,7 @@
         
                                     <div class="col-md-6">
                                     <select class="form-control" id="segment_id" name="segment_id">
-                                        <option value="{{ $var->subsegment_id }}" {{ old('Segments') }}>{{ $var->subsegments['description'] }}</option>
+                                        <option value="{{ $var->twosubsegment_id }}" {{ old('Segments') }}>{{ $var->subsegments['description'] }}</option>
                                         <option value="nulo">----------------</option>
                                         @if (empty($twosubsegments))
                                         @else

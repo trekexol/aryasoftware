@@ -102,6 +102,7 @@ class ThreeSubSegmentController extends Controller
        
         $subsegment_status = $subsegment->status;
 
+        
         $request->validate([
             'description'         =>'required|max:255',
             'segment_id'  => 'required|integer',
