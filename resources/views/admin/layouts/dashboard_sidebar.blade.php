@@ -233,6 +233,11 @@
             </a>
             <div id="collapseReportes" class="collapse" aria-labelledby="headingReportes" data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
+                    <a  class="collapse-header text-danger" href="#">Listados</a> 
+                    <a class="collapse-item" href="{{ route('reports.clients')}}" > <i class="fas fa-user fa-sm fa-fw mr-2 text-black-400"></i><strong>Clientes</strong></a>
+                    <a class="collapse-item" href="{{ route('reports.providers')}}" > <i class="fas fa-user fa-sm fa-fw mr-2 text-black-400"></i><strong>Proveedores</strong></a>
+                    <a class="collapse-item" href="{{ route('reports.employees')}}" > <i class="fas fa-users fa-sm fa-fw mr-2 text-black-400"></i><strong>Empleados</strong></a>
+                   
                     <a  class="collapse-header text-danger" href="{{ route('accounts') }}">Cuentas</a> 
                     <a class="collapse-item" href="{{ route('reports.accounts')}}" > <i class="fas fa-list-ul fa-sm fa-fw mr-2 text-black-400"></i><strong>Listado de Cuentas</strong></a>
                     <a class="collapse-item" href="{{ route('reports.accounts_receivable')}}" > <i class="fas fa-hand-holding-usd fa-sm fa-fw mr-2 text-black-400"></i><strong>Cuentas por Cobrar</strong></a>
@@ -245,7 +250,12 @@
                     <a class="collapse-item" href="{{ route('daily_listing') }}" > <i class="fas fa-book-reader fa-sm fa-fw mr-2 text-blue-400"></i><strong>Listado Diario</strong></a>                            
                     <a class="collapse-item" href="{{ route('reports.sales_books') }}" > <i class="fas fa-book fa-sm fa-fw mr-2 text-blue-400"></i><strong>Libro de Ventas</strong></a>                            
                     <a class="collapse-item" href="{{ route('reports.purchases_book') }}" > <i class="fas fa-bookmark fa-sm fa-fw mr-2 text-blue-400"></i><strong>Libro de Compras</strong></a>                       
+                    <a class="collapse-item" href="{{ route('reports.operating_margin') }}" > <i class="fas fa-chart-bar fa-sm fa-fw mr-2 text-blue-400"></i><strong>Margen Operativo</strong></a>                       
                     <a class="collapse-item" href="{{ route('reports.inventory') }}" > <i class="fas fa-boxes fa-sm fa-fw mr-2 text-blue-400"></i><strong>Inventario</strong></a>                         
+                    
+                    <a  class="collapse-header text-danger" href="#">Otros</a> 
+                    <a class="collapse-item" href="{{ route('reports.sales')}}" > <i class="fas fa-dollar-sign fa-sm fa-fw mr-2 text-black-400"></i><strong>Ventas</strong></a>
+                   
                 </div>
             </div>
         </li>

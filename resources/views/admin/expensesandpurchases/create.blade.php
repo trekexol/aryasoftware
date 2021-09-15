@@ -360,7 +360,13 @@
                                 </div>
                             </div>
                             <div class="form-group row mb-0">
-                                
+                                <div class="col-md-4">
+                                    @if($suma == 0)
+                                        <a onclick="validate()" id="btnSendNote" name="btnfacturar" class="btn btn-info" title="facturar">Nota de Entrega</a>  
+                                    @else
+                                        <a onclick="deliveryNoteSend()" id="btnSendNote" name="btnfacturar" class="btn btn-info" title="facturar">Nota de Entrega</a>  
+                                    @endif
+                                </div>
                                 <div class="col-md-4">
                                     <a id="btnpayment" href="{{ route('expensesandpurchases.create_payment',[$expense->id,$coin]) }}" name="btnpayment" class="btn btn-info" title="Registrar">Registrar</a>  
                                 </div>
@@ -421,6 +427,17 @@
             window.location = "{{route('expensesandpurchases.create_detail', [$expense->id,'',''])}}"+"/"+coin+"/"+"{{ $inventory->id ?? '' }}";
             
         });
+
+        function deliveryNoteSend() {
+            window.location = "{{route('expenses.createdeliverynote', [$expense->id,$coin])}}";
+        }
+
+
+
+        function validate() {
+            alert('Debe ingresar al menos un producto para poder continuar');           
+        }
+
 
         function refreshrate() {
        

@@ -5,11 +5,11 @@
     <div class="row justify-content-center">
         <div class="col-sm-12">
             <div class="card">
-                <form method="POST" action="{{ route('reports.store_operating_margin') }}">
+                <form method="POST" action="{{ route('reports.store_clients') }}">
                     @csrf
 
                 <div class="card-header text-center h4">
-                    Margen Operativo
+                    Clientes
                 </div>
 
                 <div class="card-body">
@@ -23,8 +23,7 @@
                                     </span>
                                 @enderror
                             </div>
-                            <label for="date_end" class="col-sm-1 col-form-label text-md-right">hasta </label>
-
+                            
                             <div class="col-sm-3">
                                 <input id="date_end" type="date" class="form-control @error('date_end') is-invalid @enderror" name="date_end" value="{{ date('Y-m-d', strtotime($date_end ?? $datenow))}}" required autocomplete="date_end">
 
@@ -34,20 +33,18 @@
                                     </span>
                                 @enderror
                             </div>
-                           
-                            <div class="col-sm-2">
-                                <select class="form-control" name="coin" id="coin">
-                                    @if(isset($coin))
-                                        <option disabled selected value="{{ $coin }}">{{ $coin }}</option>
-                                        <option disabled  value="{{ $coin }}">-----------</option>
-                                    @else
-                                        <option disabled selected value="bolivares">Moneda</option>
-                                    @endif
-                                    
-                                    <option  value="bolivares">Bolívares</option>
-                                    <option value="dolares">Dólares</option>
-                                </select>
-                            </div>
+                            
+                            <label for="name" class="col-md-1 col-form-label text-md-right">Nombre</label>
+
+                            <div class="col-md-3">
+                                <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ $name ?? '' }}" autocomplete="name">
+
+                                @error('name')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div> 
                             <div class="col-sm-2">
                                 <button type="submit" class="btn btn-primary ">
                                     Buscar
@@ -56,7 +53,7 @@
                         </div>
                     </form>
                         <div class="embed-responsive embed-responsive-16by9">
-                            <iframe class="embed-responsive-item" src="{{ route('reports.operating_margin_pdf',[$coin ?? 'bolivares',$datebeginyear ?? $date_begin ?? $datenow,$date_end ?? $datenow]) }}" allowfullscreen></iframe>
+                            <iframe class="embed-responsive-item" src="{{ route('reports.clients_pdf',[$datebeginyear ?? $date_begin ?? $datenow,$date_end ?? $datenow,$name ?? null]) }}" allowfullscreen></iframe>
                           </div>
                         
                         </div>

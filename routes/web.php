@@ -811,6 +811,26 @@ Route::group(["prefix"=>'reports'],function(){
     
     Route::get('operating_margin','ReportController@index_operating_margin')->name('reports.operating_margin');
     Route::post('storeoperating_margin','ReportController@store_operating_margin')->name('reports.store_operating_margin');
-    Route::get('operating_marginpdf/{coin}/{date_begin}/{date_end}/{name?}','ReportController@operating_margin_pdf')->name('reports.operating_margin_pdf');
+    Route::get('operating_marginpdf/{coin}/{date_begin}/{date_end}','ReportController@operating_margin_pdf')->name('reports.operating_margin_pdf');
+    
+    Route::get('clients','ReportController@index_clients')->name('reports.clients');
+    Route::post('storeclients','ReportController@store_clients')->name('reports.store_clients');
+    Route::get('clientspdf/{date_begin}/{date_end}/{name?}','ReportController@clients_pdf')->name('reports.clients_pdf');
+    
+    Route::get('providers','ReportController@index_providers')->name('reports.providers');
+    Route::post('storeproviders','ReportController@store_providers')->name('reports.store_providers');
+    Route::get('providerspdf/{date_begin}/{date_end}/{name?}','ReportController@providers_pdf')->name('reports.providers_pdf');
+    
+    Route::get('employees','ReportController@index_employees')->name('reports.employees');
+    Route::post('storeemployees','ReportController@store_employees')->name('reports.store_employees');
+    Route::get('employeespdf/{date_begin}/{date_end}/{name?}','ReportController@employees_pdf')->name('reports.employees_pdf');
+    
+    Route::get('employees','ReportController@index_employees')->name('reports.employees');
+    Route::post('storeemployees','ReportController@store_employees')->name('reports.store_employees');
+    Route::get('employeespdf/{date_begin}/{date_end}/{name?}','ReportController@employees_pdf')->name('reports.employees_pdf');
+    
+    Route::get('sales','ReportController@index_sales')->name('reports.sales');
+    Route::post('storesales','ReportController@store_sales')->name('reports.store_sales');
+    Route::get('salespdf/{coin}/{date_begin}/{date_end}/{name?}','ReportController@sales_pdf')->name('reports.sales_pdf');
     
 });

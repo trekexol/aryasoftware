@@ -11,10 +11,12 @@ use App\Account;
 use App\Client;
 use App\Company;
 use App\DetailVoucher;
+use App\Employee;
 use App\ExpensesAndPurchase;
 use App\Product;
 use App\Provider;
 use App\Quotation;
+use App\QuotationProduct;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
@@ -225,6 +227,83 @@ class ReportController extends Controller
       
     }
 
+
+    public function index_clients()
+    {
+        
+        $user       =   auth()->user();
+        $users_role =   $user->role_id;
+        
+        $date = Carbon::now();
+        $datenow = $date->format('Y-m-d');    
+        
+        $clients = Client::on(Auth::user()->database_name)->orderBy('created_at','asc')->first();
+
+        $date_begin = Carbon::parse($clients->created_at);
+        $datebeginyear = $date_begin->format('Y-m-d');
+
+        //$datebeginyear = $date->firstOfYear()->format('Y-m-d');
+
+        return view('admin.reports.index_clients',compact('datebeginyear','datenow'));
+      
+    }
+
+    public function index_providers()
+    {
+        
+        $user       =   auth()->user();
+        $users_role =   $user->role_id;
+        
+        $date = Carbon::now();
+        $datenow = $date->format('Y-m-d');    
+        
+        $providers = Provider::on(Auth::user()->database_name)->orderBy('created_at','asc')->first();
+
+        $date_begin = Carbon::parse($providers->created_at);
+        $datebeginyear = $date_begin->format('Y-m-d');
+
+        //$datebeginyear = $date->firstOfYear()->format('Y-m-d');
+
+        return view('admin.reports.index_providers',compact('datebeginyear','datenow'));
+      
+    }
+
+    public function index_employees()
+    {
+        
+        $user       =   auth()->user();
+        $users_role =   $user->role_id;
+        
+        $date = Carbon::now();
+        $datenow = $date->format('Y-m-d');    
+        
+        $employees = Employee::on(Auth::user()->database_name)->orderBy('created_at','asc')->first();
+
+        $date_begin = Carbon::parse($employees->created_at);
+        $datebeginyear = $date_begin->format('Y-m-d');
+
+        //$datebeginyear = $date->firstOfYear()->format('Y-m-d');
+
+        return view('admin.reports.index_employees',compact('datebeginyear','datenow'));
+      
+    }
+
+    public function index_sales()
+    {
+        
+        $user       =   auth()->user();
+        $users_role =   $user->role_id;
+        
+        $date = Carbon::now();
+        $datenow = $date->format('Y-m-d');    
+        
+        $datebeginyear = $date->firstOfYear()->format('Y-m-d');
+
+        return view('admin.reports.index_sales',compact('datebeginyear','datenow'));
+      
+    }
+
+
     public function store(Request $request)
     {
         
@@ -357,6 +436,37 @@ class ReportController extends Controller
         $date_end = request('date_end');
         
         return view('admin.reports.index_operating_margin',compact('coin','date_begin','date_end'));
+    }
+
+    public function store_clients(Request $request)
+    {
+        
+        $date_begin = request('date_begin');
+        $date_end = request('date_end');
+        $name = request('name');
+        
+        return view('admin.reports.index_clients',compact('name','date_begin','date_end'));
+    }
+
+    public function store_providers(Request $request)
+    {
+        
+        $date_begin = request('date_begin');
+        $date_end = request('date_end');
+        $name = request('name');
+        
+        return view('admin.reports.index_providers',compact('name','date_begin','date_end'));
+    }
+
+    public function store_sales(Request $request)
+    {
+        
+        $date_begin = request('date_begin');
+        $date_end = request('date_end');
+        $name = request('name');
+        $coin = request('coin');
+        
+        return view('admin.reports.index_sales',compact('name','coin','date_begin','date_end'));
     }
 
     function balance_pdf($coin = null,$date_begin = null,$date_end = null,$level = null)
@@ -743,7 +853,7 @@ class ReportController extends Controller
 
         
         
-        $pdf = $pdf->loadView('admin.reports.accounts',compact('coin','datenow','accounts','level','detail_old','date_begin','date_end'))->setPaper('a4', 'landscape');;
+        $pdf = $pdf->loadView('admin.reports.accounts',compact('coin','datenow','accounts','level','detail_old','date_begin','date_end'))->setPaper('a4', 'landscape');
         return $pdf->stream();
                  
     }
@@ -845,7 +955,7 @@ class ReportController extends Controller
         
        
         
-        $pdf = $pdf->loadView('admin.reports.bankmovements',compact('details_banks','coin','datenow','date_begin','date_end'))->setPaper('a4', 'landscape');;
+        $pdf = $pdf->loadView('admin.reports.bankmovements',compact('details_banks','coin','datenow','date_begin','date_end'))->setPaper('a4', 'landscape');
         return $pdf->stream();
                  
     }
@@ -872,7 +982,7 @@ class ReportController extends Controller
         $date_end = $date_end->format('d-m-Y');
 
 
-        $pdf = $pdf->loadView('admin.reports.sales_books',compact('coin','quotations','datenow','date_begin','date_end'))->setPaper('a4', 'landscape');;
+        $pdf = $pdf->loadView('admin.reports.sales_books',compact('coin','quotations','datenow','date_begin','date_end'))->setPaper('a4', 'landscape');
         return $pdf->stream();
                  
     }
@@ -898,7 +1008,7 @@ class ReportController extends Controller
         $date_end = $date_end->format('d-m-Y');
 
 
-        $pdf = $pdf->loadView('admin.reports.purchases_books',compact('coin','expenses','datenow','date_begin','date_end'))->setPaper('a4', 'landscape');;
+        $pdf = $pdf->loadView('admin.reports.purchases_books',compact('coin','expenses','datenow','date_begin','date_end'))->setPaper('a4', 'landscape');
         return $pdf->stream();
                  
     }
@@ -946,7 +1056,7 @@ class ReportController extends Controller
             $rate = $company->rate;
         }
 
-        $pdf = $pdf->loadView('admin.reports.inventory',compact('rate','coin','products','datenow','date_begin','date_end'))->setPaper('a4', 'landscape');;
+        $pdf = $pdf->loadView('admin.reports.inventory',compact('rate','coin','products','datenow','date_begin','date_end'))->setPaper('a4', 'landscape');
         return $pdf->stream();
                  
     }
@@ -968,6 +1078,227 @@ class ReportController extends Controller
         $to = $date_end->format('Y-m-d');
         $date_end = $date_end->format('d-m-Y');
 
+       
+
+        if(isset($coin) && ($coin == "bolivares")){
+            $accounts_all = $this->calculation($from,$to);
+        }else{
+            $accounts_all = $this->calculation_dolar("dolares");
+        }
+      
+        $ventas = 0;
+        $costos = 0;
+        $gastos = 0;
+        $utilidad = 0;
+        $margen_operativo = 0;
+        $gastos_costos = 0;
+        $rentabilidad = 0;
+
+
+        foreach($accounts_all as $account){
+            if(($account->code_one == 4) && ($account->code_two == 0) && ($account->code_three == 0) && ($account->code_four == 0) && ($account->code_five == 0) ){
+                $ventas = $account->debe - $account->haber;
+            }
+            if(($account->code_one == 5) && ($account->code_two == 0) && ($account->code_three == 0) && ($account->code_four == 0) && ($account->code_five == 0) ){
+                $costos = $account->debe - $account->haber;
+            }
+            if(($account->code_one == 6) && ($account->code_two == 0) && ($account->code_three == 0) && ($account->code_four == 0) && ($account->code_five == 0) ){
+                $gastos = $account->debe - $account->haber;
+            }
+        }
+
+        $ventas = $ventas * -1;
+
+        $utilidad = $ventas - $costos - $gastos;
+        $gastos_costos = $gastos + $costos;
+
+        if(($utilidad > 0) && ($ventas >0)){
+            $margen_operativo = ($utilidad / $ventas) * 100;
+        }else{
+            
+            if(($utilidad > 0)){
+                $margen_operativo = $utilidad;
+            }else{
+                $margen_operativo = $ventas;
+            }
+        }
+
+        //RENTABILIDAD
+        if(($utilidad > 0) && ($gastos_costos > 0)){
+            $rentabilidad = ($utilidad/$gastos_costos) * 100;
+        }else{
+            
+            if(($utilidad > 0)){
+                $margen_operativo = $utilidad * 100;
+            }else{
+                $margen_operativo = $gastos_costos * 100;
+            }
+        }
+       
+        $pdf = $pdf->loadView('admin.reports.operating_margin',compact('rentabilidad','margen_operativo','utilidad','ventas','costos','gastos','coin','datenow','date_begin','date_end'));
+        return $pdf->stream();
+                 
+    }
+
+    function clients_pdf($date_begin,$date_end,$name = null)
+    {
+        
+        $pdf = App::make('dompdf.wrapper');
+
+        $date = Carbon::now();
+        $datenow = $date->format('d-m-Y'); 
+        $period = $date->format('Y'); 
+
+
+        if(isset($name)){
+            $clients = Client::on(Auth::user()->database_name)
+            ->where('name','LIKE',$name.'%')
+            ->whereRaw(
+                "(DATE_FORMAT(created_at, '%Y-%m-%d') >= ? AND DATE_FORMAT(created_at, '%Y-%m-%d') <= ?)", 
+                [$date_begin, $date_end])
+            ->orderBy('name','asc')->get();
+        }else{
+            $clients = Client::on(Auth::user()->database_name)
+            ->whereRaw(
+                "(DATE_FORMAT(created_at, '%Y-%m-%d') >= ? AND DATE_FORMAT(created_at, '%Y-%m-%d') <= ?)", 
+                [$date_begin, $date_end])
+            ->orderBy('name','asc')->get();
+        }
+        
+
+        $date_begin = Carbon::parse($date_begin);
+        $date_begin = $date_begin->format('d-m-Y');
+
+        $date_end = Carbon::parse($date_end);
+        $date_end = $date_end->format('d-m-Y');
+
+       
+        $pdf = $pdf->loadView('admin.reports.clients',compact('clients','datenow','date_begin','date_end'))->setPaper('a4', 'landscape');
+        return $pdf->stream();
+                 
+    }
+
+    function providers_pdf($date_begin,$date_end,$name = null)
+    {
+        
+        $pdf = App::make('dompdf.wrapper');
+
+        $date = Carbon::now();
+        $datenow = $date->format('d-m-Y'); 
+        $period = $date->format('Y'); 
+
+
+        if(isset($name)){
+            $providers = Provider::on(Auth::user()->database_name)
+            ->where('razon_social','LIKE',$name.'%')
+            ->whereRaw(
+                "(DATE_FORMAT(created_at, '%Y-%m-%d') >= ? AND DATE_FORMAT(created_at, '%Y-%m-%d') <= ?)", 
+                [$date_begin, $date_end])
+            ->orderBy('razon_social','asc')->get();
+        }else{
+            $providers = Provider::on(Auth::user()->database_name)
+            ->whereRaw(
+                "(DATE_FORMAT(created_at, '%Y-%m-%d') >= ? AND DATE_FORMAT(created_at, '%Y-%m-%d') <= ?)", 
+                [$date_begin, $date_end])
+            ->orderBy('razon_social','asc')->get();
+        }
+        
+
+        $date_begin = Carbon::parse($date_begin);
+        $date_begin = $date_begin->format('d-m-Y');
+
+        $date_end = Carbon::parse($date_end);
+        $date_end = $date_end->format('d-m-Y');
+
+       
+        $pdf = $pdf->loadView('admin.reports.providers',compact('providers','datenow','date_begin','date_end'))->setPaper('a4', 'landscape');
+        return $pdf->stream();
+                 
+    }
+
+    function employees_pdf($date_begin,$date_end,$name = null)
+    {
+        
+        $pdf = App::make('dompdf.wrapper');
+
+        $date = Carbon::now();
+        $datenow = $date->format('d-m-Y'); 
+        $period = $date->format('Y'); 
+
+
+        if(isset($name)){
+            $employees = Employee::on(Auth::user()->database_name)
+            ->where('nombres','LIKE',$name.'%')
+            ->whereRaw(
+                "(DATE_FORMAT(created_at, '%Y-%m-%d') >= ? AND DATE_FORMAT(created_at, '%Y-%m-%d') <= ?)", 
+                [$date_begin, $date_end])
+            ->orderBy('nombres','asc')->get();
+        }else{
+            $employees = Employee::on(Auth::user()->database_name)
+            ->whereRaw(
+                "(DATE_FORMAT(created_at, '%Y-%m-%d') >= ? AND DATE_FORMAT(created_at, '%Y-%m-%d') <= ?)", 
+                [$date_begin, $date_end])
+            ->orderBy('nombres','asc')->get();
+        }
+        
+
+        $date_begin = Carbon::parse($date_begin);
+        $date_begin = $date_begin->format('d-m-Y');
+
+        $date_end = Carbon::parse($date_end);
+        $date_end = $date_end->format('d-m-Y');
+
+       
+        $pdf = $pdf->loadView('admin.reports.employees',compact('employees','datenow','date_begin','date_end'))->setPaper('a4', 'landscape');
+        return $pdf->stream();
+                 
+    }
+
+    function sales_pdf($coin,$date_begin,$date_end,$name = null)
+    {
+        
+        $pdf = App::make('dompdf.wrapper');
+
+        $date = Carbon::now();
+        $datenow = $date->format('d-m-Y'); 
+        $period = $date->format('Y'); 
+
+        if(isset($name)){
+            $sales = Product::on(Auth::user()->database_name)
+            ->join('inventories', 'inventories.product_id', '=', 'products.id')
+            ->join('quotation_products', 'quotation_products.id_inventory', '=', 'inventories.id')
+            ->join('segments', 'segments.id', '=', 'products.segment_id')
+            ->join('subsegments', 'subsegments.id', '=', 'products.subsegment_id')
+            ->where('quotation_products.status','C')
+            ->where('products.description','LIKE',$name.'%')
+            ->whereRaw(
+                "(DATE_FORMAT(quotation_products.created_at, '%Y-%m-%d') >= ? AND DATE_FORMAT(quotation_products.created_at, '%Y-%m-%d') <= ?)", 
+                [$date_begin, $date_end])
+            ->select('products.description', DB::connection(Auth::user()->database_name)->raw('SUM(quotation_products.amount) as amount_sales'), DB::connection(Auth::user()->database_name)->raw('SUM(quotation_products.price*quotation_products.amount) as price_sales'), DB::connection(Auth::user()->database_name)->raw('SUM(quotation_products.price*quotation_products.amount/quotation_products.rate) as price_sales_dolar'),'products.type','products.price as price','inventories.code','products.money as money','segments.description as segment_description','subsegments.description as subsegment_description')
+            ->groupBy('products.description','products.type','products.price','inventories.code','products.money','segments.description','subsegments.description')
+            ->orderBy('products.description','asc')->get();
+           
+        }else{
+            $sales = Product::on(Auth::user()->database_name)
+            ->join('inventories', 'inventories.product_id', '=', 'products.id')
+            ->join('quotation_products', 'quotation_products.id_inventory', '=', 'inventories.id')
+            ->join('segments', 'segments.id', '=', 'products.segment_id')
+            ->join('subsegments', 'subsegments.id', '=', 'products.subsegment_id')
+            ->where('quotation_products.status','C')
+            ->whereRaw(
+                "(DATE_FORMAT(quotation_products.created_at, '%Y-%m-%d') >= ? AND DATE_FORMAT(quotation_products.created_at, '%Y-%m-%d') <= ?)", 
+                [$date_begin, $date_end])
+            ->select('products.description', DB::connection(Auth::user()->database_name)->raw('SUM(quotation_products.amount) as amount_sales'), DB::connection(Auth::user()->database_name)->raw('SUM(quotation_products.price*quotation_products.amount) as price_sales'), DB::connection(Auth::user()->database_name)->raw('SUM(quotation_products.price*quotation_products.amount/quotation_products.rate) as price_sales_dolar'),'products.type','products.price as price','inventories.code','products.money as money','segments.description as segment_description','subsegments.description as subsegment_description')
+            ->groupBy('products.description','products.type','products.price','inventories.code','products.money','segments.description','subsegments.description')
+            ->orderBy('products.description','asc')->get();
+        }
+        
+        $date_begin = Carbon::parse($date_begin);
+        $date_begin = $date_begin->format('d-m-Y');
+
+        $date_end = Carbon::parse($date_end);
+        $date_end = $date_end->format('d-m-Y');
+
         $company = Company::on(Auth::user()->database_name)->find(1);
         //Si la taza es automatica
         if($company->tiporate_id == 1){
@@ -977,32 +1308,11 @@ class ReportController extends Controller
             $rate = $company->rate;
         }
 
-
-        if(isset($coin) && ($coin == "bolivares")){
-            $accounts_all = $this->calculation($from,$to);
-        }else{
-            $accounts_all = $this->calculation_dolar("dolares");
-        }
-      
-
-        $accounts = $accounts_all->filter(function($account)
-        {
-            if($account->code_one <= 3){
-                $total = $account->balance_previus + $account->debe - $account->haber;
-                if ($total != 0) {
-                    return $account;
-                }
-            }
-            
-        });
-
-        $pdf = $pdf->loadView('admin.reports.inventory',compact('rate','coin','products','datenow','date_begin','date_end'))->setPaper('a4', 'landscape');;
+       
+        $pdf = $pdf->loadView('admin.reports.sales',compact('coin','rate','sales','datenow','date_begin','date_end'))->setPaper('a4', 'landscape');
         return $pdf->stream();
                  
     }
-
-
-
 
     function retencion_iva_expense($date_begin = null,$date_end = null,$level = null)
     {

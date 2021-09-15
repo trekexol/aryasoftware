@@ -5,11 +5,11 @@
     <div class="row justify-content-center">
         <div class="col-sm-12">
             <div class="card">
-                <form method="POST" action="{{ route('reports.store_operating_margin') }}">
+                <form method="POST" action="{{ route('reports.store_sales') }}">
                     @csrf
 
                 <div class="card-header text-center h4">
-                    Margen Operativo
+                    Ventas
                 </div>
 
                 <div class="card-body">
@@ -34,7 +34,13 @@
                                     </span>
                                 @enderror
                             </div>
-                           
+                            <div class="col-sm-2">
+                                <button type="submit" class="btn btn-primary ">
+                                    Buscar
+                                 </button>
+                            </div>
+                        </div>
+                        <div class="form-group row">
                             <div class="col-sm-2">
                                 <select class="form-control" name="coin" id="coin">
                                     @if(isset($coin))
@@ -48,15 +54,23 @@
                                     <option value="dolares">Dólares</option>
                                 </select>
                             </div>
-                            <div class="col-sm-2">
-                                <button type="submit" class="btn btn-primary ">
-                                    Buscar
-                                 </button>
-                            </div>
+                            <label for="name" class="col-md-2 col-form-label text-md-right">Nombre</label>
+
+                            <div class="col-md-3">
+                                <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ $name ?? '' }}" autocomplete="name">
+
+                                @error('name')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div> 
+                            
+                        </div>
                         </div>
                     </form>
                         <div class="embed-responsive embed-responsive-16by9">
-                            <iframe class="embed-responsive-item" src="{{ route('reports.operating_margin_pdf',[$coin ?? 'bolivares',$datebeginyear ?? $date_begin ?? $datenow,$date_end ?? $datenow]) }}" allowfullscreen></iframe>
+                            <iframe class="embed-responsive-item" src="{{ route('reports.sales_pdf',[$coin ?? 'bolivares',$datebeginyear ?? $date_begin ?? $datenow,$date_end ?? $datenow,$name ?? null]) }}" allowfullscreen></iframe>
                           </div>
                         
                         </div>
