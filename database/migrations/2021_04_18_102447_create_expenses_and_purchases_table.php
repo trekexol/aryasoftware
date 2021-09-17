@@ -25,6 +25,7 @@ class CreateExpensesAndPurchasesTable extends Migration
             $table->string('observation',150)->nullable();
 
             $table->date('date');
+            $table->date('date_delivery_note')->nullable();
             $table->date('date_payment')->nullable();
 
             $table->decimal('retencion_iva',64,2)->nullable();

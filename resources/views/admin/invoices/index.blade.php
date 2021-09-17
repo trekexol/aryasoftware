@@ -85,26 +85,36 @@
                     @foreach ($quotations as $quotation)
                         <tr>
                             <td class="text-center font-weight-bold">{{$quotation->date_billing}}</td>
-                            <td class="text-center font-weight-bold">
-                                <a href="{{ route('quotations.createfacturado',[$quotation->id,$quotation->coin ?? 'bolivares']) }}" title="Ver Factura" class="font-weight-bold text-dark">{{ $quotation->id }}</a>
-                            </td>
+                            @if ($quotation->status == "X")
+                                <td class="text-center font-weight-bold">{{ $quotation->id }}
+                                </td>
+                            @else
+                                <td class="text-center font-weight-bold">
+                                    <a href="{{ route('quotations.createfacturado',[$quotation->id,$quotation->coin ?? 'bolivares']) }}" title="Ver Factura" class="font-weight-bold text-dark">{{ $quotation->id }}</a>
+                                </td>
+                            @endif
                             <td class="text-center font-weight-bold">{{ $quotation->clients['name']}}</td>
                             <td class="text-right font-weight-bold">{{number_format($quotation->amount, 2, ',', '.')}}</td>
                             <td class="text-right font-weight-bold">{{number_format($quotation->amount_iva, 2, ',', '.')}}</td>
                             <td class="text-right font-weight-bold">{{number_format($quotation->amount_with_iva, 2, ',', '.')}}</td>
                             @if ($quotation->status == "C")
-                            <td class="text-center font-weight-bold">
-                                <a href="{{ route('quotations.createfacturado',[$quotation->id,$quotation->coin ?? 'bolivares']) }}" title="Ver Factura" class="text-center text-success font-weight-bold">Cobrado</a>
-                            </td>
-                            <td class="text-center font-weight-bold">
-                            </td>
+                                <td class="text-center font-weight-bold">
+                                    <a href="{{ route('quotations.createfacturado',[$quotation->id,$quotation->coin ?? 'bolivares']) }}" title="Ver Factura" class="text-center text-success font-weight-bold">Cobrado</a>
+                                </td>
+                                <td class="text-center font-weight-bold">
+                                </td>
+                            @elseif ($quotation->status == "X")
+                                <td class="text-center font-weight-bold text-danger">Reversado
+                                </td>
+                                <td>
+                                </td>
                             @else
-                            <td class="text-center font-weight-bold">
-                                <a href="{{ route('quotations.createfacturar_after',[$quotation->id,$quotation->coin ?? 'bolivares']) }}" title="Cobrar Factura" class="font-weight-bold text-dark">Click para Cobrar</a>
-                            </td>
-                            <td>
-                                <input type="checkbox" name="check{{ $quotation->id }}" value="{{ $quotation->id }}" onclick="buttom();" id="flexCheckChecked">    
-                            </td>
+                                <td class="text-center font-weight-bold">
+                                    <a href="{{ route('quotations.createfacturar_after',[$quotation->id,$quotation->coin ?? 'bolivares']) }}" title="Cobrar Factura" class="font-weight-bold text-dark">Click para Cobrar</a>
+                                </td>
+                                <td>
+                                    <input type="checkbox" name="check{{ $quotation->id }}" value="{{ $quotation->id }}" onclick="buttom();" id="flexCheckChecked">    
+                                </td>
                             @endif
                             
                         </tr>     

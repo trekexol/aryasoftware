@@ -268,6 +268,124 @@ class PDFController extends Controller
     }
 
     
+    function deliverynote_expense($id_expense,$coin,$iva){
+      
+
+        $pdf = App::make('dompdf.wrapper');
+    
+             $expense = null;
+                 
+             if(isset($id_expense)){
+                $expense = ExpensesAndPurchase::on(Auth::user()->database_name)->findOrFail($id_expense);
+
+                if(!(isset($expense->date_delivery_note))){
+
+                    $date = Carbon::now();
+                    $datenow = $date->format('Y-m-d');   
+
+                    $expense->iva_percentage = $iva;
+
+                    $expense->date_delivery_note = $datenow;
+
+                }else{
+                if(isset($expense->bcv)){
+                    $bcv = $expense->bcv;
+                    }
+                }
+                 
+                                     
+             }else{
+                return redirect('/expensesandpurchases')->withDanger('No llega el numero de la cotizacion');
+                } 
+     
+             if(isset($expense)){
+               
+                $inventories_expenses = DB::connection(Auth::user()->database_name)->table('products')->join('inventories', 'products.id', '=', 'inventories.product_id')
+                                                           ->join('expenses_details', 'inventories.id', '=', 'expenses_details.id_inventory')
+                                                           ->where('expenses_details.id_expense',$expense->id)
+                                                           ->select('products.*','expenses_details.price as price','expenses_details.rate as rate',
+                                                           'expenses_details.amount as amount_expense','expenses_details.exento as retiene_iva_expense'
+                                                           ,'expenses_details.islr as retiene_islr_expense')
+                                                           ->get(); 
+
+
+                $total= 0;
+                $base_imponible= 0;
+                $price_cost_total= 0;
+
+                //este es el total que se usa para guardar el monto de todos los productos que estan exentos de iva, osea retienen iva
+                $total_retiene_iva = 0;
+                $retiene_iva = 0;
+
+                $total_retiene_islr = 0;
+                $retiene_islr = 0;
+
+                foreach($inventories_expenses as $var){
+                    //Se calcula restandole el porcentaje de descuento (discount)
+                        
+                        $total += ($var->price * $var->amount_expense);
+                    //----------------------------- 
+     
+                    if($var->retiene_iva_expense == 0){
+     
+                        $base_imponible += ($var->price * $var->amount_expense); 
+     
+                    }else{
+                        $retiene_iva += ($var->price * $var->amount_expense); 
+                    }
+     
+                    if($var->retiene_islr_expense == 1){
+     
+                        $retiene_islr += ($var->price * $var->amount_expense); 
+     
+                    }
+     
+                }
+     
+                
+                $expense->amount = $total;
+                $expense->base_imponible = $base_imponible;
+                $expense->amount_iva = $base_imponible * $expense->iva_percentage / 100;
+                $expense->amount_with_iva = $expense->amount + $expense->amount_iva;
+                $expense->save();
+
+
+                $expense->total_factura = $total;
+                //$expense->base_imponible = $base_imponible;
+
+                
+                $date = Carbon::now();
+                $datenow = $date->format('Y-m-d');    
+                $anticipos_sum = 0;
+                if(isset($coin)){
+                    if($coin == 'bolivares'){
+                        $bcv = null;
+                    }else{
+                        $bcv = $expense->bcv;
+                    }
+                }else{
+                    $bcv = null;
+                }
+
+
+                $company = Company::on(Auth::user()->database_name)->find(1);
+                
+                $pdf = $pdf->loadView('pdf.deliverynote_expense',compact('expense','inventories_expenses','bcv','company'
+                                                                ,'total_retiene_iva','total_retiene_islr'));
+                return $pdf->stream();
+         
+            }else{
+                return redirect('/expensesandpurchases')->withDanger('La nota de entrega no existe');
+            } 
+             
+        
+
+        
+    }
+
+
+
+
     function asignar_payment_type($type){
       
         if($type == 1){

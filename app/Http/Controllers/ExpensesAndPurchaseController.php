@@ -89,6 +89,98 @@ class ExpensesAndPurchaseController extends Controller
        return view('admin.expensesandpurchases.index_movement',compact('coin','detailvouchers','expense','expenses','multipayments_detail'));
    }
 
+
+   public function index_delivery_note()
+   {
+       $user       =   auth()->user();
+       $users_role =   $user->role_id;
+       
+        $expenses = ExpensesAndPurchase::on(Auth::user()->database_name)->orderBy('id' ,'DESC')
+                                ->where('date_delivery_note','<>',null)
+                                ->get();
+      
+
+       return view('admin.expensesandpurchases.indexdeliverynote',compact('expenses'));
+   }
+
+
+
+
+
+   public function createdeliverynote($id_expense,$coin)
+   {
+       
+        $expense = null;
+            
+        if(isset($id_expense)){
+           $expense = ExpensesAndPurchase::on(Auth::user()->database_name)->findOrFail($id_expense);
+           $expense->coin = $coin;
+           $expense->save();
+        }
+
+        if(isset($expense)){
+           
+           $inventories_expenses = DB::connection(Auth::user()->database_name)->table('products')->join('inventories', 'products.id', '=', 'inventories.product_id')
+                                                           ->join('expenses_details', 'inventories.id', '=', 'expenses_details.id_inventory')
+                                                           ->where('expenses_details.id_expense',$expense->id)
+                                                           ->select('products.*','expenses_details.price as price','expenses_details.rate as rate',
+                                                           'expenses_details.amount as amount_expense','expenses_details.exento as retiene_iva_expense'
+                                                           ,'expenses_details.islr as retiene_islr_expense')
+                                                           ->get(); 
+
+           
+           $total= 0;
+           $base_imponible= 0;
+
+           //este es el total que se usa para guardar el monto de todos los productos que estan exentos de iva, osea retienen iva
+           $total_retiene_iva = 0;
+           $retiene_iva = 0;
+
+           $total_retiene_islr = 0;
+           $retiene_islr = 0;
+
+           foreach($inventories_expenses as $var){
+               //Se calcula restandole el porcentaje de descuento (discount)
+                   
+                   $total += ($var->price * $var->amount_expense);
+               //----------------------------- 
+
+               if($var->retiene_iva_expense == 0){
+
+                   $base_imponible += ($var->price * $var->amount_expense); 
+
+               }else{
+                   $retiene_iva += ($var->price * $var->amount_expense); 
+               }
+
+               if($var->retiene_islr_expense == 1){
+
+                   $retiene_islr += ($var->price * $var->amount_expense); 
+
+               }
+
+           }
+
+           $expense->total_factura = $total;
+           $expense->base_imponible = $base_imponible;
+
+           $date = Carbon::now();
+           $datenow = $date->format('Y-m-d');    
+
+           if($coin == 'bolivares'){
+               $bcv = null;
+               
+           }else{
+               $bcv = $expense->rate;
+           }
+           
+
+            return view('admin.expensesandpurchases.createdeliverynote',compact('coin','expense','datenow','bcv','total_retiene_iva','total_retiene_islr'));
+        }else{
+            return redirect('/expensesandpurchases')->withDanger('La cotizacion no existe');
+        } 
+        
+   }
    /**
     * Show the form for creating a new resource.
     *

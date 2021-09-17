@@ -68,8 +68,8 @@
                                     <option value="Cliente" {{ old('Beneficiario') == 'Cliente' ? 'selected' : '' }}>
                                         Cliente
                                     </option>
-                                    <option value="Vendedor" {{ old('Beneficiario') == 'Vendedor' ? 'selected' : '' }}>
-                                        Vendedor
+                                    <option value="Proveedor" {{ old('Beneficiario') == 'Proveedor' ? 'selected' : '' }}>
+                                        Proveedor
                                     </option>
                                 </select>
 
@@ -351,11 +351,7 @@
             });
 
         
-	$(function(){
-        soloNumeros('xtelf_local');
-        soloNumeros('xtelf_cel');
-    });
-    
+	
  
 
 

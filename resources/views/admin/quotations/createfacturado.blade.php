@@ -178,9 +178,20 @@
                             <div class="col-md-3">
                                 <a onclick="pdf();" id="btnimprimir" name="btnimprimir" class="btn btn-info" title="imprimir">Imprimir Factura</a>  
                             </div>
-                            <div class="col-md-4">
-                                <a onclick="pdf_media();" id="btnfacturar" name="btnfacturar" class="btn btn-success" title="facturar">Imprimir Factura Media Carta</a>  
-                            </div>
+                            
+                            <div class="col-sm-3  dropdown mb-4">
+                                <button class="btn btn-success" type="button"
+                                    id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="false"
+                                    aria-expanded="false">
+                                    <i class="fas fa-bars"></i>
+                                    Opciones
+                                </button>
+                                <div class="dropdown-menu animated--fade-in"
+                                    aria-labelledby="dropdownMenuButton">
+                                    <a onclick="pdf_media();" id="btnfacturar" name="btnfacturar" class="dropdown-item" title="facturar">Imprimir Factura Media Carta</a>  
+                                    <a href="{{ route('quotations.reversarQuotation',$quotation->id) }}" class="dropdown-item">Reversar Compra</a> 
+                                </div>
+                            </div> 
                            
                             <div class="col-md-3">
                                 <a href="{{ route('invoices.movement',[$quotation->id,$coin]) }}" id="btnmovement" name="btnmovement" class="btn btn-light" title="movement">Ver Movimiento de Cuenta</a>  

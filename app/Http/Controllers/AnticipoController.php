@@ -582,8 +582,22 @@ class AnticipoController extends Controller
         }
         
     }
+    public function delete_anticipo(Request $request)
+    {
+       
+        $anticipo = Anticipo::on(Auth::user()->database_name)->find(request('id_anticipo_modal')); 
 
+        if(isset($anticipo)){
+            $anticipo->delete(); 
+            return redirect('/anticipos')->withSuccess('Eliminacion exitosa!!');
+        }else{
+            return redirect('/anticipos')->withDanger('No se pudo encontrar el anticipo!!');
+        }
+        
 
+       
+        
+    }
    /**
     * Remove the specified resource from storage.
     *

@@ -81,16 +81,17 @@
                 @else  
                     @foreach ($quotations as $quotation)
                         <tr>
-                            <td>
-                            <a href="{{ route('quotations.createfacturar',[$quotation->id,$quotation->coin])}}" title="Seleccionar"><i class="fa fa-check"></i></a>
-                            <a href="{{ route('quotations.createdeliverynote',[$quotation->id,$quotation->coin])}}" title="Mostrar"><i class="fa fa-file-alt"></i></a>
+                            <td class="text-center">
+                                <a href="{{ route('quotations.createfacturar',[$quotation->id,$quotation->coin])}}" title="Seleccionar"><i class="fa fa-check"></i></a>
+                                <a href="{{ route('quotations.createdeliverynote',[$quotation->id,$quotation->coin])}}" title="Mostrar"><i class="fa fa-file-alt"></i></a>
+                                <a href="{{ route('quotations.reversarQuotation',$quotation->id)}}" title="Borrar"><i class="fa fa-trash text-danger"></i></a>
                            </td>
-                            <td>{{$quotation->serie}}</td>
-                            <td>{{ $quotation->clients['name']}}</td>
-                            <td>{{ $quotation->vendors['name']}}</td>
-                            <td>{{ $quotation->transports['placa'] ?? ''}}</td>
-                            <td>{{$quotation->date_quotation}}</td>
-                            <td>{{$quotation->date_delivery_note}}</td>
+                            <td class="text-center">{{ $quotation->serie}}</td>
+                            <td class="text-center">{{ $quotation->clients['name']}}</td>
+                            <td class="text-center">{{ $quotation->vendors['name']}}</td>
+                            <td class="text-center">{{ $quotation->transports['placa'] ?? ''}}</td>
+                            <td class="text-center">{{ $quotation->date_quotation}}</td>
+                            <td class="text-center">{{ $quotation->date_delivery_note}}</td>
                         </tr>     
                     @endforeach   
                 @endif

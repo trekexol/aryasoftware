@@ -360,13 +360,15 @@
                                 </div>
                             </div>
                             <div class="form-group row mb-0">
+                                @if (empty($expense->date_delivery_note))
                                 <div class="col-md-4">
                                     @if($suma == 0)
-                                        <a onclick="validate()" id="btnSendNote" name="btnfacturar" class="btn btn-info" title="facturar">Nota de Entrega</a>  
+                                        <a onclick="validate()" id="btnSendNote" name="btnfacturar" class="btn btn-success" title="facturar">Orden de Compra</a>  
                                     @else
-                                        <a onclick="deliveryNoteSend()" id="btnSendNote" name="btnfacturar" class="btn btn-info" title="facturar">Nota de Entrega</a>  
+                                        <a onclick="deliveryNoteSend()" id="btnSendNote" name="btnfacturar" class="btn btn-success" title="facturar">Orden de Compra</a>  
                                     @endif
                                 </div>
+                                @endif
                                 <div class="col-md-4">
                                     <a id="btnpayment" href="{{ route('expensesandpurchases.create_payment',[$expense->id,$coin]) }}" name="btnpayment" class="btn btn-info" title="Registrar">Registrar</a>  
                                 </div>
@@ -429,7 +431,7 @@
         });
 
         function deliveryNoteSend() {
-            window.location = "{{route('expenses.createdeliverynote', [$expense->id,$coin])}}";
+            window.location = "{{route('expensesandpurchases.createdeliverynote', [$expense->id,$coin])}}";
         }
 
 

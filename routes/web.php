@@ -448,6 +448,8 @@ Route::group(["prefix"=>'quotations'],function(){
 
     Route::delete('deleteproduct','QuotationController@deleteProduct')->name('quotations.deleteProduct');
     Route::delete('deletequotation','QuotationController@deleteQuotation')->name('quotations.deleteQuotation');
+
+    Route::get('reversarquotation{id}','QuotationController@reversar_quotation')->name('quotations.reversarQuotation');
    
 });
 
@@ -535,6 +537,8 @@ Route::group(["prefix"=>'invoices'],function(){
     Route::get('expensemedia/{id_expense}/{coin}','PDFController@imprimirExpenseMedia')->name('pdf.expense_media');
 
     Route::get('previousexercise/{date_begin}/{date_end}','PDFController@print_previousexercise')->name('pdf.previousexercise');
+    
+    Route::get('deliverynoteexpense/{id_expense}/{coin}/{iva}','PDFController@deliverynote_expense')->name('pdf.deliverynote_expense');
  });
 
 
@@ -557,8 +561,7 @@ Route::group(["prefix"=>'anticipos'],function(){
     Route::post('store', 'AnticipoController@store')->name('anticipos.store');
    
     Route::get('edit/{id}/{id_client?}/{id_provider?}','AnticipoController@edit')->name('anticipos.edit');
-    Route::delete('{id}/delete','AnticipoController@destroy')->name('anticipos.delete');
-    Route::patch('{id}/update','AnticipoController@update')->name('anticipos.update');
+   Route::patch('{id}/update','AnticipoController@update')->name('anticipos.update');
 
     Route::get('register/{id_client}','AnticipoController@createclient')->name('anticipos.createclient');
     Route::get('selectclient/{id_anticipo?}','AnticipoController@selectclient')->name('anticipos.selectclient');
@@ -576,6 +579,7 @@ Route::group(["prefix"=>'anticipos'],function(){
     Route::get('selectanticipoexpense/{id_provider}/{coin}/{id_expense}','AnticipoController@selectanticipo_provider')->name('anticipos.selectanticipo_provider');
     Route::post('storeprovider', 'AnticipoController@store_provider')->name('anticipos.store_provider');
 
+    Route::delete('delete','AnticipoController@delete_anticipo')->name('anticipos.delete');
 });
 
 
@@ -644,6 +648,9 @@ Route::group(["prefix"=>'expensesandpurchases'],function(){
     Route::post('storemultipayment','ExpensesMultipaymentController@storemultipayment')->name('expensesandpurchases.storemultipayment');
 
     Route::get('reversarcompra/{id_expense}','ExpensesAndPurchaseController@reversar_expense')->name('expensesandpurchases.reversar_expense');
+
+    Route::get('notadeentrega/{id_expense}/{coin}','ExpensesAndPurchaseController@createdeliverynote')->name('expensesandpurchases.createdeliverynote');
+    Route::get('indexnotasdeentrega/','ExpensesAndPurchaseController@index_delivery_note')->name('expensesandpurchases.indexdeliverynote');
 });
 
 Route::group(["prefix"=>'directpaymentorders'],function(){

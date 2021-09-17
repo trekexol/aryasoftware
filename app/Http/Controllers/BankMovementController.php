@@ -11,6 +11,7 @@ use App\Client;
 use App\Company;
 use App\DetailVoucher;
 use App\HeaderVoucher;
+use App\Provider;
 use App\Segment;
 use App\Subsegment;
 use App\UnitOfMeasure;
@@ -1560,7 +1561,7 @@ class BankMovementController extends Controller
             if(strcmp($id_var, "Cliente") == 0){
                 $respuesta = Client::on(Auth::user()->database_name)->select('id','name')->orderBy('name','asc')->get();
             }else{
-               $respuesta = Vendor::on(Auth::user()->database_name)->select('id','name')->orderBy('name','asc')->get();
+               $respuesta = Provider::on(Auth::user()->database_name)->select('id','razon_social as name')->orderBy('razon_social','asc')->get();
              }
            
             return response()->json($respuesta,200);

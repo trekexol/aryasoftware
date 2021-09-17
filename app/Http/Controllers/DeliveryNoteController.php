@@ -21,6 +21,7 @@ class DeliveryNoteController extends Controller
          $quotations = Quotation::on(Auth::user()->database_name)->orderBy('id' ,'DESC')
                                  ->where('date_delivery_note','<>',null)
                                  ->where('date_billing',null)
+                                 ->whereIn('status',[1,'M'])
                                  ->get();
        
  

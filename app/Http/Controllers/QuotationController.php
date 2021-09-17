@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Client;
 use App\Company;
+use App\DetailVoucher;
 use App\Inventory;
 use App\Product;
 use App\Quotation;
@@ -119,7 +120,7 @@ class QuotationController extends Controller
                 $quotation = Quotation::on(Auth::user()->database_name)->find($id_quotation);
             }
 
-            if(isset($quotation)){
+            if(isset($quotation) && ($quotation->status == 1)){
                 //$inventories_quotations = QuotationProduct::on(Auth::user()->database_name)->where('id_quotation',$quotation->id)->get();
                 $inventories_quotations = DB::connection(Auth::user()->database_name)->table('products')
                                 ->join('inventories', 'products.id', '=', 'inventories.product_id')
@@ -159,7 +160,7 @@ class QuotationController extends Controller
         
                 return view('admin.quotations.create',compact('quotation','inventories_quotations','datenow','bcv','coin','bcv_quotation_product'));
             }else{
-                return redirect('/quotations')->withDanger('La cotizacion no existe');
+                return redirect('/quotations')->withDanger('No es posible ver esta cotizacion');
             } 
             
 
@@ -198,7 +199,7 @@ class QuotationController extends Controller
             $quotation = Quotation::on(Auth::user()->database_name)->find($id_quotation);
         }
 
-        if(isset($quotation)){
+        if(isset($quotation) && ($quotation->status == 1)){
             //$product_quotations = QuotationProduct::on(Auth::user()->database_name)->where('id_quotation',$quotation->id)->get();
                 $product = null;
                 $inventories_quotations = DB::connection(Auth::user()->database_name)->table('products')
@@ -791,6 +792,36 @@ class QuotationController extends Controller
 
         return redirect('/quotations')->withDanger('Eliminacion exitosa!!');
         
+    }
+
+    public function reversar_quotation($id_quotation)
+    { 
+        
+        $quotation = Quotation::on(Auth::user()->database_name)->findOrFail($id_quotation);
+
+        if($quotation != 'X'){
+            $detail = DetailVoucher::on(Auth::user()->database_name)->where('id_invoice',$id_quotation)
+            ->update(['status' => 'X']);
+
+
+            /* DB::connection(Auth::user()->database_name)->table('detail_vouchers')
+            ->join('header_vouchers', 'header_vouchers.id','=','detail_vouchers.id_header_voucher')
+            ->join('multipayment_expenses', 'multipayment_expenses.id_header','=','header_vouchers.id')
+            ->where('multipayment_expenses.id_expense','=',$id_quotation)
+            ->update(['detail_vouchers.status' => 'X']);*/
+
+            QuotationProduct::on(Auth::user()->database_name)
+                            ->join('inventories','inventories.id','quotation_products.id_inventory')
+                            ->where('id_quotation',$quotation->id)
+                            ->update(['inventories.amount' => DB::raw('inventories.amount+quotation_products.amount') , 'quotation_products.status' => 'X']);
+
+            $quotation->status = 'X';
+            $quotation->save();
+        }
+        
+        
+        return redirect('invoices')->withSuccess('Reverso de Factura Exitosa!');
+
     }
 
 
