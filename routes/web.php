@@ -841,3 +841,10 @@ Route::group(["prefix"=>'reports'],function(){
     Route::get('salespdf/{coin}/{date_begin}/{date_end}/{name?}','ReportController@sales_pdf')->name('reports.sales_pdf');
     
 });
+
+
+Route::group(["prefix"=>'payments'],function(){
+    Route::get('index','PaymentController@index')->name('payments');
+    Route::get('movement/{id_quotation}','PaymentController@movements')->name('payments.movement');
+    Route::get('pdf/{id_quotation}/{coin}','PaymentController@pdf')->name('payments.pdf');
+});

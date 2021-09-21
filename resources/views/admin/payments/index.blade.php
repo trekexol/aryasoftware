@@ -29,27 +29,23 @@
 
 
 
-<form method="POST" action="{{ route('invoices.multipayment') }}" enctype="multipart/form-data" >
-@csrf
+
 <!-- container-fluid -->
 <div class="container-fluid">
 
     <!-- Page Heading -->
     <div class="row py-lg-2">
       <div class="col-md-2">
-          <h2>Facturas</h2>
+          <h2>Cobros</h2>
       </div>
       <div class="col-md-2">
-        <a href="{{ route('payments')}}" class="btn btn-info btn-icon-split">
+        <a href="{{ route('invoices')}}" class="btn btn-info btn-icon-split">
             <span class="icon text-white-50">
-                <i class="fas fa-hand-holding-usd"></i>
+                <i class="fas fa-file-alt"></i>
             </span>
-            <span class="text">Cobros</span>
+            <span class="text">Facturas</span>
         </a>
     </div>
-      <div class="col-md-6">
-        <button type="submit" title="Agregar" id="btncobrar" class="btn btn-primary  float-md-right" >Cobrar Facturas</a>
-      </div>
     </div>
   </div>
   <!-- /.container-fluid -->
@@ -78,52 +74,31 @@
             <tr> 
                 <th class="text-center">Fecha</th>
                 <th class="text-center">Nº</th>
-                <th class="text-center">Cliente</th>
+                <th class="text-center">Referencia</th>
+                <th class="text-center">Tipo de Pago</th>
                 <th class="text-center">Monto</th>
-                <th class="text-center">Iva</th>
-                <th class="text-center">Monto Con Iva</th>
-                <th class="text-center"></th>
-                <th class="text-center"></th>
+                <th class="text-center" width="5%"></th>
             </tr>
             </thead>
             
             <tbody>
-                @if (empty($quotations))
+                @if (empty($payment_quotations))
                 @else  
-                    @foreach ($quotations as $quotation)
+                    @foreach ($payment_quotations as $payment_quotation)
                         <tr>
-                            <td class="text-center font-weight-bold">{{$quotation->date_billing}}</td>
-                            @if ($quotation->status == "X")
-                                <td class="text-center font-weight-bold">{{ $quotation->id }}
-                                </td>
-                            @else
-                                <td class="text-center font-weight-bold">
-                                    <a href="{{ route('quotations.createfacturado',[$quotation->id,$quotation->coin ?? 'bolivares']) }}" title="Ver Factura" class="font-weight-bold text-dark">{{ $quotation->id }}</a>
-                                </td>
-                            @endif
-                            <td class="text-center font-weight-bold">{{ $quotation->clients['name']}}</td>
-                            <td class="text-right font-weight-bold">{{number_format($quotation->amount, 2, ',', '.')}}</td>
-                            <td class="text-right font-weight-bold">{{number_format($quotation->amount_iva, 2, ',', '.')}}</td>
-                            <td class="text-right font-weight-bold">{{number_format($quotation->amount_with_iva, 2, ',', '.')}}</td>
-                            @if ($quotation->status == "C")
-                                <td class="text-center font-weight-bold">
-                                    <a href="{{ route('quotations.createfacturado',[$quotation->id,$quotation->coin ?? 'bolivares']) }}" title="Ver Factura" class="text-center text-success font-weight-bold">Cobrado</a>
-                                </td>
-                                <td class="text-center font-weight-bold">
-                                </td>
-                            @elseif ($quotation->status == "X")
-                                <td class="text-center font-weight-bold text-danger">Reversado
-                                </td>
-                                <td>
-                                </td>
-                            @else
-                                <td class="text-center font-weight-bold">
-                                    <a href="{{ route('quotations.createfacturar_after',[$quotation->id,$quotation->coin ?? 'bolivares']) }}" title="Cobrar Factura" class="font-weight-bold text-dark">Click para Cobrar</a>
-                                </td>
-                                <td>
-                                    <input type="checkbox" name="check{{ $quotation->id }}" value="{{ $quotation->id }}" onclick="buttom();" id="flexCheckChecked">    
-                                </td>
-                            @endif
+                            <td class="text-center font-weight-bold">{{$payment_quotation->created_at->format('d-m-Y')}}</td>
+                            
+                            <td class="text-center font-weight-bold">
+                                <a href="{{ route('payments.movement',$payment_quotation->id_quotation) }}" title="Ver Movimiento" class="font-weight-bold text-dark">{{ $payment_quotation->id }}</a>
+                            </td>
+                            
+                            <td class="text-center font-weight-bold">{{ $payment_quotation->reference}}</td>
+                            <td class="text-center font-weight-bold">{{ $payment_quotation->type}}</td>
+                            <td class="text-right font-weight-bold">{{number_format($payment_quotation->amount, 2, ',', '.')}}</td>
+                            <td class="text-center">
+                                <a href="{{ route('payments.pdf',[$payment_quotation->id_quotation,'bolivares']) }}" title="Mostrar"><i class="fa fa-file-alt"></i></a>
+                                <a  title="Borrar"><i class="fa fa-trash text-danger"></i></a>                        
+                            </td>
                             
                         </tr>     
                     @endforeach   
@@ -135,7 +110,6 @@
         </div>
     </div>
 </div>
-</form>
 @endsection
 @section('javascript')
     <script>
@@ -152,11 +126,5 @@
         };
 
 
-        $("#btncobrar").hide();
-
-        function buttom(){
-            
-            $("#btncobrar").show();
-        }
     </script>
 @endsection

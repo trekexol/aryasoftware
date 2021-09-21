@@ -17,9 +17,17 @@
             </a>
         </div>
         <div class="col-sm-3">
+        @if ((isset($return)) && ($return == 'payments'))
+            <a href="{{ route('payments') }}" class="btn btn-light"><i class="fas fa-undo" ></i>
+                &nbsp Volver
+            </a>
+        @else
             <a href="{{ route('quotations.createfacturado',[$quotation->id,$coin]) }}" class="btn btn-light"><i class="fas fa-undo" ></i>
                 &nbsp Volver a la Factura
             </a>
+        @endif
+        
+            
         </div>
     </div>
     <!-- Page Heading -->
