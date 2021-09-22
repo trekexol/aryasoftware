@@ -375,7 +375,7 @@ class AnticipoController extends Controller
 
         /*Aplicamos el movimiento contable*/
         $header_voucher  = new HeaderVoucher();
-        $var->setConnection(Auth::user()->database_name);
+        $header_voucher->setConnection(Auth::user()->database_name);
 
         $date = Carbon::now();
         $datenow = $date->format('Y-m-d');

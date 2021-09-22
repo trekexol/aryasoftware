@@ -44,7 +44,10 @@ class InvoiceController extends Controller
         $users_role =   $user->role_id;
         
             $quotation = Quotation::on(Auth::user()->database_name)->find($id_invoice);
-            $detailvouchers = DetailVoucher::on(Auth::user()->database_name)->where('id_invoice',$id_invoice)->get();
+            $detailvouchers = DetailVoucher::on(Auth::user()->database_name)
+                                            ->where('id_invoice',$id_invoice)
+                                            ->where('status','C')
+                                            ->get();
 
             $multipayments_detail = null;
             $invoices = null;

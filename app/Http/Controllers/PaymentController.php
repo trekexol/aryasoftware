@@ -61,6 +61,7 @@ class PaymentController extends Controller
                                             ->join('header_vouchers','header_vouchers.id','detail_vouchers.id_header_voucher')
                                             ->where('id_invoice',$id_invoice)
                                             ->where('header_vouchers.description','LIKE','Cobro%')
+                                            ->where('detail_vouchers.status','C')
                                             ->get();
 
             $multipayments_detail = null;
@@ -84,26 +85,30 @@ class PaymentController extends Controller
     }
 
 
-    function pdf($id_quotation,$coin)
+    public function pdf($id_payment,$coin)
     {
         
         $pdf = App::make('dompdf.wrapper');
 
         $date = Carbon::now();
         $datenow = $date->format('Y-m-d');    
-       
-        $movement = Quotation::on(Auth::user()->database_name)
-        ->join('quotation_payments', 'quotation_payments.id_quotation', '=', 'quotations.id')
-        ->join('detail_vouchers', 'detail_vouchers.id_invoice', '=', 'quotations.id')
-        ->join('header_vouchers','header_vouchers.id','detail_vouchers.id_header_voucher')
-        ->join('accounts','accounts.id','detail_vouchers.id_account')
-        ->where('quotations.id',$id_quotation)
 
-        ->select('header_vouchers.description', 'detail_vouchers.debe', 'detail_vouchers.haber', 'detail_vouchers.haber',
-        'accounts.code_one','accounts.code_two','accounts.code_three','accounts.code_four','accounts.code_five',
-        'detail_vouchers.tasa')
-        ->get();
-           
+        $payment = QuotationPayment::on(Auth::user()->database_name)->find($id_payment);
+       
+        $movements = Quotation::on(Auth::user()->database_name)
+            ->join('detail_vouchers', 'detail_vouchers.id_invoice', '=', 'quotations.id')
+            ->join('header_vouchers','header_vouchers.id','detail_vouchers.id_header_voucher')
+            ->join('accounts','accounts.id','detail_vouchers.id_account')
+            ->join('clients','clients.id','quotations.id_client')
+            ->where('quotations.id',$payment->id_quotation)
+            ->where('header_vouchers.description','LIKE','Cobro%')
+            ->where('detail_vouchers.status','C')
+            ->select('header_vouchers.description', 'header_vouchers.id as header_id',
+            'detail_vouchers.debe', 'detail_vouchers.haber', 'detail_vouchers.haber', 'detail_vouchers.tasa',
+            'accounts.code_one','accounts.code_two','accounts.code_three','accounts.code_four','accounts.code_five','accounts.description as account_description',
+            'clients.name as client_name','clients.cedula_rif as client_cedula_rif','clients.type_code as client_type_code',
+            'quotations.id as quotation_id')
+            ->get();
 
         $company = Company::on(Auth::user()->database_name)->find(1);
         //Si la taza es automatica
@@ -114,12 +119,46 @@ class PaymentController extends Controller
             $rate = $company->rate;
         }
 
-       
-        $pdf = $pdf->loadView('admin.payments.pdf',compact('coin','rate','movement','datenow'));
+        
+        $type = $this->asignar_payment_type($payment->payment_type);
+
+        $payment->type = $type;
+            
+        $pdf = $pdf->loadView('admin.payments.pdf',compact('payment','coin','rate','movements','datenow'));
         return $pdf->stream();
                  
     }
 
+
+    public function deleteAllPayments(Request $request){
+
+        
+        $id_quotation = request('id_quotation_modal');
+        //dd($request);
+        $quotation = Quotation::on(Auth::user()->database_name)->findOrFail($id_quotation);
+        
+        if($quotation->status != 'X'){
+            
+            DetailVoucher::on(Auth::user()->database_name)
+                    ->join('header_vouchers','header_vouchers.id','detail_vouchers.id_header_voucher')
+                    ->where('id_invoice',$id_quotation)
+                    ->where('header_vouchers.description','LIKE','Cobro%')
+                    ->update(['detail_vouchers.status' => 'X','header_vouchers.status' => 'X']);
+
+                    
+            QuotationPayment::on(Auth::user()->database_name)
+                            ->where('id_quotation',$quotation->id)
+                            ->update(['status' => 'X']);
+
+            $quotation->status = 'P';
+            $quotation->save();
+        }
+        
+        
+        return redirect('payments/index')->withSuccess('Reverso de Pagos Exitoso!');
+    }
+
+  
 
     function asignar_payment_type($type){
       

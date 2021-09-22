@@ -94,13 +94,14 @@ class InventoryController extends Controller
             //si la tasa es fija
             $bcv = $company->rate;
         }
-
-        $contrapartidas     = Account::on(Auth::user()->database_name)->where('code_one', '<>',0)
-                                                                    ->where('code_two', '<>',0)
-                                                                    ->where('code_three', '<>',0)
-                                                                    ->where('code_four', '<>',0)
-                                                                    ->where('code_five', '=',0)
-                                                                ->orderBY('description','asc')->pluck('description','id')->toArray();
+        
+        $contrapartidas     = Account::on(Auth::user()->database_name)
+                                                        ->orWhere('description', 'LIKE','Bancos')
+                                                        ->orWhere('description', 'LIKE','Caja')
+                                                        ->orWhere('description', 'LIKE','Cuentas por Pagar Comerciales')
+                                                        ->orWhere('description', 'LIKE','Capital Social Suscrito y Pagado')
+                                                        ->orWhere('description', 'LIKE','Capital Social Suscripto y No Pagado')
+                                                        ->orderBY('description','asc')->pluck('description','id')->toArray();
 
         return view('admin.inventories.create_increase_inventory',compact('inventory','bcv','contrapartidas'));
    }

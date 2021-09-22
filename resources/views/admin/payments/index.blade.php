@@ -96,8 +96,8 @@
                             <td class="text-center font-weight-bold">{{ $payment_quotation->type}}</td>
                             <td class="text-right font-weight-bold">{{number_format($payment_quotation->amount, 2, ',', '.')}}</td>
                             <td class="text-center">
-                                <a href="{{ route('payments.pdf',[$payment_quotation->id_quotation,'bolivares']) }}" title="Mostrar"><i class="fa fa-file-alt"></i></a>
-                                <a  title="Borrar"><i class="fa fa-trash text-danger"></i></a>                        
+                                <a href="#" onclick="pdf({{ $payment_quotation->id }});" title="Mostrar"><i class="fa fa-file-alt"></i></a>
+                                <a href="#"  class="delete" title="Borrar" data-id-quotation={{$payment_quotation->id_quotation}} data-toggle="modal" data-target="#deleteModal"><i class="fa fa-trash text-danger"></i></a>                        
                             </td>
                             
                         </tr>     
@@ -110,6 +110,33 @@
         </div>
     </div>
 </div>
+<!-- Delete Warning Modal -->
+<div class="modal modal-danger fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Eliminar Todos los Pagos</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            <form action="{{ route('payments.deleteAllPayments') }}" method="post">
+                @csrf
+                @method('DELETE')
+                <input id="id_quotation_modal" type="hidden" class="form-control @error('id_quotation_modal') is-invalid @enderror" name="id_quotation_modal" readonly required autocomplete="id_quotation_modal">
+                    
+                <h5 class="text-center">Seguro que desea eliminar todos los pagos pertenecientes a esta factura?</h5>
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-danger">Eliminar</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
 @section('javascript')
     <script>
@@ -117,14 +144,22 @@
         "ordering": false,
         "order": [],
             'aLengthMenu': [[50, 100, 150, -1], [50, 100, 150, "All"]]
-    } );
+        } );
 
         $("body").toggleClass("sidebar-toggled");
         $(".sidebar").toggleClass("toggled");
         if ($(".sidebar").hasClass("toggled")) {
             $('.sidebar .collapse').collapse('hide');
         };
+       
+        function pdf(id_payment) {
+            var nuevaVentana= window.open("{{ route('payments.pdf',['',''])}}"+"/"+id_payment+"/"+'bolivares',"ventana","left=800,top=800,height=800,width=1000,scrollbar=si,location=no ,resizable=si,menubar=no");   
+        }
 
-
+        $(document).on('click','.delete',function(){
+            let id_quotation = $(this).attr('data-id-quotation');
+        
+            $('#id_quotation_modal').val(id_quotation);
+        });
     </script>
 @endsection

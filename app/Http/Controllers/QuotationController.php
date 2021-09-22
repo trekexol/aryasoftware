@@ -8,6 +8,7 @@ use App\DetailVoucher;
 use App\Inventory;
 use App\Product;
 use App\Quotation;
+use App\QuotationPayment;
 use App\QuotationProduct;
 use App\Transport;
 use App\Vendor;
@@ -814,6 +815,10 @@ class QuotationController extends Controller
                             ->join('inventories','inventories.id','quotation_products.id_inventory')
                             ->where('id_quotation',$quotation->id)
                             ->update(['inventories.amount' => DB::raw('inventories.amount+quotation_products.amount') , 'quotation_products.status' => 'X']);
+
+            QuotationPayment::on(Auth::user()->database_name)
+                            ->where('id_quotation',$quotation->id)
+                            ->update(['status' => 'X']);
 
             $quotation->status = 'X';
             $quotation->save();

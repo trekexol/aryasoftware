@@ -846,5 +846,7 @@ Route::group(["prefix"=>'reports'],function(){
 Route::group(["prefix"=>'payments'],function(){
     Route::get('index','PaymentController@index')->name('payments');
     Route::get('movement/{id_quotation}','PaymentController@movements')->name('payments.movement');
-    Route::get('pdf/{id_quotation}/{coin}','PaymentController@pdf')->name('payments.pdf');
+    Route::get('pdf/{id_payment}/{coin}','PaymentController@pdf')->name('payments.pdf');
+
+    Route::delete('deleteall','PaymentController@deleteAllPayments')->name('payments.deleteAllPayments');
 });
