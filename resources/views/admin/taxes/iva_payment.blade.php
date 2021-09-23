@@ -2,14 +2,12 @@
 
 @section('content')
 
-
-
     {{-- VALIDACIONES-RESPUESTA--}}
     @include('admin.layouts.success')   {{-- SAVE --}}
     @include('admin.layouts.danger')    {{-- EDITAR --}}
     @include('admin.layouts.delete')    {{-- DELELTE --}}
     {{-- VALIDACIONES-RESPUESTA --}}
-    
+
 @if ($errors->any())
         <div class="alert alert-danger">
             <ul>
@@ -23,30 +21,45 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header text-center font-weight-bold h3">Retiros / Ordenes de Pago</div>
+                <div class="card-header text-center font-weight-bold h3">Debito Fiscal IVA por Pagar</div>
 
                 <div class="card-body">
                     <form method="POST" action="{{ route('bankmovements.storeretirement') }}" enctype="multipart/form-data">
                         @csrf
-                        
                         <input id="id_account_iva" type="hidden" class="form-control @error('id_account') is-invalid @enderror" name="id_account_iva" value="{{ $account_iva->id }}" required autocomplete="id_account_iva" autofocus>
                         <input id="user_id" type="hidden" class="form-control @error('user_id') is-invalid @enderror" name="user_id" value="{{ Auth::user()->id }}" required autocomplete="user_id">
-                        
                         <div class="form-group row">
-                            <label id="coinlabel" for="type" class="col-md-2 col-form-label text-md-right">Tipo:</label>
-                            <div class="col-md-2">
-                                <select class="form-control" name="type_contado" id="type_contado">
-                                    <option selected value="contado">Contado</option>
+                            <div class="col-sm-2">
+                                <label id="date_begin" for="type" >Fecha del Retiro Mes:</label>
+                            </div>
+                            <div class="col-sm-4">
+
+
+                                <input type="text" class="form-control @error('description') is-invalid @enderror" value="{{$mes_nombre}}"  readonly>
+                            </div>
+                            <div class="col-sm-2">
+                                <label id="date_begin" for="type" >Fecha del Retiro Año:</label>
+                            </div>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control @error('description') is-invalid @enderror" name="Fecha_Year"  readonly>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-2">
+                                <label id="Tipo" for="type" >Tipo:</label>
+                            </div>
+                            <div class="col-sm-4">
+                                <select class="form-control" name="Tipo" id="type_contado">
+                                    <option selected value="">Seleccione..</option>
+                                    <option value="contado">Contado</option>
                                     <option value="credito">Credito</option>
                                 </select>
                             </div>
-                        </div>
-                       
-                        <div class="form-group row">
-                            <label for="account" class="col-md-2 col-form-label text-md-right">Retirar Desde:</label>
-
-                            <div class="col-md-4">
-                                <select  id="account"  name="account" class="form-control">
+                            <div class="col-sm-2" >
+                                <label for="Filtro">Retirar / Pagar:</label>
+                            </div>
+                            <div class="col-sm-4 ">
+                                <select  id="account"  name="Filtro" class="form-control">
                                     <option value="">Seleccionar</option>
                                 </select>
 
@@ -56,90 +69,190 @@
                                     </span>
                                 @endif
                             </div>
-                            <label for="date_begin" class="col-md-3 col-form-label text-md-right">Fecha del Retiro:</label>
-
-                            <div class="col-md-3">
-                                <input id="date_begin" type="date" class="form-control @error('date_begin') is-invalid @enderror" name="date" value="{{ $datenow ?? old('date_begin') }}" required autocomplete="date_begin">
-
-                                @error('date_begin')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
                         </div>
-                       
                         <div class="form-group row">
-                            
-                            <label for="description" class="col-md-2 col-form-label text-md-right">Descripción</label>
-
-                            <div class="col-md-4">
-                                <input id="description" type="text" class="form-control @error('description') is-invalid @enderror" name="description" value="{{ old('description') }}" required autocomplete="description">
-
+                            <div class="col-sm-2" >
+                                <label for="Filtro">Descripción:</label>
+                            </div>
+                            <div class="col-sm-10 ">
+                                <input id="description" type="text" class="form-control @error('description') is-invalid @enderror" name="description" value="{{ old('Descripcion') }}" required autocomplete="description">
                                 @error('description')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                            <label for="reference" class="col-md-3 col-form-label text-md-right">Número de Referencia:</label>
-
-                            <div class="col-md-3">
-                                <input id="reference" type="text" class="form-control @error('reference') is-invalid @enderror" name="reference" value="{{ old('reference') }}" autocomplete="reference">
-
-                                @error('reference')
-                                    <span class="invalid-feedback" role="alert">
+                                <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                 @enderror
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label id="coinlabel" for="coin" class="col-md-2 col-form-label text-md-right">Moneda:</label>
-
-                            <div class="col-md-2">
-                                <select class="form-control" name="coin" id="coin">
+                            <div class="col-sm-2" >
+                                <label for="money">Moneda:</label>
+                            </div>
+                            <div class="col-sm-4 ">
+                                <select class="form-control" name="Moneda" id="coin">
                                     <option selected value="bolivares">Bolívares</option>
                                     <option value="dolares">Dolares</option>
                                 </select>
                             </div>
-                            <label for="rate" class="col-md-1 col-form-label text-md-right">Tasa:</label>
-                            <div class="col-md-3">
-                                <input id="rate" type="text" class="form-control @error('rate') is-invalid @enderror" name="rate" value="{{ $bcv }}" required autocomplete="rate">
+                            <div class="col-sm-2">
+                                <label for="rate">Tasa:</label>
+                            </div>
+                            <div class="col-sm-4">
+                                <input id="rate" type="text" class="form-control @error('rate') is-invalid @enderror" name="rate" value="{{ number_format($bcv,2,",",".")}}" required autocomplete="rate">
                                 @error('rate')
-                                    <span class="invalid-feedback" role="alert">
+                                <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                 @enderror
                             </div>
                         </div>
                         <div class="form-group row">
-                            
-                            <label for="amount" class="col-md-2 col-form-label text-md-right">Monto:</label>
-
-                            <div class="col-md-4">
-                                <input id="amount" type="text" class="form-control @error('amount') is-invalid @enderror" placeholder="0,00" name="amount" value="{{ old('amount') }}" required autocomplete="amount">
-
-                                @error('amount')
-                                    <span class="invalid-feedback" role="alert">
+                            <div class="col-sm-2">
+                                <label for="beneficiario">Beneficiario:</label>
+                            </div>
+                            <div class="col-sm-4">
+                                <input id="nro_ref" type="text" class="form-control @error('beneficiario') is-invalid @enderror"  name="Beneficiario" value="SENIAT" readonly autocomplete="beneficiario">
+                                @error('beneficiario')
+                                <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                 @enderror
                             </div>
-                            
+                            <div class="col-sm-2">
+                                <label for="amount">Debito Fiscal:</label>
+                            </div>
+                            <div class="col-sm-4">
+                                <input id="amount" type="text" class="form-control @error('amount') is-invalid @enderror"  name="amount" value="{{ number_format($total_resultado,2,",",".") }}" required readonly autocomplete="amount">
+                                @error('amount')
+                                <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
                         </div>
-                       
-                        
-                      
+                        <div class="form-group row">
+                            <div class="col-sm-2">
+                                <label for="amount">Monto:</label>
+                            </div>
+                            <div class="col-sm-4">
+                                <input id="amount" type="text" class="form-control @error('amount') is-invalid @enderror" placeholder="0,00" name="amount" value="{{ old('amount') }}" required autocomplete="amount">
+                                @error('amount')
+                                <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                            <div class="col-sm-2">
+                                <label for="amount">Retenciónes del Perido:</label>
+                            </div>
+                            <div class="col-sm-4">
+                                <input id="amount" type="text" class="form-control @error('amount') is-invalid @enderror" placeholder="0,00" name="amount" value="{{ old('amount') }}" required autocomplete="amount">
+                                @error('amount')
+                                <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-2">
+                                <label for="amount">Crédito Fiscal:</label>
+                            </div>
+                            <div class="col-sm-4">
+                                <input id="amount" type="text" class="form-control @error('amount') is-invalid @enderror" placeholder="0,00" name="amount" value="{{ old('amount') }}" required autocomplete="amount">
+                                @error('amount')
+                                <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                            <div class="col-sm-2">
+                                <label for="amount">Excedente:</label>
+                            </div>
+                            <div class="col-sm-4">
+                                <input id="amount" type="text" class="form-control @error('amount') is-invalid @enderror" placeholder="0,00" name="amount" value="{{ old('amount') }}" required autocomplete="amount">
+                                @error('amount')
+                                <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-2">
+                                <label for="amount">Total a Pagar:</label>
+                            </div>
+                            <div class="col-sm-4">
+                                <input id="amount" type="text" class="form-control @error('amount') is-invalid @enderror" placeholder="0,00" name="amount" value="{{ old('amount') }}" required autocomplete="amount">
+                                @error('amount')
+                                <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                            <div class="col-sm-2">
+                                <label for="amount">Contrapartida:</label>
+                            </div>
+                            <div class="col-sm-4">
+                                <select class="form-control" id="exampleFormControlSelect1">
+                                    <option>Seleccione..</option>
+                                    @foreach($account_impuestos as $index => $value)
+                                        <option value="{{ $index }}" {{ old('Botones') == $index ? 'selected' : '' }}>
+                                            {{ $value }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-2">
+                                <label for="amount">Centro de costo:</label>
+                            </div>
+                            <div class="col-sm-4">
+                                    <select class="form-control" id="exampleFormControlSelect1">
+                                        <option>Seleccione..</option>
+                                        @foreach($branches as $index => $value)
+                                            <option value="{{ $index }}" {{ old('Botones') == $index ? 'selected' : '' }}>
+                                                {{ $value }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                            </div>
+                            <div class="col-sm-2">
+                                <label for="amount">Emitir Cheque:</label>
+                            </div>
+                            <div class="col-sm-4">
+                                <select class="form-control" id="exampleFormControlSelect1">
+                                    <option>NO</option>
+                                    <option>SI</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="div_nro" style="display: none">
+                            <div class="form-group row">
+                                <div class="col-sm-2">
+                                    <label for="nro_ref">Nro Referencia:</label>
+                                </div>
+                                <div class="col-sm-4">
+                                    <input id="nro_ref" type="text" class="form-control @error('nro_ref') is-invalid @enderror" placeholder="0000" name="Nro_Ref" value="{{ old('Nro_Ref') }}" required autocomplete="nro_ref">
+                                    @error('nro_ref')
+                                    <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
                         <br>
                         <div class="form-group row mb-0">
-                            <div class="col-md-3 offset-md-4">
+                            <div class="col-sm-6 ">
                                 <button type="submit" class="btn btn-primary">
-                                   Guardar Depósito
+                                   Pagar Impuesto
                                 </button>
                             </div>
-                            <div class="col-md-2">
-                                <a href="{{ route('bankmovements') }}" id="btnfacturar" name="btnfacturar" class="btn btn-danger" title="facturar">Volver</a>  
+                            <div class="col-sm-6">
+                                <a href="{{ route('bankmovements') }}" id="btnfacturar" name="btnfacturar" class="btn btn-danger" title="facturar">Volver</a>
                             </div>
                         </div>
                     </form>
@@ -149,38 +262,67 @@
     </div>
 </div>
 @endsection
-@section('validacion_usuario')
-    <script>
-        
-    
+@section('javascript_iva_payment')
 
-    </script>
-@endsection
-@section('javascript')
-    
     <script>
+
+            var fecha = new Date();
+            var ano = fecha.getFullYear();
+            document.getElementsByName("Fecha_Year")[0].value = ano ;
+
+            $("#filtro_mount").on('change',function(){
+                var mes_id = $(this).val();
+                var fecha   = new Date();
+                var ano     = fecha.getFullYear();
+                $fe
+
+                if(metodo_id == 1){
+                    document.getElementById("pp-button").style.display   = "none";
+                    document.getElementById("div_pagar").style.display   = "block";
+                }
+
+                if(metodo_id == 2){
+                    document.getElementById("pp-button").style.display   = "block";
+                    document.getElementById("div_pagar").style.display   = "none";
+                }
+
+            });
+
+            $("#type_contado").on('change',function(){
+            var type_id = $(this).val();
+
+            if(type_id == 'contado'){
+                document.getElementById("div_nro").style.display   = "block";
+            }
+
+            if(type_id == 'credito'){
+                document.getElementById("div_nro").style.display   = "none";
+            }
+
+        });
+
         $(document).ready(function () {
             $("#amount").mask('00.000.000.000.000,00', { reverse: true });
-            
+
         });
         $(document).ready(function () {
             $("#reference").mask('0000000000000000', { reverse: true });
-            
+
         });
         $(document).ready(function () {
             $("#rate").mask('000.000.000.000.000,00', { reverse: true });
-            
+
         });
 
         $("#type_contado").on('change',function(){
-            
+
             var type = $(this).val();
-            
+
             getAccount(type);
         });
 
         function getAccount(type){
-            
+
             $.ajax({
                 url:"{{ route('taxes.list_account','') }}" + '/' + type,
                 beforSend:()=>{
@@ -201,15 +343,15 @@
                     // console.log(htmlOptions);
                     subbeneficiario.html('');
                     subbeneficiario.html(htmlOptions);
-                
-                    
-                
+
+
+
                 },
                 error:(xhr)=>{
                     alert('Presentamos inconvenientes al consultar los datos');
                 }
             })
         }
-    </script> 
+    </script>
 
-@endsection    
+@endsection

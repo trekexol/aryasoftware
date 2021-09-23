@@ -860,7 +860,12 @@ Route::group(["prefix"=>'payment_expenses'],function(){
     Route::delete('deleteall','PaymentExpenseController@deleteAllPayments')->name('payment_expenses.deleteAllPayments');
 });
 
+Route::group(["prefix"=>'taxes'],function(){
 
+    Route::get('ivapaymentindex','TaxesController@iva_paymentindex')->name('taxes.iva_paymentindex');
+    Route::post('ivapayment','TaxesController@iva_payment')->name('taxes.iva_payment');
+    Route::get('listaccount/{type}','TaxesController@list_account')->name('taxes.list_account');
+});
 
 
 

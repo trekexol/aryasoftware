@@ -160,7 +160,8 @@
   @yield('quotation_facturar_after')
   @yield('validacion_transport')
   @yield('validacion_vendor')
-
+  @yield('javascript_iva_payment')
+  
   <script>
     function soloNumeros(idCampo){
     $('#'+idCampo).keyup(function (){
