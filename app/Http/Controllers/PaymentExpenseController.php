@@ -2,21 +2,19 @@
 
 namespace App\Http\Controllers;
 
+
+
 use Carbon\Carbon;
-use Illuminate\Http\Request;
-
-
 use App;
+use App\DetailVoucher;
+use App\ExpensePayment;
+use App\ExpensesAndPurchase;
+use App\MultipaymentExpense;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
-use App\Company;
-use App\DetailVoucher;
-use App\Multipayment;
-use App\Quotation;
-use App\QuotationPayment;
-
-class PaymentController extends Controller
+class PaymentExpenseController extends Controller
 {
     public function index()
     {
@@ -24,55 +22,55 @@ class PaymentController extends Controller
         $user       =   auth()->user();
         $users_role =   $user->role_id;
 
-        $payment_quotations = null;
+        $payment_expenses = null;
         
         $date = Carbon::now();
         $datenow = $date->format('Y-m-d');    
         $datebeginyear = $date->firstOfYear()->format('Y-m-d');
         
-        $payment_quotations = QuotationPayment::on(Auth::user()->database_name)
+        $payment_expenses = ExpensePayment::on(Auth::user()->database_name)
                                 ->whereRaw(
                                     "(DATE_FORMAT(created_at, '%Y-%m-%d') >= ? AND DATE_FORMAT(created_at, '%Y-%m-%d') <= ?)", 
                                     [$datebeginyear, $datenow])
-                                ->where('status','1')->orderBy('created_at','desc')->get();
+                                ->where('status',1)->orderBy('created_at','desc')->get();
 
-        foreach($payment_quotations as $payment_quotation){
+        foreach($payment_expenses as $payment_expense){
 
-            $type = $this->asignar_payment_type($payment_quotation->payment_type);
+            $type = $this->asignar_payment_type($payment_expense->payment_type);
 
-            $payment_quotation->type = $type;
+            $payment_expense->type = $type;
         }
             
         
-        return view('admin.payments.index',compact('datenow','payment_quotations'));
+        return view('admin.payment_expenses.index',compact('datenow','payment_expenses'));
       
     }
 
 
-    public function movements($id_invoice)
+    public function movements($id_expense)
     {
         
 
         $user       =   auth()->user();
         $users_role =   $user->role_id;
         
-            $quotation = Quotation::on(Auth::user()->database_name)->find($id_invoice);
+            $expense = ExpensesAndPurchase::on(Auth::user()->database_name)->find($id_expense);
             $detailvouchers = DetailVoucher::on(Auth::user()->database_name)
                                             ->join('header_vouchers','header_vouchers.id','detail_vouchers.id_header_voucher')
-                                            ->where('id_invoice',$id_invoice)
-                                            ->where('header_vouchers.description','LIKE','Cobro%')
+                                            ->where('id_expense',$id_expense)
+                                            ->where('header_vouchers.description','LIKE','Pago%')
                                             ->where('detail_vouchers.status','C')
                                             ->get();
 
             $multipayments_detail = null;
-            $invoices = null;
-            $coin = $quotation->coin;
+            $expenses = null;
+            $coin = $expense->coin;
             $return = "payments";
 
             //Buscamos a la factura para luego buscar atraves del header a la otras facturas
-            $multipayment = Multipayment::on(Auth::user()->database_name)->where('id_quotation',$id_invoice)->first();
+            $multipayment = MultipaymentExpense::on(Auth::user()->database_name)->where('id_expense',$id_expense)->first();
             if(isset($multipayment)){
-            $invoices = Multipayment::on(Auth::user()->database_name)->where('id_header',$multipayment->id_header)->get();
+            $expenses = MultipaymentExpense::on(Auth::user()->database_name)->where('id_header',$multipayment->id_header)->get();
             $multipayments_detail = DetailVoucher::on(Auth::user()->database_name)->where('id_header_voucher',$multipayment->id_header)->get();
             }
 
@@ -81,7 +79,7 @@ class PaymentController extends Controller
             }
          
         
-        return view('admin.invoices.index_detail_movement',compact('return','detailvouchers','quotation','coin','invoices','multipayments_detail'));
+        return view('admin.expensesandpurchases.index_movement',compact('return','detailvouchers','expense','coin','expenses','multipayments_detail'));
     }
 
 
@@ -93,21 +91,21 @@ class PaymentController extends Controller
         $date = Carbon::now();
         $datenow = $date->format('Y-m-d');    
 
-        $payment = QuotationPayment::on(Auth::user()->database_name)->find($id_payment);
+        $payment = ExpensePayment::on(Auth::user()->database_name)->find($id_payment);
        
-        $movements = Quotation::on(Auth::user()->database_name)
-            ->join('detail_vouchers', 'detail_vouchers.id_invoice', '=', 'quotations.id')
+        $movements = ExpensesAndPurchase::on(Auth::user()->database_name)
+            ->join('detail_vouchers', 'detail_vouchers.id_expense', '=', 'expenses_and_purchases.id')
             ->join('header_vouchers','header_vouchers.id','detail_vouchers.id_header_voucher')
             ->join('accounts','accounts.id','detail_vouchers.id_account')
-            ->join('clients','clients.id','quotations.id_client')
-            ->where('quotations.id',$payment->id_quotation)
-            ->where('header_vouchers.description','LIKE','Cobro%')
+            ->join('providers','providers.id','expenses_and_purchases.id_provider')
+            ->where('expenses_and_purchases.id',$payment->id_expense)
+            ->where('header_vouchers.description','LIKE','Pago%')
             ->where('detail_vouchers.status','C')
             ->select('header_vouchers.description', 'header_vouchers.id as header_id',
             'detail_vouchers.debe', 'detail_vouchers.haber', 'detail_vouchers.haber', 'detail_vouchers.tasa',
             'accounts.code_one','accounts.code_two','accounts.code_three','accounts.code_four','accounts.code_five','accounts.description as account_description',
-            'clients.name as client_name','clients.cedula_rif as client_cedula_rif','clients.type_code as client_type_code',
-            'quotations.id as quotation_id')
+            'providers.razon_social as provider_name','providers.code_provider as provider_code_provider',
+            'expenses_and_purchases.id as expense_id','expenses_and_purchases.serie as expense_serie')
             ->get();
 
         
@@ -117,7 +115,7 @@ class PaymentController extends Controller
 
         $payment->type = $type;
             
-        $pdf = $pdf->loadView('admin.payments.pdf',compact('payment','coin','movements','datenow'));
+        $pdf = $pdf->loadView('admin.payment_expenses.pdf',compact('payment','coin','movements','datenow'));
         return $pdf->stream();
                  
     }
@@ -126,29 +124,29 @@ class PaymentController extends Controller
     public function deleteAllPayments(Request $request){
 
         
-        $id_quotation = request('id_quotation_modal');
-        //dd($request);
-        $quotation = Quotation::on(Auth::user()->database_name)->findOrFail($id_quotation);
+        $id_expense = request('id_expense_modal');
         
-        if($quotation->status != 'X'){
+        $expense = ExpensesAndPurchase::on(Auth::user()->database_name)->findOrFail($id_expense);
+        
+        if($expense->status != 'X'){
             
             DetailVoucher::on(Auth::user()->database_name)
                     ->join('header_vouchers','header_vouchers.id','detail_vouchers.id_header_voucher')
-                    ->where('id_invoice',$id_quotation)
+                    ->where('detail_vouchers.id_expense',$id_expense)
                     ->where('header_vouchers.description','LIKE','Cobro%')
                     ->update(['detail_vouchers.status' => 'X','header_vouchers.status' => 'X']);
 
                     
-            QuotationPayment::on(Auth::user()->database_name)
-                            ->where('id_quotation',$quotation->id)
+            ExpensePayment::on(Auth::user()->database_name)
+                            ->where('id_expense',$expense->id)
                             ->update(['status' => 'X']);
 
-            $quotation->status = 'P';
-            $quotation->save();
+            $expense->status = 'P';
+            $expense->save();
         }
         
         
-        return redirect('payments/index')->withSuccess('Reverso de Pagos Exitoso!');
+        return redirect('payment_expenses/index')->withSuccess('Reverso de Pago Exitoso!');
     }
 
   
@@ -191,5 +189,4 @@ class PaymentController extends Controller
     }
 
 
-   
 }

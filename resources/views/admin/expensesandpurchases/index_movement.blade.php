@@ -17,13 +17,19 @@
             </a>
         </div>
         <div class="col-md-3">
+            @if ((isset($return)) && ($return == 'payments'))
+            <a href="{{ route('payment_expenses') }}" class="btn btn-light"><i class="fas fa-undo" ></i>
+                &nbsp Volver
+            </a>
+        @else
             <a href="{{ route('expensesandpurchases.create_expense_voucher',[$expense->id,$coin]) }}" class="btn btn-light2"><i class="fas fa-undo" ></i>
                  Volver a la Compra
             </a>
+        @endif
         </div>
     </div>
     <!-- Page Heading -->
-   
+
   </div>
 
   {{-- VALIDACIONES-RESPUESTA--}}

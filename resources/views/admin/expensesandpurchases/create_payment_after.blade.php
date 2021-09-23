@@ -944,7 +944,7 @@
 
                 document.getElementById("total_pay").value =  total_payformat;
 
-                document.getElementById("total_pay_form").value =  total_pay.toFixed(3);
+                document.getElementById("total_pay_form").value =  total_pay.toFixed(2);
 
                 document.getElementById("iva_form").value =  inputIva;
 
@@ -1068,7 +1068,7 @@
 
                 document.getElementById("total_pay").value =  total_payformat;
 
-                document.getElementById("total_pay_form").value =  total_pay.toFixed(3);
+                document.getElementById("total_pay_form").value =  total_pay.toFixed(2);
 
                 document.getElementById("iva_form").value =  inputIva;
               
@@ -1197,7 +1197,7 @@
 
                 document.getElementById("total_pay").value =  total_payformat;
 
-                document.getElementById("total_pay_form").value =  total_pay.toFixed(3);
+                document.getElementById("total_pay_form").value =  total_pay.toFixed(2);
 
                 document.getElementById("iva_form").value =  inputIva;
 

@@ -845,7 +845,7 @@ class ExpensesAndPurchaseController extends Controller
                     
                     $valor_sin_formato_amount_pay = str_replace(',', '.', str_replace('.', '', $amount_pay));
                 }else{
-                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe ingresar un monto de pago 1!');
+                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe ingresar un monto de pago 1!');
                 }
                     
         
@@ -876,10 +876,10 @@ class ExpensesAndPurchaseController extends Controller
                                     $var->reference = $reference;
         
                                 }else{
-                                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe ingresar una Referencia Bancaria!');
+                                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe ingresar una Referencia Bancaria!');
                                 }
                             }else{
-                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar una Cuenta Bancaria!');
+                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar una Cuenta Bancaria!');
                             }
                         }
                         if($payment_type == 4){
@@ -889,7 +889,7 @@ class ExpensesAndPurchaseController extends Controller
                                 $var->credit_days = $credit_days;
         
                             }else{
-                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe ingresar los Dias de Credito!');
+                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe ingresar los Dias de Credito!');
                             }
                         }
         
@@ -900,7 +900,7 @@ class ExpensesAndPurchaseController extends Controller
                                 $var->id_account = $account_efectivo;
         
                             }else{
-                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar una Cuenta de Efectivo!');
+                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar una Cuenta de Efectivo!');
                             }
                         }
         
@@ -909,7 +909,7 @@ class ExpensesAndPurchaseController extends Controller
                             if(($account_punto_de_venta != 0)){
                                 $var->id_account = $account_punto_de_venta;
                             }else{
-                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar una Cuenta de Punto de Venta!');
+                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar una Cuenta de Punto de Venta!');
                             }
                         }
         
@@ -931,12 +931,12 @@ class ExpensesAndPurchaseController extends Controller
         
                         
                     }else{
-                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar un Tipo de Pago 1!');
+                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar un Tipo de Pago 1!');
                     }
         
                     
                 }else{
-                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('El pago debe ser distinto de Cero!');
+                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('El pago debe ser distinto de Cero!');
                     }
                 /*--------------------------------------------*/
             }   
@@ -954,7 +954,7 @@ class ExpensesAndPurchaseController extends Controller
                     
                     $valor_sin_formato_amount_pay2 = str_replace(',', '.', str_replace('.', '', $amount_pay2));
                 }else{
-                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe ingresar un monto de pago 2!');
+                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe ingresar un monto de pago 2!');
                 }
                     
 
@@ -985,10 +985,10 @@ class ExpensesAndPurchaseController extends Controller
                                 $var2->reference = $reference2;
 
                             }else{
-                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe ingresar una Referencia Bancaria en pago numero 2!');
+                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe ingresar una Referencia Bancaria en pago numero 2!');
                             }
                         }else{
-                            return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 2!');
+                            return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 2!');
                         }
                     }
                     if($payment_type2 == 4){
@@ -998,7 +998,7 @@ class ExpensesAndPurchaseController extends Controller
                             $var2->credit_days = $credit_days2;
 
                         }else{
-                            return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe ingresar los Dias de Credito en pago numero 2!');
+                            return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe ingresar los Dias de Credito en pago numero 2!');
                         }
                     }
 
@@ -1009,7 +1009,7 @@ class ExpensesAndPurchaseController extends Controller
                             $var2->id_account = $account_efectivo2;
 
                         }else{
-                            return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar una Cuenta de Efectivo en pago numero 2!');
+                            return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar una Cuenta de Efectivo en pago numero 2!');
                         }
                     }
 
@@ -1018,7 +1018,7 @@ class ExpensesAndPurchaseController extends Controller
                         if(($account_punto_de_venta2 != 0)){
                             $var2->id_account = $account_punto_de_venta2;
                         }else{
-                            return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar una Cuenta de Punto de Venta en pago numero 2!');
+                            return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar una Cuenta de Punto de Venta en pago numero 2!');
                         }
                     }
 
@@ -1040,12 +1040,12 @@ class ExpensesAndPurchaseController extends Controller
 
                     
                 }else{
-                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar un Tipo de Pago 2!');
+                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar un Tipo de Pago 2!');
                 }
 
                 
                 }else{
-                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('El pago 2 debe ser distinto de Cero!');
+                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('El pago 2 debe ser distinto de Cero!');
                 }
                 /*--------------------------------------------*/
             } 
@@ -1063,7 +1063,7 @@ class ExpensesAndPurchaseController extends Controller
                         
                         $valor_sin_formato_amount_pay3 = str_replace(',', '.', str_replace('.', '', $amount_pay3));
                     }else{
-                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe ingresar un monto de pago 3!');
+                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe ingresar un monto de pago 3!');
                     }
                         
 
@@ -1094,10 +1094,10 @@ class ExpensesAndPurchaseController extends Controller
                                         $var3->reference = $reference3;
 
                                     }else{
-                                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe ingresar una Referencia Bancaria en pago numero 3!');
+                                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe ingresar una Referencia Bancaria en pago numero 3!');
                                     }
                                 }else{
-                                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 3!');
+                                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 3!');
                                 }
                             }
                             if($payment_type3 == 4){
@@ -1107,7 +1107,7 @@ class ExpensesAndPurchaseController extends Controller
                                     $var3->credit_days = $credit_days3;
 
                                 }else{
-                                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe ingresar los Dias de Credito en pago numero 3!');
+                                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe ingresar los Dias de Credito en pago numero 3!');
                                 }
                             }
 
@@ -1118,7 +1118,7 @@ class ExpensesAndPurchaseController extends Controller
                                     $var3->id_account = $account_efectivo3;
 
                                 }else{
-                                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar una Cuenta de Efectivo en pago numero 3!');
+                                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar una Cuenta de Efectivo en pago numero 3!');
                                 }
                             }
 
@@ -1127,7 +1127,7 @@ class ExpensesAndPurchaseController extends Controller
                                 if(($account_punto_de_venta3 != 0)){
                                     $var3->id_account = $account_punto_de_venta3;
                                 }else{
-                                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar una Cuenta de Punto de Venta en pago numero 3!');
+                                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar una Cuenta de Punto de Venta en pago numero 3!');
                                 }
                             }
 
@@ -1149,12 +1149,12 @@ class ExpensesAndPurchaseController extends Controller
 
                             
                         }else{
-                            return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar un Tipo de Pago 3!');
+                            return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar un Tipo de Pago 3!');
                         }
 
                         
                     }else{
-                            return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('El pago 3 debe ser distinto de Cero!');
+                            return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('El pago 3 debe ser distinto de Cero!');
                         }
                     /*--------------------------------------------*/
             }
@@ -1172,7 +1172,7 @@ class ExpensesAndPurchaseController extends Controller
                         
                         $valor_sin_formato_amount_pay4 = str_replace(',', '.', str_replace('.', '', $amount_pay4));
                     }else{
-                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe ingresar un monto de pago 4!');
+                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe ingresar un monto de pago 4!');
                     }
                         
 
@@ -1203,10 +1203,10 @@ class ExpensesAndPurchaseController extends Controller
                                         $var4->reference = $reference4;
 
                                     }else{
-                                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe ingresar una Referencia Bancaria en pago numero 4!');
+                                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe ingresar una Referencia Bancaria en pago numero 4!');
                                     }
                                 }else{
-                                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 4!');
+                                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 4!');
                                 }
                             }
                             if($payment_type4 == 4){
@@ -1216,7 +1216,7 @@ class ExpensesAndPurchaseController extends Controller
                                     $var4->credit_days = $credit_days4;
 
                                 }else{
-                                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe ingresar los Dias de Credito en pago numero 4!');
+                                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe ingresar los Dias de Credito en pago numero 4!');
                                 }
                             }
 
@@ -1227,7 +1227,7 @@ class ExpensesAndPurchaseController extends Controller
                                     $var4->id_account = $account_efectivo4;
 
                                 }else{
-                                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar una Cuenta de Efectivo en pago numero 4!');
+                                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar una Cuenta de Efectivo en pago numero 4!');
                                 }
                             }
 
@@ -1236,7 +1236,7 @@ class ExpensesAndPurchaseController extends Controller
                                 if(($account_punto_de_venta4 != 0)){
                                     $var4->id_account = $account_punto_de_venta4;
                                 }else{
-                                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar una Cuenta de Punto de Venta en pago numero 4!');
+                                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar una Cuenta de Punto de Venta en pago numero 4!');
                                 }
                             }
 
@@ -1258,12 +1258,12 @@ class ExpensesAndPurchaseController extends Controller
 
                             
                         }else{
-                            return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar un Tipo de Pago 4!');
+                            return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar un Tipo de Pago 4!');
                         }
 
                         
                     }else{
-                            return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('El pago 4 debe ser distinto de Cero!');
+                            return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('El pago 4 debe ser distinto de Cero!');
                         }
                     /*--------------------------------------------*/
             } 
@@ -1281,7 +1281,7 @@ class ExpensesAndPurchaseController extends Controller
                     
                     $valor_sin_formato_amount_pay5 = str_replace(',', '.', str_replace('.', '', $amount_pay5));
                 }else{
-                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe ingresar un monto de pago 5!');
+                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe ingresar un monto de pago 5!');
                 }
                     
 
@@ -1312,10 +1312,10 @@ class ExpensesAndPurchaseController extends Controller
                                     $var5->reference = $reference5;
 
                                 }else{
-                                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe ingresar una Referencia Bancaria en pago numero 5!');
+                                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe ingresar una Referencia Bancaria en pago numero 5!');
                                 }
                             }else{
-                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 5!');
+                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 5!');
                             }
                         }
                         if($payment_type5 == 4){
@@ -1325,7 +1325,7 @@ class ExpensesAndPurchaseController extends Controller
                                 $var5->credit_days = $credit_days5;
 
                             }else{
-                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe ingresar los Dias de Credito en pago numero 5!');
+                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe ingresar los Dias de Credito en pago numero 5!');
                             }
                         }
 
@@ -1336,7 +1336,7 @@ class ExpensesAndPurchaseController extends Controller
                                 $var5->id_account = $account_efectivo5;
 
                             }else{
-                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar una Cuenta de Efectivo en pago numero 5!');
+                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar una Cuenta de Efectivo en pago numero 5!');
                             }
                         }
 
@@ -1345,7 +1345,7 @@ class ExpensesAndPurchaseController extends Controller
                             if(($account_punto_de_venta5 != 0)){
                                 $var5->id_account = $account_punto_de_venta5;
                             }else{
-                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar una Cuenta de Punto de Venta en pago numero 5!');
+                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar una Cuenta de Punto de Venta en pago numero 5!');
                             }
                         }
 
@@ -1367,12 +1367,12 @@ class ExpensesAndPurchaseController extends Controller
 
                         
                     }else{
-                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar un Tipo de Pago 5!');
+                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar un Tipo de Pago 5!');
                     }
 
                     
                 }else{
-                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('El pago 5 debe ser distinto de Cero!');
+                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('El pago 5 debe ser distinto de Cero!');
                     }
                 /*--------------------------------------------*/
             } 
@@ -1390,7 +1390,7 @@ class ExpensesAndPurchaseController extends Controller
                     
                     $valor_sin_formato_amount_pay6 = str_replace(',', '.', str_replace('.', '', $amount_pay6));
                 }else{
-                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe ingresar un monto de pago 6!');
+                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe ingresar un monto de pago 6!');
                 }
                     
 
@@ -1421,10 +1421,10 @@ class ExpensesAndPurchaseController extends Controller
                                     $var6->reference = $reference6;
 
                                 }else{
-                                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe ingresar una Referencia Bancaria en pago numero 6!');
+                                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe ingresar una Referencia Bancaria en pago numero 6!');
                                 }
                             }else{
-                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 6!');
+                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 6!');
                             }
                         }
                         if($payment_type6 == 4){
@@ -1434,7 +1434,7 @@ class ExpensesAndPurchaseController extends Controller
                                 $var6->credit_days = $credit_days6;
 
                             }else{
-                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe ingresar los Dias de Credito en pago numero 6!');
+                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe ingresar los Dias de Credito en pago numero 6!');
                             }
                         }
 
@@ -1445,7 +1445,7 @@ class ExpensesAndPurchaseController extends Controller
                                 $var6->id_account = $account_efectivo6;
 
                             }else{
-                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar una Cuenta de Efectivo en pago numero 6!');
+                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar una Cuenta de Efectivo en pago numero 6!');
                             }
                         }
 
@@ -1454,7 +1454,7 @@ class ExpensesAndPurchaseController extends Controller
                             if(($account_punto_de_venta6 != 0)){
                                 $var6->id_account = $account_punto_de_venta6;
                             }else{
-                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar una Cuenta de Punto de Venta en pago numero 6!');
+                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar una Cuenta de Punto de Venta en pago numero 6!');
                             }
                         }
 
@@ -1476,12 +1476,12 @@ class ExpensesAndPurchaseController extends Controller
 
                         
                     }else{
-                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar un Tipo de Pago 6!');
+                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar un Tipo de Pago 6!');
                     }
 
                     
                 }else{
-                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('El pago 6 debe ser distinto de Cero!');
+                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('El pago 6 debe ser distinto de Cero!');
                     }
                 /*--------------------------------------------*/
             } 
@@ -1499,7 +1499,7 @@ class ExpensesAndPurchaseController extends Controller
                     
                     $valor_sin_formato_amount_pay7 = str_replace(',', '.', str_replace('.', '', $amount_pay7));
                 }else{
-                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe ingresar un monto de pago 7!');
+                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe ingresar un monto de pago 7!');
                 }
                     
 
@@ -1530,10 +1530,10 @@ class ExpensesAndPurchaseController extends Controller
                                     $var7->reference = $reference7;
 
                                 }else{
-                                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe ingresar una Referencia Bancaria en pago numero 7!');
+                                    return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe ingresar una Referencia Bancaria en pago numero 7!');
                                 }
                             }else{
-                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 7!');
+                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 7!');
                             }
                         }
                         if($payment_type7 == 4){
@@ -1543,7 +1543,7 @@ class ExpensesAndPurchaseController extends Controller
                                 $var7->credit_days = $credit_days7;
 
                             }else{
-                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe ingresar los Dias de Credito en pago numero 7!');
+                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe ingresar los Dias de Credito en pago numero 7!');
                             }
                         }
 
@@ -1554,7 +1554,7 @@ class ExpensesAndPurchaseController extends Controller
                                 $var7->id_account = $account_efectivo7;
 
                             }else{
-                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar una Cuenta de Efectivo en pago numero 7!');
+                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar una Cuenta de Efectivo en pago numero 7!');
                             }
                         }
 
@@ -1563,7 +1563,7 @@ class ExpensesAndPurchaseController extends Controller
                             if(($account_punto_de_venta7 != 0)){
                                 $var7->id_account = $account_punto_de_venta7;
                             }else{
-                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar una Cuenta de Punto de Venta en pago numero 7!');
+                                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar una Cuenta de Punto de Venta en pago numero 7!');
                             }
                         }
 
@@ -1585,20 +1585,22 @@ class ExpensesAndPurchaseController extends Controller
 
                         
                     }else{
-                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Debe seleccionar un Tipo de Pago 7!');
+                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Debe seleccionar un Tipo de Pago 7!');
                     }
 
                     
                 }else{
-                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('El pago 7 debe ser distinto de Cero!');
+                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('El pago 7 debe ser distinto de Cero!');
                     }
                 /*--------------------------------------------*/
             } 
 
             $total_pay_form = request('total_pay_form');
 
+           
             //VALIDA QUE LA SUMA MONTOS INGRESADOS SEAN IGUALES AL MONTO TOTAL DEL PAGO
-            if($total_pay == $total_pay_form){
+            if($total_pay == $total_pay_form)
+            {
 
             
                 $header_voucher  = new HeaderVoucher();
@@ -1810,7 +1812,7 @@ class ExpensesAndPurchaseController extends Controller
                     $retorno = $this->increase_inventory($expense->id);
 
                     if($retorno != "exito"){
-                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'');
+                        return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'');
                     }
                 
                 /*---------------- */
@@ -1833,7 +1835,7 @@ class ExpensesAndPurchaseController extends Controller
                 /*------------------------------------------------- */
 
             }else{
-                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('La suma de los pagos es diferente al monto Total a Pagar!');
+                return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('La suma de los pagos es diferente al monto Total a Pagar!');
             }
 
             
@@ -1841,7 +1843,7 @@ class ExpensesAndPurchaseController extends Controller
             return redirect('expensesandpurchases/expensevoucher/'.$expense->id.'/'.$coin.'')->withSuccess('Factura Guardada con Exito!');
 
         }else{
-            return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'')->withDanger('Este pago ya ha sido realizado!');
+            return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('Este pago ya ha sido realizado!');
         }
 
     }

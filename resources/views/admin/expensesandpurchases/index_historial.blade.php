@@ -26,7 +26,15 @@
       <div class="col-md-6">
           <h2>Historial de Gastos y Compras</h2>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-2">
+        <a href="{{ route('payment_expenses')}}" class="btn btn-info btn-icon-split">
+            <span class="icon text-white-50">
+                <i class="fas fa-hand-holding-usd"></i>
+            </span>
+            <span class="text">Pagos</span>
+        </a>
+    </div>
+      <div class="col-md-4">
         <button type="submit" title="Agregar" id="btncobrar" class="btn btn-primary  float-md-right" >Cobrar Gastos o Compras</a>
       </div>
     </div>

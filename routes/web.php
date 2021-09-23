@@ -850,3 +850,18 @@ Route::group(["prefix"=>'payments'],function(){
 
     Route::delete('deleteall','PaymentController@deleteAllPayments')->name('payments.deleteAllPayments');
 });
+
+
+Route::group(["prefix"=>'payment_expenses'],function(){
+    Route::get('index','PaymentExpenseController@index')->name('payment_expenses');
+    Route::get('movement/{id_expense}','PaymentExpenseController@movements')->name('payment_expenses.movement');
+    Route::get('pdf/{id_payment}/{coin}','PaymentExpenseController@pdf')->name('payment_expenses.pdf');
+
+    Route::delete('deleteall','PaymentExpenseController@deleteAllPayments')->name('payment_expenses.deleteAllPayments');
+});
+
+
+
+
+
+
