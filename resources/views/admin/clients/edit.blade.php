@@ -269,10 +269,7 @@
         }
     }
 
-        $(document).ready(function () {
-            $("#cedula_rif").mask('000.000.000', { reverse: true });
-            
-        });
+        
         $(document).ready(function () {
             $("#phone1").mask('0000 000-0000', { reverse: true });
             

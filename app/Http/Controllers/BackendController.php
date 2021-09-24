@@ -21,74 +21,83 @@ class BackendController extends Controller
      */
     public function index()
     {
-        $accounts = $this->calculation('bolivares');
-        $account_activo = 0;
-        $account_pasivo = 0;
-        $account_patrimonio = 0;
-        $account_ingresos = 0;
-        $account_costos = 0;
-        $account_gastos = 0;
+        $user       =   auth()->user();
+        $users_role =   $user->role_id;
 
-        $account_cuentas_por_pagar = 0;
-        $account_cuentas_por_cobrar = 0;
-        $account_prestamos = 0;
+        
+        if($users_role == 1){
 
-        $account_banco1 = 0;
-        $account_banco1_name = "";
-        $account_banco2 = 0;
-        $account_banco2_name = "";
-        $account_banco3 = 0;
-        $account_banco3_name = "";
+            $accounts = $this->calculation('bolivares');
+            $account_activo = 0;
+            $account_pasivo = 0;
+            $account_patrimonio = 0;
+            $account_ingresos = 0;
+            $account_costos = 0;
+            $account_gastos = 0;
 
-        foreach($accounts as $account){
+            $account_cuentas_por_pagar = 0;
+            $account_cuentas_por_cobrar = 0;
+            $account_prestamos = 0;
 
-            if(($account->code_one == 1)&&($account->code_two == 0)&&($account->code_three == 0)&&($account->code_four == 0)&&($account->code_five == 0)){
-                $account_activo = $account->balance + $account->debe - $account->haber;
-            }
-            if(($account->code_one == 2)&&($account->code_two == 0)&&($account->code_three == 0)&&($account->code_four == 0)&&($account->code_five == 0)){
-                $account_pasivo = $account->balance + $account->debe - $account->haber;
-            }
-            if(($account->code_one == 3)&&($account->code_two == 0)&&($account->code_three == 0)&&($account->code_four == 0)&&($account->code_five == 0)){
-                $account_patrimonio = $account->balance + $account->debe - $account->haber;
-            }
-            if(($account->code_one == 4)&&($account->code_two == 0)&&($account->code_three == 0)&&($account->code_four == 0)&&($account->code_five == 0)){
-                $account_ingresos = $account->balance + $account->debe - $account->haber;
-            }
-            if(($account->code_one == 5)&&($account->code_two == 0)&&($account->code_three == 0)&&($account->code_four == 0)&&($account->code_five == 0)){
-                $account_costos = $account->balance + $account->debe - $account->haber;
-            }
-            if(($account->code_one == 6)&&($account->code_two == 0)&&($account->code_three == 0)&&($account->code_four == 0)&&($account->code_five == 0)){
-                $account_gastos = $account->balance + $account->debe - $account->haber;
-            }
-            if(($account->code_one == 2)&&($account->code_two == 1)&&($account->code_three == 1)&&($account->code_four == 0)&&($account->code_five == 0)){
-                $account_cuentas_por_pagar = $account->balance + $account->debe - $account->haber;
-            }
-            if(($account->code_one == 1)&&($account->code_two == 1)&&($account->code_three == 2)&&($account->code_four == 1)&&($account->code_five == 0)){
-                $account_cuentas_por_cobrar = $account->balance + $account->debe - $account->haber;
-            }
-            if(($account->code_one == 2)&&($account->code_two == 2)&&($account->code_three == 1)&&($account->code_four == 0)&&($account->code_five == 0)){
-                $account_prestamos = $account->balance + $account->debe - $account->haber;
+            $account_banco1 = 0;
+            $account_banco1_name = "";
+            $account_banco2 = 0;
+            $account_banco2_name = "";
+            $account_banco3 = 0;
+            $account_banco3_name = "";
+
+            foreach($accounts as $account){
+
+                if(($account->code_one == 1)&&($account->code_two == 0)&&($account->code_three == 0)&&($account->code_four == 0)&&($account->code_five == 0)){
+                    $account_activo = $account->balance + $account->debe - $account->haber;
+                }
+                if(($account->code_one == 2)&&($account->code_two == 0)&&($account->code_three == 0)&&($account->code_four == 0)&&($account->code_five == 0)){
+                    $account_pasivo = $account->balance + $account->debe - $account->haber;
+                }
+                if(($account->code_one == 3)&&($account->code_two == 0)&&($account->code_three == 0)&&($account->code_four == 0)&&($account->code_five == 0)){
+                    $account_patrimonio = $account->balance + $account->debe - $account->haber;
+                }
+                if(($account->code_one == 4)&&($account->code_two == 0)&&($account->code_three == 0)&&($account->code_four == 0)&&($account->code_five == 0)){
+                    $account_ingresos = $account->balance + $account->debe - $account->haber;
+                }
+                if(($account->code_one == 5)&&($account->code_two == 0)&&($account->code_three == 0)&&($account->code_four == 0)&&($account->code_five == 0)){
+                    $account_costos = $account->balance + $account->debe - $account->haber;
+                }
+                if(($account->code_one == 6)&&($account->code_two == 0)&&($account->code_three == 0)&&($account->code_four == 0)&&($account->code_five == 0)){
+                    $account_gastos = $account->balance + $account->debe - $account->haber;
+                }
+                if(($account->code_one == 2)&&($account->code_two == 1)&&($account->code_three == 1)&&($account->code_four == 0)&&($account->code_five == 0)){
+                    $account_cuentas_por_pagar = $account->balance + $account->debe - $account->haber;
+                }
+                if(($account->code_one == 1)&&($account->code_two == 1)&&($account->code_three == 2)&&($account->code_four == 1)&&($account->code_five == 0)){
+                    $account_cuentas_por_cobrar = $account->balance + $account->debe - $account->haber;
+                }
+                if(($account->code_one == 2)&&($account->code_two == 2)&&($account->code_three == 1)&&($account->code_four == 0)&&($account->code_five == 0)){
+                    $account_prestamos = $account->balance + $account->debe - $account->haber;
+                }
+
+                if(($account->code_one == 1)&&($account->code_two == 1)&&($account->code_three == 1)&&($account->code_four == 2)&&($account->code_five == 1)){
+                    $account_banco1 = $account->balance + $account->debe - $account->haber;
+                    $account_banco1_name = $account->description;
+                }
+                if(($account->code_one == 1)&&($account->code_two == 1)&&($account->code_three == 1)&&($account->code_four == 2)&&($account->code_five == 2)){
+                    $account_banco2 = $account->balance + $account->debe - $account->haber;
+                    $account_banco2_name = $account->description;
+                }
+                if(($account->code_one == 1)&&($account->code_two == 1)&&($account->code_three == 1)&&($account->code_four == 2)&&($account->code_five == 3)){
+                    $account_banco3 = $account->balance + $account->debe - $account->haber;
+                    $account_banco3_name = $account->description;
+                }
             }
 
-            if(($account->code_one == 1)&&($account->code_two == 1)&&($account->code_three == 1)&&($account->code_four == 2)&&($account->code_five == 1)){
-                $account_banco1 = $account->balance + $account->debe - $account->haber;
-                $account_banco1_name = $account->description;
-            }
-            if(($account->code_one == 1)&&($account->code_two == 1)&&($account->code_three == 1)&&($account->code_four == 2)&&($account->code_five == 2)){
-                $account_banco2 = $account->balance + $account->debe - $account->haber;
-                $account_banco2_name = $account->description;
-            }
-            if(($account->code_one == 1)&&($account->code_two == 1)&&($account->code_three == 1)&&($account->code_four == 2)&&($account->code_five == 3)){
-                $account_banco3 = $account->balance + $account->debe - $account->haber;
-                $account_banco3_name = $account->description;
-            }
+            return view('admin.index',compact('account_activo','account_pasivo','account_patrimonio','account_ingresos'
+            ,'account_costos','account_gastos','account_cuentas_por_pagar','account_cuentas_por_cobrar','account_prestamos'
+            ,'account_banco1','account_banco1_name','account_banco2','account_banco2_name','account_banco3','account_banco3_name'));
+
+            //return view('admin/home');
+        }else{
+            return view('admin.quotations.index');
         }
-
-        return view('admin.index',compact('account_activo','account_pasivo','account_patrimonio','account_ingresos'
-        ,'account_costos','account_gastos','account_cuentas_por_pagar','account_cuentas_por_cobrar','account_prestamos'
-        ,'account_banco1','account_banco1_name','account_banco2','account_banco2_name','account_banco3','account_banco3_name'));
-
-        //return view('admin/home');
     }
 
 

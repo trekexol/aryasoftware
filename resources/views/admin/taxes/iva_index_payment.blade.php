@@ -27,10 +27,10 @@
                         <form method="POST" action="{{ route('taxes.iva_payment') }}" enctype="multipart/form-data">
                             @csrf
                             <div class="form-group row">
-                                <div class="col-sm-2">
-                                    <label id="date_begin" for="type" >Fecha del Retiro Mes:</label>
-                                </div>
-                                <div class="col-sm-4">
+                                
+                                <label id="date_begin" class="col-sm-3 col-form-label text-md-right" for="type" >Fecha del Retiro Mes:</label>
+                               
+                                <div class="col-sm-3">
                                     <select class="form-control" id="filtro_mount" name="Filtro_Meses" >
                                         <option value="0">Seleccione..</option>
                                         <option value="01">Enero-01</option>
@@ -47,21 +47,24 @@
                                         <option value="12">Dicienmbre-12</option>
                                     </select>
                                 </div>
-                                <div class="col-sm-2">
-                                    <label id="date_begin" for="type" >Fecha del Retiro Año:</label>
-                                </div>
-                                <div class="col-sm-4">
-                                    <input type="text" class="form-control @error('description') is-invalid @enderror" name="Fecha_Year"  readonly>
+                               
+                                <label id="date_begin" class="col-sm-3 col-form-label text-md-right" for="type" >Fecha del Retiro Año:</label>
+                                
+                                <div class="col-sm-3">
+                                    <select class="form-control" id="filtro_year" name="Filtro_Year" >
+                                        <option value="{{ $year_anterior }}">{{ $year_anterior }}</option>
+                                        <option selected value="{{ $datenow }}">{{ $datenow }}</option>
+                                    </select>
                                 </div>
                             </div>
                             <br>
                             <div class="form-group row mb-0">
-                                <div class="col-sm-6 ">
+                                <div class="col-sm-3 offset-sm-3">
                                     <button type="submit" class="btn btn-primary">
                                         Consultar Impuesto
                                     </button>
                                 </div>
-                                <div class="col-sm-6">
+                                <div class="col-sm-3">
                                     <a href="{{ route('bankmovements') }}" id="btnfacturar" name="btnfacturar" class="btn btn-danger" title="facturar">Volver</a>
                                 </div>
                             </div>

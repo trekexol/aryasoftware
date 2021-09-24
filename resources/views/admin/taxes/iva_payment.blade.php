@@ -121,13 +121,39 @@
                                 <label for="amount">Debito Fiscal:</label>
                             </div>
                             <div class="col-sm-4">
-                                <input id="amount" type="text" class="form-control @error('amount') is-invalid @enderror"  name="amount" value="{{ number_format($total_resultado,2,",",".") }}" required readonly autocomplete="amount">
+                                <input id="amount" type="text" class="form-control @error('amount') is-invalid @enderror"  name="amount" value="{{ number_format($debito_fiscal_total,2,",",".") }}" required readonly autocomplete="amount">
                                 @error('amount')
                                 <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                 @enderror
                             </div>
+                        </div>
+                        
+                        <div class="form-group row">
+                            <div class="col-sm-2">
+                                <label for="amount">Crédito Fiscal:</label>
+                            </div>
+                            <div class="col-sm-4">
+                                <input id="amount" type="text" class="form-control @error('amount') is-invalid @enderror" placeholder="0,00" name="amount" value="{{ number_format($iva_credito_fiscal_total,2,",",".") }}" required autocomplete="amount">
+                                @error('amount')
+                                <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                            <div class="col-sm-2">
+                                <label for="amount">Excedente:</label>
+                            </div>
+                            <div class="col-sm-4">
+                                <input id="amount" type="text" class="form-control @error('amount') is-invalid @enderror" placeholder="0,00" name="amount" value="{{ old('amount') }}" required autocomplete="amount">
+                                @error('amount')
+                                <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+
                         </div>
                         <div class="form-group row">
                             <div class="col-sm-2">
@@ -143,31 +169,6 @@
                             </div>
                             <div class="col-sm-2">
                                 <label for="amount">Retenciónes del Perido:</label>
-                            </div>
-                            <div class="col-sm-4">
-                                <input id="amount" type="text" class="form-control @error('amount') is-invalid @enderror" placeholder="0,00" name="amount" value="{{ old('amount') }}" required autocomplete="amount">
-                                @error('amount')
-                                <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-sm-2">
-                                <label for="amount">Crédito Fiscal:</label>
-                            </div>
-                            <div class="col-sm-4">
-                                <input id="amount" type="text" class="form-control @error('amount') is-invalid @enderror" placeholder="0,00" name="amount" value="{{ old('amount') }}" required autocomplete="amount">
-                                @error('amount')
-                                <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                            <div class="col-sm-2">
-                                <label for="amount">Excedente:</label>
                             </div>
                             <div class="col-sm-4">
                                 <input id="amount" type="text" class="form-control @error('amount') is-invalid @enderror" placeholder="0,00" name="amount" value="{{ old('amount') }}" required autocomplete="amount">
@@ -246,13 +247,13 @@
                         </div>
                         <br>
                         <div class="form-group row mb-0">
-                            <div class="col-sm-6 ">
+                            <div class="col-sm-3 offset-sm-2">
                                 <button type="submit" class="btn btn-primary">
                                    Pagar Impuesto
                                 </button>
                             </div>
-                            <div class="col-sm-6">
-                                <a href="{{ route('bankmovements') }}" id="btnfacturar" name="btnfacturar" class="btn btn-danger" title="facturar">Volver</a>
+                            <div class="col-sm-2">
+                                <a href="{{ route('taxes.iva_paymentindex') }}" id="btnvolver" name="btnvolver" class="btn btn-danger" title="volver">Volver</a>
                             </div>
                         </div>
                     </form>
