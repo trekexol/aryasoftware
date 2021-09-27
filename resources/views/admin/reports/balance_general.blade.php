@@ -27,7 +27,7 @@
 <body>
   <table>
     <tr>
-      <th style="text-align: left; font-weight: normal; width: 15%; border-color: white; font-weight: bold;"> <img src="{{ asset($foto ?? 'img/northdelivery.jpg') }}" width="90" height="30" class="d-inline-block align-top" alt="">
+      <th style="text-align: left; font-weight: normal; width: 15%; border-color: white; font-weight: bold;"> <img src="{{ asset($foto ?? 'img/northdelivery.jpg') }}" width="50%"  class="d-inline-block align-top" alt="">
       </th>
       <th style="text-align: left; font-weight: normal; width: 85%; border-color: white; font-weight: bold;"><h4>{{$code_rif ?? ''}}  </h4></th>
     </tr> 

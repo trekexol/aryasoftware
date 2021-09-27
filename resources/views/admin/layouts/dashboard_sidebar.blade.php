@@ -200,32 +200,36 @@
             </div>
         </li>
     @endif
-    @if (Auth::user()->role_id  == '1')
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('inventories')}}">
-                <i class="fas fa-fw fa-boxes" ></i>
-                <span>Inventario</span></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('companies.create') }}">
-                <i class="fas fa-fw fa-wrench"></i>
-                <span>General</span></a>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseImpuestos"
-                aria-expanded="true" aria-controls="collapseImpuestos">
-                <i class="fas fa-fw fa-book" ></i>
-                <span>Impuestos</span>
-            </a>
-            <div id="collapseImpuestos" class="collapse" aria-labelledby="headingImpuestos" data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
-
-                <a class="collapse-item" href="{{ route('taxes.iva_paymentindex')}}" > <i class="fas fa-coins fa-sm fa-fw mr-2 text-black-400"></i><strong>Pago de Iva</strong></a>
-                
-                </div>
+    @if (Auth::user()->role_id  == '2')
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseReportes"
+            aria-expanded="true" aria-controls="collapseReportes">
+            <i class="fas fa-fw fa-book" ></i>
+            <span>Reportes</span>
+        </a>
+        <div id="collapseReportes" class="collapse" aria-labelledby="headingReportes" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a  class="collapse-header text-danger" href="{{ route('accounts') }}">Contabilidad</a>                         
+                <a class="collapse-item" href="{{ route('reports.sales_books') }}" > <i class="fas fa-book fa-sm fa-fw mr-2 text-blue-400"></i><strong>Libro de Ventas</strong></a>                            
             </div>
-        </li>
+        </div>
+    </li>
+    @endif
+    @if (Auth::user()->role_id  == '1')
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseImpuestos"
+            aria-expanded="true" aria-controls="collapseImpuestos">
+            <i class="fas fa-fw fa-book" ></i>
+            <span>Impuestos</span>
+        </a>
+        <div id="collapseImpuestos" class="collapse" aria-labelledby="headingImpuestos" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+
+            <a class="collapse-item" href="{{ route('taxes.iva_paymentindex')}}" > <i class="fas fa-coins fa-sm fa-fw mr-2 text-black-400"></i><strong>Pago de Iva</strong></a>
+            
+            </div>
+        </div>
+    </li>
         <li class="nav-item">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseReportes"
                 aria-expanded="true" aria-controls="collapseReportes">
@@ -260,6 +264,17 @@
                 </div>
             </div>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('inventories')}}">
+                <i class="fas fa-fw fa-boxes" ></i>
+                <span>Inventario</span></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('companies.create') }}">
+                <i class="fas fa-fw fa-wrench"></i>
+                <span>General</span></a>
+        </li>
+
     @endif
  
     

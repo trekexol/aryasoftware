@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Account;
 use App\Branch;
 use App\Company;
+use App\DetailVoucher;
+use App\HeaderVoucher;
 use App\Provider;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -73,6 +75,14 @@ class TaxesController extends Controller
             $mes_nombre = "DICIEMBRE";
         }
 
+        $account_iva = Account::on(Auth::user()->database_name)->where('code_one', 2)
+        ->where('code_two', 1)
+        ->where('code_three', 3)
+        ->where('code_four', 1)
+        ->where('code_five',4)
+        ->first();
+
+       
 
         $datenow        = Carbon::now();
         $ano            = request('Filtro_Year');
@@ -87,6 +97,9 @@ class TaxesController extends Controller
         $date_begin     = $fecha ;
         $date_end       = $mes_anterior;*/
 
+        $date_begin_last_month   = date("Y-m-d",strtotime($date_begin."- 1 month"));
+        $date_end_last_month     = new Carbon($date_begin_last_month); 
+        $date_end_last_month     = $date_end_last_month->endOfMonth()->format('Y-m-d');
         //Calculo de superavit
         $coin = 'bolivares';
 
@@ -99,8 +112,14 @@ class TaxesController extends Controller
 
         $debito_fiscal_total = $this->calculation_for_account($debito_fical,$coin,$date_begin,$date_end);
 
+        $debito_fiscal_total_last_month = $this->calculation_for_account($debito_fical,$coin,$date_begin_last_month,$date_end_last_month);
+
         if($debito_fiscal_total < 0){
             $debito_fiscal_total = $debito_fiscal_total * -1;
+        }
+
+        if($debito_fiscal_total_last_month < 0){
+            $debito_fiscal_total_last_month = $debito_fiscal_total_last_month * -1;
         }
 
         $iva_credito_fiscal = Account::on(Auth::user()->database_name)->where('code_one', 1)
@@ -112,33 +131,31 @@ class TaxesController extends Controller
 
         $iva_credito_fiscal_total = $this->calculation_for_account($iva_credito_fiscal,$coin,$date_begin,$date_end); 
 
+        $iva_credito_fiscal_total_last_month = $this->calculation_for_account($iva_credito_fiscal,$coin,$date_begin_last_month,$date_end_last_month); 
+
         if($iva_credito_fiscal_total < 0){
             $iva_credito_fiscal_total = $iva_credito_fiscal_total * -1;
         }
 
-        $iva_retenido_tercero= Account::on(Auth::user()->database_name)->where('code_one', 1)
+        if($iva_credito_fiscal_total_last_month < 0){
+            $iva_credito_fiscal_total_last_month = $iva_credito_fiscal_total_last_month * -1;
+        }
+
+
+
+        $iva_retenido_tercero = Account::on(Auth::user()->database_name)->where('code_one', 1)
             ->where('code_two', 1)
             ->where('code_three', 4)
             ->where('code_four', 1)
             ->where('code_five',2)
             ->first();
 
-        $iva_retenido_tercero = $this->calculation_for_account($iva_retenido_tercero,$coin,$date_begin,$date_end);
+        $iva_retenido_terceros_total = $this->calculation_for_account($iva_retenido_tercero,$coin,$date_begin,$date_end);
 
         
-        $account_iva = Account::on(Auth::user()->database_name)->where('code_one', 2)
-        ->where('code_two', 1)
-        ->where('code_three', 3)
-        ->where('code_four', 1)
-        ->where('code_five',4)
-        ->first();
-
-       $account_impuestos = Account::on(Auth::user()->database_name)->where('code_one', 1)
-           ->where('code_two', 1)
-           ->where('code_three', 4)
-           ->where('code_four', 1)
-           ->orderBY('description','asc')->pluck('description','id')->toArray();
-
+        if($iva_retenido_terceros_total < 0){
+            $iva_retenido_terceros_total = $iva_retenido_terceros_total * -1;
+        }
 
 
        $providers = Provider::on(Auth::user()->database_name)->orderBy('id', 'asc')->get();
@@ -158,10 +175,23 @@ class TaxesController extends Controller
            $bcv = $company->rate;
        }
 
+       
+       $total_excedente = $debito_fiscal_total_last_month - $iva_credito_fiscal_total_last_month;
 
+       
+       if($total_excedente < 0){
+            $total_excedente = $total_excedente * -1;
+       }else{
+            $total_excedente = 0;
+       }
 
+       $total_pay = $debito_fiscal_total - $iva_credito_fiscal_total - $total_excedente - $iva_retenido_terceros_total;
 
-       return view('admin.taxes.iva_payment',compact('debito_fiscal_total','iva_credito_fiscal_total','providers','branches','account_iva','bcv','datenow','account_impuestos','nro_mes','mes_nombre'));
+        if($total_pay < 0){
+            $total_pay = 0;
+        }
+
+       return view('admin.taxes.iva_payment',compact('total_pay','iva_retenido_terceros_total','total_excedente','debito_fiscal_total','iva_credito_fiscal_total','providers','branches','account_iva','bcv','datenow','nro_mes','mes_nombre'));
    }
 
    /**
@@ -174,61 +204,37 @@ class TaxesController extends Controller
     {
         dd($request);
         $data = request()->validate([
-            'code_provider'         =>'required|max:20',
-            'razon_social'          =>'required|max:80',
-            'direction'             =>'required|max:100',
-
-            'city'                  =>'required|max:20',
-            'country'               =>'required|max:20',
-            'phone1'         =>'required|max:20',
-            'phone2'         =>'required|max:20',
-
-
-            'days_credit'           =>  'required|integer',
-            'amount_max_credit'     =>  'required',
-            'porc_retencion_iva'    =>  'numeric|min:0|max:100',
-            'porc_retencion_islr'    => 'numeric|min:0|max:100',
-
-            'balance'         =>'required',
-
-
+            'rate'  =>'required',
+            'month'  =>'required',
 
         ]);
+        $user       =   auth()->user();
 
-        $users = new Provider();
-        $users->setConnection(Auth::user()->database_name);
+        $datenow        = Carbon::now();
 
-
-        $users->code_provider = request('code_provider');
-        $users->razon_social = request('razon_social');
-        $users->direction = request('direction');
-        $users->city = request('city');
-        $users->country = request('country');
-        $users->phone1 = request('phone1');
-        $users->phone2 = request('phone2');
-
-        $has_credit = request('has_credit');
-        if($has_credit == null){
-            $users->has_credit = false;
-        }else{
-            $users->has_credit = true;
-        }
-
-        $users->days_credit = request('days_credit');
-
-        $sin_formato_amount_max_credit = str_replace(',', '.', str_replace('.', '', request('amount_max_credit')));
-        $sin_formato_balance = str_replace(',', '.', str_replace('.', '', request('balance')));
+        $header_voucher  = new HeaderVoucher();
+        $header_voucher->setConnection(Auth::user()->database_name);
 
 
-        $users->amount_max_credit = $sin_formato_amount_max_credit;
-        $users->porc_retencion_iva = request('porc_retencion_iva');
-        $users->porc_retencion_islr = request('porc_retencion_islr');
+        $header_voucher->description = "Pago Iva Debito Fiscal".request('month');
+        $header_voucher->date = $datenow;
+        
+        $header_voucher->status =  "1";
+    
+        $header_voucher->save();
 
-        $users->balance = $sin_formato_balance;
+        $rate = request('rate');
+        $total_pay = request('total_pay');
 
-        $users->status =  1;
+        $account_iva = Account::on(Auth::user()->database_name)->where('code_one', 2)
+        ->where('code_two', 1)
+        ->where('code_three', 3)
+        ->where('code_four', 1)
+        ->where('code_five',4)
+        ->first();
 
-        $users->save();
+
+        $this->add_movement($rate,$header_voucher->id,$account_iva->id,$user->id,$total_pay,0);
 
         return redirect('/taxes/ivapayment')->withSuccess('Registro Exitoso!');
     }
@@ -386,6 +392,37 @@ class TaxesController extends Controller
 
     }
 
+    public function add_movement($bcv,$id_header,$id_account,$id_user,$debe,$haber){
+
+        $detail = new DetailVoucher();
+        $detail->setConnection(Auth::user()->database_name);
+
+
+        $detail->id_account = $id_account;
+        $detail->id_header_voucher = $id_header;
+        $detail->user_id = $id_user;
+        $detail->tasa = $bcv;
+
+     
+        $detail->debe = $debe;
+        $detail->haber = $haber;
+       
+      
+        $detail->status =  "C";
+
+         /*Le cambiamos el status a la cuenta a M, para saber que tiene Movimientos en detailVoucher */
+         
+            $account = Account::on(Auth::user()->database_name)->findOrFail($detail->id_account);
+
+            if($account->status != "M"){
+                $account->status = "M";
+                $account->save();
+            }
+         
+    
+        $detail->save();
+
+    }
 
     public function list_account(Request $request, $type){
         //validar si la peticion es asincrona

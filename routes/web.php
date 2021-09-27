@@ -865,6 +865,7 @@ Route::group(["prefix"=>'taxes'],function(){
     Route::get('ivapaymentindex','TaxesController@iva_paymentindex')->name('taxes.iva_paymentindex');
     Route::post('ivapayment','TaxesController@iva_payment')->name('taxes.iva_payment');
     Route::get('listaccount/{type}','TaxesController@list_account')->name('taxes.list_account');
+    Route::post('payment','TaxesController@store')->name('taxes.store');
 });
 
 

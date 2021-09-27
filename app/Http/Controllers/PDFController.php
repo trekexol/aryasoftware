@@ -172,10 +172,6 @@ class PDFController extends Controller
    
                     $quotation->date_delivery_note = $datenow;
 
-                   
-   
-                    
-
 
                  }else{
                     if(isset($quotation->bcv)){

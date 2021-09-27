@@ -361,8 +361,6 @@ class QuotationController extends Controller
             'id_vendor'         =>'required',
             'id_transport'         =>'required',
             'id_user'         =>'required',
-        
-            'serie'         =>'required',
             'date_quotation'         =>'required',
         
         ]);

@@ -78,16 +78,20 @@ class ClientController extends Controller
     
     $users->days_credit = request('days_credit');
 
+    if(request('amount_max_credit') != null){
+        $sin_formato_amount_max_credit = str_replace(',', '.', str_replace('.', '', request('amount_max_credit')));
+    }
+    if(request('percentage_retencion_iva') != null){
+        $sin_formato_percentage_retencion_iva = str_replace(',', '.', str_replace('.', '', request('percentage_retencion_iva')));
+    }
+    if(request('percentage_retencion_islr') != null){
+        $sin_formato_percentage_retencion_islr = str_replace(',', '.', str_replace('.', '', request('percentage_retencion_islr')));
+    }
 
-    $sin_formato_amount_max_credit = str_replace(',', '.', str_replace('.', '', request('amount_max_credit')));
-    $sin_formato_percentage_retencion_iva = str_replace(',', '.', str_replace('.', '', request('percentage_retencion_iva')));
-    $sin_formato_percentage_retencion_islr = str_replace(',', '.', str_replace('.', '', request('percentage_retencion_islr')));
-
-
-    $users->amount_max_credit = $sin_formato_amount_max_credit;
+    $users->amount_max_credit = $sin_formato_amount_max_credit ?? 0;
     
-    $users->percentage_retencion_iva = $sin_formato_percentage_retencion_iva;
-    $users->percentage_retencion_islr = $sin_formato_percentage_retencion_islr;
+    $users->percentage_retencion_iva = $sin_formato_percentage_retencion_iva ?? 0;
+    $users->percentage_retencion_islr = $sin_formato_percentage_retencion_islr ?? 0;
    
     $users->status =  1;
    
