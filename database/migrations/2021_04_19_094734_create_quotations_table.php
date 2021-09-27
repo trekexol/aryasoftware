@@ -16,7 +16,7 @@ class CreateQuotationsTable extends Migration
         Schema::create('quotations', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('id_client');
-            $table->unsignedBigInteger('id_vendor');
+            $table->unsignedBigInteger('id_vendor')->nullable();
             $table->unsignedBigInteger('id_transport')->nullable();
             $table->unsignedBigInteger('id_user');
 

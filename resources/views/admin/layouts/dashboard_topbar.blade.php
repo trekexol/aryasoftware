@@ -7,7 +7,7 @@
         
         <nav class="navbar navbar-light bg-light ">
             <a class="navbar-brand text-secondary" href="#">
-                <img src="{{ asset($company->foto_company ?? 'img/northdelivery.jpg') }}" width="90" height="30" class="d-inline-block align-top" alt="">                
+                <img src="{{ asset(Auth::user()->company->foto_company ?? 'img/northdelivery.jpg') }}" width="90" height="30" class="d-inline-block align-top" alt="">                
                 {{Auth::user()->company->razon_social ?? 'North Delivery'}} 
             </a>
         </nav>

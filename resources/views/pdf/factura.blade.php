@@ -42,7 +42,6 @@
     @if (isset($quotation->credit_days))
       <td style="width: 20%;">Fecha de Emisión:</td>
       <td style="width: 40%;"> {{ $quotation->date_billing }} | Dias de Crédito: {{ $quotation->credit_days }}</td>
-    
     @else
       <td style="width: 20%;">Fecha de Emisión:</td>
       <td style="width: 40%;">{{ $quotation->date_billing }}</td>
@@ -83,10 +82,10 @@
    
   </tr>
   <tr>
-    <td style="text-align: center;">{{ $quotation->clients['phone1'] }}</td>
-    <td style="text-align: center;">{{ $quotation->clients['cedula_rif'] }}</td>
-    <td style="text-align: center;">{{ $quotation->serie }}</td>
-    <td style="text-align: center;">{{ $quotation->note }}</td>
+    <td style="text-align: center;">{{ $quotation->clients['phone1'] ?? '' }}</td>
+    <td style="text-align: center;">{{ $quotation->clients['cedula_rif'] ?? '' }}</td>
+    <td style="text-align: center;">{{ $quotation->serie ?? '' }}</td>
+    <td style="text-align: center;">{{ $quotation->date_delivery_note ?? '' }}</td>
     <td style="text-align: center;">{{ $quotation->transports['placa'] ?? '' }}</td>
     
     

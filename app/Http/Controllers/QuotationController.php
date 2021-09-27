@@ -358,7 +358,6 @@ class QuotationController extends Controller
             
         
             'id_client'         =>'required',
-            'id_vendor'         =>'required',
             'id_transport'         =>'required',
             'id_user'         =>'required',
             'date_quotation'         =>'required',
@@ -370,7 +369,7 @@ class QuotationController extends Controller
 
         
         if($id_client != '-1'){
-            if($id_vendor != '-1'){
+            
                 $var = new Quotation();
                 $var->setConnection(Auth::user()->database_name);
 
@@ -408,10 +407,7 @@ class QuotationController extends Controller
         
                 return redirect('quotations/register/'.$var->id.'/bolivares');
 
-            }else{
-                return redirect('/quotations/registerquotation/'.$id_client.'')->withDanger('Debe Buscar un Vendedor');
-            } 
-        
+            
         }else{
             return redirect('/quotations/registerquotation')->withDanger('Debe Buscar un Cliente');
         } 

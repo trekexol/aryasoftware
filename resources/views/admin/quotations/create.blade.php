@@ -57,7 +57,7 @@
                             <label for="serie" class="col-md-2 col-form-label text-md-right">N° de Control/Serie:</label>
 
                             <div class="col-md-3">
-                                <input id="serie" type="text" class="form-control @error('serie') is-invalid @enderror" name="serie" value="{{ $quotation->serie ?? old('serie') }}" readonly required autocomplete="serie">
+                                <input id="serie" type="text" class="form-control @error('serie') is-invalid @enderror" name="serie" value="{{ $quotation->serie ?? '' }}" readonly required autocomplete="serie">
 
                                 @error('serie')
                                     <span class="invalid-feedback" role="alert">
@@ -150,7 +150,7 @@
                                     </span>
                                 @enderror
                             </div>
-                            <a href="#" onclick="refreshrate()" title="tasaactual"><i class="fa fa-redo-alt"></i></a>  
+                            <a href="#" onclick="refreshrate()" title="actualizar tasa"><i class="fa fa-redo-alt"></i></a>  
                             <label  class="col-md-2 col-form-label text-md-right h6">Tasa actual:</label>
                             <div class="col-md-2 col-form-label text-md-left">
                                 <label for="tasaactual" id="tasaacutal">{{ number_format($bcv, 2, ',', '.')}}</label>

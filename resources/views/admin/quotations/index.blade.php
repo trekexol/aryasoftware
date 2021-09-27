@@ -83,11 +83,11 @@
                             <td>
                             <a href="{{ route('quotations.create',[$quotation->id,'bolivares']) }}" title="Seleccionar"><i class="fa fa-check" style="color: orange;"></i></a>
                             </td>
-                            <td class="text-center">{{$quotation->serie}}</td>
-                            <td class="text-center">{{ $quotation->clients['name']}}</td>
-                            <td class="text-center">{{ $quotation->vendors['name']}}</td>
+                            <td class="text-center">{{$quotation->serie ?? ''}}</td>
+                            <td class="text-center">{{ $quotation->clients['name'] ?? ''}}</td>
+                            <td class="text-center">{{ $quotation->vendors['name'] ?? ''}}</td>
                             <td class="text-center">{{ $quotation->transports['placa'] ?? ''}}</td>
-                            <td class="text-center">{{ $quotation->date_quotation}}</td>
+                            <td class="text-center">{{ $quotation->date_quotation ?? ''}}</td>
                             <td>
                             <a href="#" class="delete" data-id-quotation={{$quotation->id}} data-toggle="modal" data-target="#deleteModal" title="Eliminar"><i class="fa fa-trash text-danger"></i></a>  
                             </td>                

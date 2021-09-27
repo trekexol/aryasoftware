@@ -202,10 +202,13 @@ class TaxesController extends Controller
     */
    public function store(Request $request)
     {
-        dd($request);
+        
         $data = request()->validate([
             'rate'  =>'required',
             'month'  =>'required',
+            'Fecha_Year'  =>'required',
+            'amount'  =>'required',
+            'Filtro'  =>'required'
 
         ]);
         $user       =   auth()->user();
@@ -216,8 +219,9 @@ class TaxesController extends Controller
         $header_voucher->setConnection(Auth::user()->database_name);
 
 
-        $header_voucher->description = "Pago Iva Debito Fiscal".request('month');
+        $header_voucher->description = "Pago Iva Debito Fiscal ".request('month')."/".request('Fecha_Year')." ".request('description');
         $header_voucher->date = $datenow;
+        $header_voucher->reference = request('Nro_Ref');
         
         $header_voucher->status =  "1";
     
@@ -225,6 +229,11 @@ class TaxesController extends Controller
 
         $rate = request('rate');
         $total_pay = request('total_pay');
+        $amount = str_replace(',', '.', str_replace('.', '',request('amount')));
+
+        if($amount == 0){
+            return redirect('/taxes/ivapaymentindex')->withDanger('El monto a pagar debe ser distinto de cero');
+        } 
 
         $account_iva = Account::on(Auth::user()->database_name)->where('code_one', 2)
         ->where('code_two', 1)
@@ -233,8 +242,13 @@ class TaxesController extends Controller
         ->where('code_five',4)
         ->first();
 
+        $id_counterpart = request('Filtro');
+        $account_counterpart = Account::on(Auth::user()->database_name)->find($id_counterpart);
 
-        $this->add_movement($rate,$header_voucher->id,$account_iva->id,$user->id,$total_pay,0);
+
+        $this->add_movement($rate,$header_voucher->id,$account_iva->id,$user->id,$amount,0);
+        
+        $this->add_movement($rate,$header_voucher->id,$account_counterpart->id,$user->id,$amount,0);
 
         return redirect('/taxes/ivapayment')->withSuccess('Registro Exitoso!');
     }

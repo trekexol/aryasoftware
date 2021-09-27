@@ -24,7 +24,7 @@
                 <div class="card-header text-center font-weight-bold h3">Debito Fiscal IVA por Pagar</div>
 
                 <div class="card-body">
-                    <form method="POST" action="{{ route('taxes.store') }}" enctype="multipart/form-data" onsubmit="return validacion();">
+                    <form method="POST" action="{{ route('taxes.store') }}" enctype="multipart/form-data" onsubmit="return validacion()">
                         @csrf
                         <input id="id_account_iva" type="hidden" class="form-control @error('id_account') is-invalid @enderror" name="id_account_iva" value="{{ $account_iva->id }}" required autocomplete="id_account_iva" autofocus>
                         <input id="user_id" type="hidden" class="form-control @error('user_id') is-invalid @enderror" name="user_id" value="{{ Auth::user()->id }}" required autocomplete="user_id">
@@ -49,7 +49,7 @@
                                 <label id="Tipo" for="type" >Tipo:</label>
                             </div>
                             <div class="col-sm-4">
-                                <select class="form-control" name="Tipo" id="type_contado">
+                                <select class="form-control" required name="Tipo" id="type_contado">
                                     <option selected value="">Seleccione..</option>
                                     <option value="contado">Contado</option>
                                     <option value="credito">Credito</option>
@@ -59,8 +59,8 @@
                                 <label for="Filtro">Retirar / Pagar:</label>
                             </div>
                             <div class="col-sm-4 ">
-                                <select  id="account"  name="Filtro" class="form-control">
-                                    <option value="">Seleccionar</option>
+                                <select  id="account" required name="Filtro" class="form-control">
+                                    <option value="" >Seleccionar</option>
                                 </select>
 
                                 @if ($errors->has('account_id'))
@@ -75,7 +75,7 @@
                                 <label for="Filtro">Descripción:</label>
                             </div>
                             <div class="col-sm-10 ">
-                                <input id="description" type="text" class="form-control @error('description') is-invalid @enderror" name="description" value="{{ old('Descripcion') }}" required autocomplete="description">
+                                <input id="description" type="text" class="form-control @error('description') is-invalid @enderror" name="description" value="{{ old('Descripcion') }}" autocomplete="description">
                                 @error('description')
                                 <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -353,9 +353,14 @@
 
         function validacion() 
         {
+            
             let amount = document.getElementById("amount").value; 
+            
+            var montoFormat = inputamount.replace(/[$.]/g,'');
 
-            if (amount <=0 ) {
+            var montoFormat_amount = montoFormat.replace(/[,]/g,'.');
+            
+            if (montoFormat_amount <= 0 ) {
 
                 alert('El monto a pagar debe ser mayor a Cero');
                 return false;
