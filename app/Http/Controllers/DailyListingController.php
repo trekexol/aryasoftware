@@ -132,55 +132,104 @@ class DailyListingController extends Controller
 
         $company = Company::on(Auth::user()->database_name)->find(1);
 
-        $detailvouchers =  DB::connection(Auth::user()->database_name)->table('detail_vouchers')
-                            ->join('header_vouchers', 'header_vouchers.id', '=', 'detail_vouchers.id_header_voucher')
-                            ->join('accounts', 'accounts.id', '=', 'detail_vouchers.id_account')
-                            ->whereBetween('header_vouchers.date', [$date_begin, $date_end])
-                            ->where('accounts.id',$id_account)
-                            ->select('detail_vouchers.*','header_vouchers.*'
-                            ,'accounts.description as account_description'
-                            ,'header_vouchers.id as id_header'
-                            ,'header_vouchers.description as header_description')
-                            ->orderBy('detail_vouchers.id','asc')->get();
+        if(isset($coin) && $coin == "bolivares"){
+            $detailvouchers =  DB::connection(Auth::user()->database_name)->table('detail_vouchers')
+            ->join('header_vouchers', 'header_vouchers.id', '=', 'detail_vouchers.id_header_voucher')
+            ->join('accounts', 'accounts.id', '=', 'detail_vouchers.id_account')
+            ->whereBetween('header_vouchers.date', [$date_begin, $date_end])
+            ->where('accounts.id',$id_account)
+            ->select('detail_vouchers.*','header_vouchers.*'
+            ,'accounts.description as account_description'
+            ,'header_vouchers.id as id_header'
+            ,'header_vouchers.description as header_description')
+            ->orderBy('detail_vouchers.id','asc')->get();
 
 
-        //busca los saldos previos de la cuenta                    
-        $detailvouchers_saldo_debe =  DB::connection(Auth::user()->database_name)->table('detail_vouchers')
-                            ->join('header_vouchers', 'header_vouchers.id', '=', 'detail_vouchers.id_header_voucher')
-                            ->join('accounts', 'accounts.id', '=', 'detail_vouchers.id_account')
-                            ->where('header_vouchers.date','<' ,$date_begin)
-                            ->where('accounts.id',$id_account)
-                            ->select('detail_vouchers.*','header_vouchers.*'
-                            ,'accounts.description as account_description'
-                            ,'header_vouchers.id as id_header'
-                            ,'header_vouchers.description as header_description')
-                            ->sum('detail_vouchers.debe');
+            //busca los saldos previos de la cuenta                    
+            $detailvouchers_saldo_debe =  DB::connection(Auth::user()->database_name)->table('detail_vouchers')
+                        ->join('header_vouchers', 'header_vouchers.id', '=', 'detail_vouchers.id_header_voucher')
+                        ->join('accounts', 'accounts.id', '=', 'detail_vouchers.id_account')
+                        ->where('header_vouchers.date','<' ,$date_begin)
+                        ->where('accounts.id',$id_account)
+                       
+                        ->sum('detail_vouchers.debe');
 
-        $detailvouchers_saldo_haber =  DB::connection(Auth::user()->database_name)->table('detail_vouchers')
-                            ->join('header_vouchers', 'header_vouchers.id', '=', 'detail_vouchers.id_header_voucher')
-                            ->join('accounts', 'accounts.id', '=', 'detail_vouchers.id_account')
-                            ->where('header_vouchers.date','<' ,$date_begin)
-                            ->where('accounts.id',$id_account)
-                            ->select('detail_vouchers.*','header_vouchers.*'
-                            ,'accounts.description as account_description'
-                            ,'header_vouchers.id as id_header'
-                            ,'header_vouchers.description as header_description')
-                            ->sum('detail_vouchers.haber');       
-        //-----------------------------------------------
+            $detailvouchers_saldo_haber =  DB::connection(Auth::user()->database_name)->table('detail_vouchers')
+                        ->join('header_vouchers', 'header_vouchers.id', '=', 'detail_vouchers.id_header_voucher')
+                        ->join('accounts', 'accounts.id', '=', 'detail_vouchers.id_account')
+                        ->where('header_vouchers.date','<' ,$date_begin)
+                        ->where('accounts.id',$id_account)
+                       
+                        ->sum('detail_vouchers.haber');       
+            //-----------------------------------------------
+        }else{
+            $detailvouchers =  DB::connection(Auth::user()->database_name)->table('detail_vouchers')
+            ->join('header_vouchers', 'header_vouchers.id', '=', 'detail_vouchers.id_header_voucher')
+            ->join('accounts', 'accounts.id', '=', 'detail_vouchers.id_account')
+            ->whereBetween('header_vouchers.date', [$date_begin, $date_end])
+            ->where('accounts.id',$id_account)
+            ->select('detail_vouchers.*','header_vouchers.*'
+            ,'accounts.description as account_description'
+            ,'header_vouchers.id as id_header'
+            ,'header_vouchers.description as header_description')
+            ->orderBy('detail_vouchers.id','asc')->get();
 
+            $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS debe
+            FROM accounts a
+            INNER JOIN detail_vouchers d 
+                ON d.id_account = a.id
+            INNER JOIN header_vouchers h 
+                ON h.id = d.id_header_voucher
+            WHERE h.date < ? AND
+            a.id = ? '
+            , [$date_begin,$id_account]);
+            
+            if(isset($total_debe[0]->debe)){
+                $detailvouchers_saldo_debe = $total_debe[0]->debe;
+            }
+           
+                
+            $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS haber
+                FROM accounts a
+                INNER JOIN detail_vouchers d 
+                    ON d.id_account = a.id
+                INNER JOIN header_vouchers h 
+                    ON h.id = d.id_header_voucher
+                WHERE h.date < ? AND
+                a.id = ? '
+                , [$date_begin,$id_account]);
+                
+                if(isset($total_haber[0]->haber)){
+                    $detailvouchers_saldo_haber = $total_haber[0]->haber;
+                }
+        }
+
+       
         $date_begin = Carbon::parse($date_begin)->format('d-m-Y');
 
         $date_end = Carbon::parse($date_end)->format('d-m-Y');
 
         $account = Account::on(Auth::user()->database_name)->find($id_account);
 
-
+        if(isset($coin) && $coin !="bolivares"){
+            $account->balance_previus = $account->balance_previus / $account->rate;
+        }
 
         $saldo_anterior = ($account->balance_previus ?? 0) + ($detailvouchers_saldo_debe ?? 0) - ($detailvouchers_saldo_haber ?? 0);
         $primer_movimiento = true;
         $saldo = 0;
 
         foreach($detailvouchers as $detail){
+            /*esta parte convierte los saldos a dolares */
+            if(isset($coin) && $coin !="bolivares"){
+                if((isset($detail->debe)) && ($detail->debe != 0)){
+                  $detail->debe = $detail->debe / ($detail->tasa ?? 1);
+                }
+                if((isset($detail->haber)) && ($detail->haber != 0)){
+                  $detail->haber = $detail->haber / ($detail->tasa ?? 1);
+                }
+              }
+              /*----------------------------- */
             if($primer_movimiento){
                 $detail->saldo = $detail->debe - $detail->haber + $saldo_anterior;
                 $saldo += $detail->saldo;
@@ -196,7 +245,7 @@ class DailyListingController extends Controller
         $detailvouchers = array_reverse($detailvouchers->toArray());
 
         
-        $pdf = $pdf->loadView('admin.reports.diary_book_detail',compact('company','detailvouchers'
+        $pdf = $pdf->loadView('admin.reports.diary_book_detail',compact('coin','company','detailvouchers'
                                 ,'datenow','date_begin','date_end','account'
                                 ,'detailvouchers_saldo_debe','detailvouchers_saldo_haber','saldo'));
         return $pdf->stream();

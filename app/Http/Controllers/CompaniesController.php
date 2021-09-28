@@ -28,9 +28,9 @@ class CompaniesController extends Controller
         $user       =   auth()->user();
         $users_role =   $user->role_id;
         if($users_role == '1'){
-           /* $user_companies = UserCompany::on(Auth::user()->database_name)->where('id_user',Auth::on(Auth::user()->database_name)->id())->first();
-            $users      =   Company::on(Auth::user()->database_name)->on($user_companies->name_connection)->orderBy('id', 'asc')->get();*/
-            $users      =   Company::on(Auth::user()->database_name)->orderBy('id', 'asc')->get();
+           /* $user_companies = UserCompany::on("logins")->where('id_user',Auth::on("logins")->id())->first();
+            $users      =   Company::on("logins")->on($user_companies->name_connection)->orderBy('id', 'asc')->get();*/
+            $users      =   Company::on("logins")->orderBy('id', 'asc')->get();
         
         }elseif($users_role == '2'){
             return view('admin.index');
@@ -44,10 +44,11 @@ class CompaniesController extends Controller
         $date           = Carbon::now();
         $periodo        = $date->format('Y');
 
-        $tipoinvs       = InventaryType::on(Auth::user()->database_name)->orderBY('description','asc')->pluck('description','id')->toArray();
-        $tiporates      = RateType::on(Auth::user()->database_name)->orderBY('description','asc')->pluck('description','id')->toArray();
+        $tipoinvs       = InventaryType::on("logins")->orderBY('description','asc')->pluck('description','id')->toArray();
+        $tiporates      = RateType::on("logins")->orderBY('description','asc')->pluck('description','id')->toArray();
 
-        $company = Company::on(Auth::user()->database_name)->first();
+        
+        $company = Company::on("logins")->where('login',Auth::user()->database_name)->first();
 
         return view('admin.companies.create',compact('periodo','tipoinvs','tiporates','bcv','company'));
     }
@@ -79,13 +80,14 @@ class CompaniesController extends Controller
         $razon_social           = strtoupper(request('Razon_Social'));
         $email                  = strtoupper(request('Email'));
         $direccion              = strtoupper(request('Direccion'));
+
+        $company = Company::on("logins")->where('login',Auth::user()->database_name)->first();
         
-        $companies  = Company::on(Auth::user()->database_name)->findOrFail(1);
+        $companies  = Company::on("logins")->findOrFail($company->id);
         /*
-        $user_companies = UserCompany::on(Auth::user()->database_name)->where('id_user',Auth::on(Auth::user()->database_name)->id())->first();
+        $user_companies = UserCompany::on("logins")->where('id_user',Auth::on("logins")->id())->first();
         $companies->setConnection($user_companies->name_connection);*/
 
-        $companies->login           = request('Login');
         $companies->email           = $email;
         $companies->code_rif        = request('Codigo');
         $companies->razon_social    = $razon_social;
@@ -101,7 +103,6 @@ class CompaniesController extends Controller
         $companies->tiporate_id     = request('rate_type');
         $companies->rate            = str_replace(',', '.', str_replace('.', '', request('Tasa')));
         $companies->rate_petro      = str_replace(',', '.', str_replace('.', '', request('Tasa_Petro')));
-        $companies->foto_company    = "default";
         $companies->period          = request('Periodo');
 
         $companies->status          = '1';
@@ -113,7 +114,7 @@ class CompaniesController extends Controller
 
     public function edit($id)
     {
-        $company            = Company::on(Auth::user()->database_name)->find($id);
+        $company            = Company::on("logins")->find($id);
 
         $urlToGet ='http://www.bcv.org.ve/tasas-informativas-sistema-bancario';
         $pageDocument = @file_get_contents($urlToGet);
@@ -128,8 +129,8 @@ class CompaniesController extends Controller
         $bcv            = $titulo;
         $date           = Carbon::now();
         $periodo        = $date->format('Y');
-        $tipoinvs       = InventaryType::on(Auth::user()->database_name)->orderBY('description','asc')->pluck('description','id')->toArray();
-        $tiporates      = RateType::on(Auth::user()->database_name)->orderBY('description','asc')->pluck('description','id')->toArray();
+        $tipoinvs       = InventaryType::on("logins")->orderBY('description','asc')->pluck('description','id')->toArray();
+        $tiporates      = RateType::on("logins")->orderBY('description','asc')->pluck('description','id')->toArray();
 
 
         return view('admin.companies.edit',compact('company','bcv','periodo','tipoinvs','tiporates'));
@@ -137,7 +138,7 @@ class CompaniesController extends Controller
 
     public function update(Request $request,$id)
     {
-        $validar              =  Company::on(Auth::user()->database_name)->find($id);
+        $validar              =  Company::on("logins")->find($id);
 
         $request->validate([
             'Nombre'         =>'required|max:191,'.$validar->id,
@@ -155,7 +156,7 @@ class CompaniesController extends Controller
         $razon_social        = strtoupper(request('Razon_Social'));
         $resul_social        = $codigo.$razon_social;
 
-        $companies          = Company::on(Auth::user()->database_name)->findOrFail($id);
+        $companies          = Company::on("logins")->findOrFail($id);
         $companies->name                = $nombre;
         $companies->email               = $email;
         $companies->description         = $descripcion;
@@ -170,7 +171,7 @@ class CompaniesController extends Controller
     public function destroy(Request $request)
     {
         //find the Division
-        $user = User::on(Auth::user()->database_name)->find($request->user_id);
+        $user = User::on("logins")->find($request->user_id);
 
         //Elimina el Division
         $user->delete();

@@ -213,6 +213,7 @@ class DirectPaymentOrderController extends Controller
                                                        ->where('accounts.code_two', $var->code_two)
                                                        ->where('accounts.code_three', $var->code_three)
                                                        ->where('accounts.code_four', $var->code_four)
+                                                       ->where('accounts.code_five', $var->code_five)
                                                        ->where('detail_vouchers.status', 'C')
                                                        ->sum('debe');
    
@@ -222,6 +223,7 @@ class DirectPaymentOrderController extends Controller
                                                        ->where('accounts.code_two', $var->code_two)
                                                        ->where('accounts.code_three', $var->code_three)
                                                        ->where('accounts.code_four', $var->code_four)
+                                                       ->where('accounts.code_five', $var->code_five)
                                                        ->where('detail_vouchers.status', 'C')
                                                        ->sum('haber');   
                             /*---------------------------------------------------*/

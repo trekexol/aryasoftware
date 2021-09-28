@@ -58,19 +58,23 @@
       
       @foreach ($detailvouchers as $detail)
         <?php 
-          if((isset($detail->debe)) && ($detail->debe != 0)){
-            $total_debe += $detail->debe;
-          }else if((isset($detail->haber)) && ($detail->haber != 0)){
-            $total_haber += $detail->haber;
-          }
+           
+            if((isset($detail->debe)) && ($detail->debe != 0)){
+              $total_debe += $detail->debe;
+            }else if((isset($detail->haber)) && ($detail->haber != 0)){
+              $total_haber += $detail->haber;
+            }
+          
+          
         ?>
         <tr>
           <td style="text-align: center;">{{ $detail->date ?? ''}}</td>
           <td style="text-align: center;">{{ $detail->id_header ?? ''}}</td>
           <td style="text-align: left;">{{ $detail->header_description ?? ''}}</td>
+
           <td style="text-align: right;">{{ number_format($detail->debe ?? 0, 2, ',', '.')}}</td>
           <td style="text-align: right;">{{ number_format($detail->haber ?? 0, 2, ',', '.')}}</td>
-          <td style="text-align: center;">{{ number_format($detail->saldo ?? 0, 2, ',', '.')}}</td>
+          <td style="text-align: right;">{{ number_format($detail->saldo ?? 0, 2, ',', '.')}}</td>
         </tr>
       @endforeach
     
@@ -102,7 +106,7 @@
         <th style="text-align: center; width: 30%; border-color: white;"></th>
         <th style="text-align: center; width: 20%; border-color: white;"></th>
         <th style="text-align: center; width: 20%; border-color: white; border-right-color: black;">Saldo del mes</th>
-        <th style="text-align: center; width: 20%;">{{ number_format($total_debe - $total_haber, 2, ',', '.')}}</th>
+        <th style="text-align: right; width: 20%;">{{ number_format($total_debe - $total_haber, 2, ',', '.')}}</th>
       </tr>
     </table>
     <table style="width: 100%;">

@@ -427,6 +427,11 @@
             $("#price").mask('000.000.000.000.000.000.000.000,00', { reverse: true });
             
         });
+
+        $(document).ready(function () {
+            $("#amount_product").mask('000.000.000.000.000.000.000.000,00', { reverse: true });
+            
+        });
         
         
         $("body").toggleClass("sidebar-toggled");
