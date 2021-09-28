@@ -32,7 +32,7 @@ class TaxesController extends Controller
  
     }
 
-    public function iva_payment(Request $request)
+    public function iva_payment($month,$year)
     {
 
         $mes= request('Filtro_Meses');
@@ -227,12 +227,16 @@ class TaxesController extends Controller
     
         $header_voucher->save();
 
-        $rate = request('rate');
-        $total_pay = request('total_pay');
+        
+        $rate = str_replace(',', '.', str_replace('.', '',request('rate')));
+        $total_pay = str_replace(',', '.', str_replace('.', '',request('total_pay')));
         $amount = str_replace(',', '.', str_replace('.', '',request('amount')));
 
         if($amount == 0){
-            return redirect('/taxes/ivapaymentindex')->withDanger('El monto a pagar debe ser distinto de cero');
+            return redirect('/taxes/ivapaymentindex')->withDanger('El monto a pagar debe ser distinto de cero!');
+        } 
+        if($amount > $total_pay){
+            return redirect('/taxes/ivapaymentindex')->withDanger('El monto a pagar no puede ser mayor al monto total del Pago!');
         } 
 
         $account_iva = Account::on(Auth::user()->database_name)->where('code_one', 2)
@@ -248,9 +252,9 @@ class TaxesController extends Controller
 
         $this->add_movement($rate,$header_voucher->id,$account_iva->id,$user->id,$amount,0);
         
-        $this->add_movement($rate,$header_voucher->id,$account_counterpart->id,$user->id,$amount,0);
+        $this->add_movement($rate,$header_voucher->id,$account_counterpart->id,$user->id,0,$amount);
 
-        return redirect('/taxes/ivapayment')->withSuccess('Registro Exitoso!');
+        return redirect('/taxes/ivapayment')->withSuccess('Pago Exitoso!');
     }
 
 

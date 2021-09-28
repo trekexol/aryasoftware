@@ -24,7 +24,7 @@ class CreateExpensesDetailsTable extends Migration
             $table->string('description',80)->nullable();
             $table->boolean('exento');
             $table->boolean('islr');
-            $table->integer('amount');
+            $table->decimal('amount',64,2);
             $table->decimal('price',64,2);
             $table->decimal('rate',64,2)->comment = 'Tasa';
             

@@ -76,7 +76,7 @@
                             <label for="subsegment" class="col-md-2 col-form-label text-md-right">Sub Segmento</label>
                         
                             <div class="col-md-4">
-                                <select  id="subsegment"  name="Subsegment" class="form-control" required>
+                                <select  id="subsegment"  name="Subsegment" class="form-control" >
                                     <option value="">Selecciona un Sub Segmento</option>
                                 </select>
 

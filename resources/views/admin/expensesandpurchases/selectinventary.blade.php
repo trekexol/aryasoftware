@@ -6,7 +6,11 @@
     <div class="row py-lg-2">
        
         <div class="col-md-10">
-            <h2>Seleccione un Producto del Inventario</h2>
+            @if(isset($type) && ($type == "MERCANCIA"))
+                <h2>Seleccione un Producto del Inventario</h2>
+            @else
+                <h2>Seleccione un Servicio</h2>
+            @endif
         </div>
         
         <div class="col-md-2">
@@ -48,8 +52,6 @@
                 <th>Moneda</th>
                 <th>Foto del Producto</th>
               
-                
-                
             </tr>
             </thead>
             
@@ -59,20 +61,20 @@
                     @foreach ($inventories as $var)
                         <tr>
                             <td>
-                                <a href="{{ route('expensesandpurchases.create_detail',[$id_expense,$coin,$var->id]) }}" title="Seleccionar"><i class="fa fa-check"></i></a>
+                                <a href="{{ route('expensesandpurchases.create_detail',[$id_expense,$coin,$type ?? 'MERCANCIA',$var->id]) }}" title="Seleccionar"><i class="fa fa-check"></i></a>
                             </td>
                             <td>{{ $var->code }}</td>
-                            <td>{{ $var->products['description']}}</td>
+                            <td>{{ $var->description}}</td>
                             <td style="text-align: right">{{ $var->amount }}</td> 
-                            <td style="text-align: right">{{number_format($var->products['price_buy'], 2, ',', '.')}}</td>
+                            <td style="text-align: right">{{number_format($var->price_buy, 2, ',', '.')}}</td>
                             
-                            @if($var->products['money'] == "D")
+                            @if($var->money == "D")
                             <td>Dolar</td>
                             @else
                             <td>Bolívar</td>
                             @endif
 
-                            <td>{{ $var->products['photo_product']}}</td> 
+                            <td>{{ $var->photo_product}}</td> 
                            
                             
                         </tr>     

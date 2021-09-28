@@ -272,7 +272,7 @@ class InventoryController extends Controller
         $id_inventory = request('id_inventory');
 
         if($valor_sin_formato_amount_new > 0){
-            if($valor_sin_formato_amount_new < $amount_old){
+            if($valor_sin_formato_amount_new <= $amount_old){
 
                 $var = Inventory::on(Auth::user()->database_name)->findOrFail($id_inventory);
             

@@ -270,7 +270,7 @@ class ExpensesAndPurchaseController extends Controller
 
     }
 
-    public function create_expense_detail($id_expense,$coin,$id_inventory = null)
+    public function create_expense_detail($id_expense,$coin,$type = null,$id_inventory = null)
     {
         
         $expense = null;
@@ -289,12 +289,22 @@ class ExpensesAndPurchaseController extends Controller
 
             if(isset($id_inventory)){
                 $inventory = Inventory::on(Auth::user()->database_name)->find($id_inventory);
-                $accounts_inventory = Account::on(Auth::user()->database_name)->select('id','description')->where('code_one',1)
-                                                                ->where('code_two', 1)
-                                                                ->where('code_three', 3)
-                                                                ->where('code_four',1)
-                                                                ->where('code_five', '<>',0)
-                                                                ->get();
+                if($inventory->products['type'] == 'MERCANCIA'){
+                    $accounts_inventory = Account::on(Auth::user()->database_name)->select('id','description')->where('code_one',1)
+                    ->where('code_two', 1)
+                    ->where('code_three', 3)
+                    ->where('code_four',1)
+                    ->where('code_five', '<>',0)
+                    ->get();
+                }else{
+                    $accounts_inventory = Account::on(Auth::user()->database_name)->select('id','description')->where('code_one',5)
+                    ->where('code_two', '<>',0)
+                    ->where('code_three', '<>',0)
+                    ->where('code_four', '<>',0)
+                    ->where('code_five', '<>',0)
+                    ->get();
+                }
+                
             }
         }
             
@@ -311,7 +321,7 @@ class ExpensesAndPurchaseController extends Controller
 
         $date = Carbon::now();
         $datenow = $date->format('Y-m-d');    
-
+      
         if(($coin == 'bolivares') || (!isset($coin)) ){
             if(isset($id_inventory)){
                 if( $inventory->products['money'] != 'Bs'){
@@ -328,7 +338,7 @@ class ExpensesAndPurchaseController extends Controller
             $coin = 'dolares';
         }
 
-        return view('admin.expensesandpurchases.create',compact('coin','bcv','datenow','provider','expense','expense_details','branches','inventory','accounts_inventory'));
+        return view('admin.expensesandpurchases.create',compact('type','coin','bcv','datenow','provider','expense','expense_details','branches','inventory','accounts_inventory'));
     }
 
     public function create_expense_voucher($id_expense,$coin)
@@ -630,11 +640,20 @@ class ExpensesAndPurchaseController extends Controller
     }
     
     
-    public function selectinventary($id_expense,$coin)
+    public function selectinventary($id_expense,$coin,$type)
     {
-            $inventories     = Inventory::on(Auth::user()->database_name)->get();
+        if($type == 'mercancia'){
+            $type = 'MERCANCIA';
+        }else{
+            $type = 'SERVICIO';
+        }
+            $inventories     = Inventory::on(Auth::user()->database_name)
+                                    ->join('products','products.id','inventories.product_id')
+                                    ->where('products.type','LIKE',$type)
+                                    ->select('inventories.*','products.price_buy','products.description','products.photo_product','products.money')
+                                    ->get();
         
-            return view('admin.expensesandpurchases.selectinventary',compact('coin','inventories','id_expense'));
+            return view('admin.expensesandpurchases.selectinventary',compact('type','coin','inventories','id_expense'));
     }
     
 
@@ -819,14 +838,6 @@ class ExpensesAndPurchaseController extends Controller
             $total_iva = ($base_imponible * $iva_percentage)/100;
 
         }
-
-         /*$sin_formato_base_imponible = str_replace(',', '.', str_replace('.', '', request('base_imponible_form')));
-        $sin_formato_amount = str_replace(',', '.', str_replace('.', '', request('sub_total_form')));
-        $sin_formato_amount_iva = str_replace(',', '.', str_replace('.', '', request('iva_amount_form')));
-        $sin_formato_amount_with_iva = str_replace(',', '.', str_replace('.', '', request('total_pay_form')));
-        $sub_total = request('sub_total_form');
-        $base_imponible = request('base_imponible_form');*/
-
 
         //Verifica el status del pago, si esta en C significa Cobrado y por tanto no se debe cobrar de nuevo 
         if($expense->status != "C"){
@@ -2454,7 +2465,12 @@ class ExpensesAndPurchaseController extends Controller
         if($request->ajax()){
             try{
                 
-                $respuesta = Inventory::on(Auth::user()->database_name)->select('id')->where('code',$var)->get();
+                $respuesta = Inventory::on(Auth::user()->database_name)
+                                        ->join('products','products.id','inventories.product_id')
+                                        ->where('inventories.code',$var)
+                                        ->select('inventories.id','products.type')
+                                        ->get();
+                                        
                 return response()->json($respuesta,200);
 
             }catch(Throwable $th){
