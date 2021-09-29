@@ -155,6 +155,7 @@
                                 <label for="tipo_inv">Tipo de Inventario:</label>
                             </div>
                             <div class="col-sm-4">
+                                @if (isset($company->tipoinv_id))
                                 <select class="form-control" id="tipo_inv" name="Tipo_Inventario">
                                     <option value="{{ $company->tipoinv_id }}" required>{{ $company->tipoinv['description'] }}</option>
                                     <option value="" disabled>-----------</option>
@@ -170,11 +171,13 @@
                                                 <strong>{{ $errors->first('tipo_inv') }}</strong>
                                             </span>
                                 @endif
+                                @endif
                             </div>
                             <div class="col-sm-2">
                                 <label for="tipo_rate">Tipo Tasa:</label>
                             </div>
                             <div class="col-sm-4">
+                                @if (isset($company->tiporate_id))
                                 <select class="form-control" id="rate_type" name="rate_type">
                                     <option value="{{ $company->tiporate_id }}" required>{{ $company->tiporate['description'] }}</option>
                                     <option value="" disabled>-----------</option>
@@ -189,6 +192,7 @@
                                     <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $errors->first('rate_type') }}</strong>
                                             </span>
+                                @endif
                                 @endif
                             </div>
                         </div>

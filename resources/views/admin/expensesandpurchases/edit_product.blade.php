@@ -76,7 +76,7 @@
                             <label for="amount" class="col-md-2 col-form-label text-md-right">Cantidad</label>
 
                             <div class="col-md-3">
-                                <input id="amount" type="text" class="form-control @error('amount') is-invalid @enderror" name="amount" value="{{ number_format($expense_detail->amount, 0, ',', '.') }}" required autocomplete="amount">
+                                <input id="amount" type="text" class="form-control @error('amount') is-invalid @enderror" name="amount" value="{{ number_format($expense_detail->amount, 2, ',', '.') }}" required autocomplete="amount">
 
                                 @error('amount')
                                     <span class="invalid-feedback" role="alert">

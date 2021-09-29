@@ -146,10 +146,10 @@
                                         </select>
                                     </div>
                                     
-                                        <label id="code_inventary_label" for="code_inventary" class="col-md-2 col-form-label text-md-right">Código Inventario:</label>
+                                        <label id="code_inventary_label" for="code_inventary" class="col-md-2 col-form-label text-md-right">Código Inventario: </label>
                                         
                                         <div class="col-md-2">
-                                            <input id="code_inventary" type="text" class="form-control @error('code_inventary') is-invalid @enderror" name="code_inventary" value="{{ $inventory->code ?? old('code_inventary') }}"  autocomplete="code_inventary">
+                                            <input id="code_inventary" type="text" class="form-control @error('code_inventary') is-invalid @enderror" name="code_inventary" value="{{ $inventory->code ?? '' }}"  autocomplete="code_inventary">
             
                                             @error('code_inventary')
                                                 <span class="invalid-feedback" role="alert">
@@ -161,7 +161,7 @@
                                         
                                         <div id="btn_code_inventary" class="form-group col-md-1">
                                             <a href="" title="Buscar por Código" onclick="searchCodeInventory()"><i class="fa fa-search"></i></a>  
-                                            <a id="btnselectinventory" href="{{ route('expensesandpurchases.selectinventary',[$expense->id,$coin,"mercancia"]) }}" title="Buscar un Producto del Inventario"><i class="fa fa-eye"></i></a>  
+                                            <a id="btnselectinventory" href="{{ route('expensesandpurchases.selectinventary',[$expense->id,$coin,"mercancia"]) }}" title="Buscar"><i class="fa fa-eye"></i></a>  
                                         
                                         </div>
                                     
@@ -346,7 +346,7 @@
                                                     <td style="text-align: center">{{ $var->description}}</td>
                                                 @endif
                                                 
-                                                <td style="text-align: right">{{ $var->amount}}</td>
+                                                <td style="text-align: right">{{number_format($var->amount, 2, ',', '.')}}</td>
                                                 <td style="text-align: right">{{number_format($var->price, 2, ',', '.')}}</td>
                                                 <td style="text-align: right">{{number_format($var->price * $var->amount, 2, ',', '.')}}</td>
                                                 <?php
@@ -442,7 +442,7 @@
 
         $("#coin").on('change',function(){
             coin = $(this).val();
-            window.location = "{{route('expensesandpurchases.create_detail', [$expense->id,'','',''])}}"+"/"+coin+"/"+"{{ $type ?? '1' }}"+"{{ $inventory->id ?? '' }}";
+            window.location = "{{route('expensesandpurchases.create_detail', [$expense->id,'','',''])}}"+"/"+coin+"/"+"{{ $type ?? 'SERVICIO' }}"+"/"+"{{ $inventory->id ?? '' }}";
             
         });
 
@@ -464,6 +464,17 @@
             
         }
     </script>
+    @if ((isset($type))&& ($type == "SERVICIO"))
+    <script>
+        
+        var type_var = 3;
+    </script>
+    @else
+    <script>
+       
+        var type_var = 0;
+    </script>
+    @endif
     <script>
         $("#code_inventary_label").hide();
         $("#code_inventary").hide();
@@ -471,20 +482,26 @@
         $("#centro_costo_label").hide();
         $("#centro_costo").hide();
 
-        var type_var = 0;
+        controlador(type_var);
 
         $("#type_form").on('change',function(){
-                 type_var = $(this).val();
-                
-                if(type_var == 1){
+            type_var = $(this).val();
+            document.getElementById("code_inventary").value = "";
+            document.getElementById("description").value = "";
+            document.getElementById("price").value = "";
+            controlador(type_var);
+        });
+
+        function controlador(type_var)
+        {
+ 
+            if(type_var == 1){
                     $("#code_inventary_label").show();
                     $("#code_inventary").show();
                     $("#btn_code_inventary").show();
                     $("#centro_costo_label").hide();
                     $("#centro_costo").hide();
-                    document.getElementById("code_inventary").value = "";
-                    document.getElementById("description").value = "";
-                    document.getElementById("price").value = "";
+                    
                     
                 }else if(type_var == 3){
                     $("#code_inventary_label").show();
@@ -496,9 +513,6 @@
                     document.getElementById("code_inventary_label").innerHTML = "Código Servicio:";
                     document.getElementById("btnselectinventory").href = "{{ route('expensesandpurchases.selectinventary',[$expense->id,$coin,'servicio']) }}";
 
-                    document.getElementById("code_inventary").value = "";
-                    document.getElementById("description").value = "";
-                    document.getElementById("price").value = "";
 
                 }else if(type_var != "-1"){
                     $("#code_inventary_label").hide();
@@ -506,9 +520,6 @@
                     $("#btn_code_inventary").hide();
                     $("#centro_costo_label").show();
                     $("#centro_costo").show();
-                    document.getElementById("code_inventary").value = "";
-                    document.getElementById("description").value = "";
-                    document.getElementById("price").value = "";
 
                 }else if(type_var == "-1"){
                     
@@ -517,17 +528,13 @@
                     $("#btn_code_inventary").hide();
                     $("#centro_costo_label").hide();
                     $("#centro_costo").hide();
-                    document.getElementById("code_inventary").value = "";
-                    document.getElementById("description").value = "";
-                    document.getElementById("price").value = "";
                 }
                
                if(type_var != "-1"){
                  
                 searchCode(type_var);
                }
-                
-        });
+        }
 
         function searchCode(type_var){
 

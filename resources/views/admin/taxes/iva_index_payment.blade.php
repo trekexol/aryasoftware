@@ -45,6 +45,7 @@
                                         <option value="11">Noviembre-11</option>
                                         <option value="12">Dicienmbre-12</option>
                                     </select>
+                                   
                                 </div>
                                
                                 <label id="date_begin" class="col-sm-3 col-form-label text-md-right" for="type" >Fecha del Retiro Año:</label>
