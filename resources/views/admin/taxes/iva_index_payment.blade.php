@@ -24,8 +24,7 @@
                     <div class="card-header text-center font-weight-bold h3">Debito Fiscal IVA por Pagar</div>
 
                     <div class="card-body">
-                        <form method="POST" action="{{ route('taxes.iva_payment') }}" enctype="multipart/form-data">
-                            @csrf
+                       
                             <div class="form-group row">
                                 
                                 <label id="date_begin" class="col-sm-3 col-form-label text-md-right" for="type" >Fecha del Retiro Mes:</label>
@@ -60,15 +59,15 @@
                             <br>
                             <div class="form-group row mb-0">
                                 <div class="col-sm-3 offset-sm-3">
-                                    <button type="submit" class="btn btn-primary">
+                                    <a onclick="consultar()" type="submit" class="btn btn-primary">
                                         Consultar Impuesto
-                                    </button>
+                                    </a>
                                 </div>
                                 <div class="col-sm-3">
                                     <a href="{{ route('bankmovements') }}" id="btnfacturar" name="btnfacturar" class="btn btn-danger" title="facturar">Volver</a>
                                 </div>
                             </div>
-                        </form>
+                        
                     </div>
                 </div>
             </div>
@@ -82,5 +81,16 @@
         var fecha = new Date();
         var ano = fecha.getFullYear();
         document.getElementsByName("Fecha_Year")[0].value = ano ;
+    </script>
+    <script>
+        function consultar(){
+            let filtro_mount = document.getElementById("filtro_mount").value; 
+            let filtro_year = document.getElementById("filtro_year").value; 
+            
+            window.location = "{{route('taxes.iva_payment', ['',''])}}"+"/"+filtro_mount+"/"+filtro_year;
+                           
+        }
+        
+    </script>
 
 @endsection

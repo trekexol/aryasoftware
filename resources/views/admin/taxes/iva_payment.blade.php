@@ -28,6 +28,9 @@
                         @csrf
                         <input id="id_account_iva" type="hidden" class="form-control @error('id_account') is-invalid @enderror" name="id_account_iva" value="{{ $account_iva->id }}" required autocomplete="id_account_iva" autofocus>
                         <input id="user_id" type="hidden" class="form-control @error('user_id') is-invalid @enderror" name="user_id" value="{{ Auth::user()->id }}" required autocomplete="user_id">
+                        
+                        <input id="nro_mes" type="hidden" class="form-control @error('nro_mes') is-invalid @enderror" name="nro_mes" value="{{ $nro_mes }}" required autocomplete="nro_mes">
+                        
                         <div class="form-group row">
                             <div class="col-sm-2">
                                 <label id="date_begin" for="type" >Fecha del Retiro Mes:</label>

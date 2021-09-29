@@ -35,7 +35,11 @@ class TaxesController extends Controller
     public function iva_payment($month,$year)
     {
 
-        $mes= request('Filtro_Meses');
+        $mes = $month;
+
+        if($mes == 0){
+            return redirect('/taxes/ivapaymentindex')->withDanger('Debe seleccionar un mes!');
+        } 
 
         if($mes == '01'){
             $nro_mes    = "01";
@@ -85,7 +89,7 @@ class TaxesController extends Controller
        
 
         $datenow        = Carbon::now();
-        $ano            = request('Filtro_Year');
+        $ano            = $year;
         $dia            = $datenow->format('d');
 
         $date_begin     = Carbon::parse($ano."-".$nro_mes."-"."1");
@@ -205,21 +209,37 @@ class TaxesController extends Controller
         
         $data = request()->validate([
             'rate'  =>'required',
-            'month'  =>'required',
+            'nro_mes'  =>'required',
             'Fecha_Year'  =>'required',
             'amount'  =>'required',
             'Filtro'  =>'required'
 
         ]);
         $user       =   auth()->user();
+        $month = request('nro_mes');
+        $year = request('Fecha_Year');
+
+        $rate = str_replace(',', '.', str_replace('.', '',request('rate')));
+        $total_pay = str_replace(',', '.', str_replace('.', '',request('total_pay')));
+        $amount = str_replace(',', '.', str_replace('.', '',request('amount')));
+
+        if($total_pay == 0){
+            return redirect('/taxes/ivapayment/'.$month.'/'.$year)->withDanger('No tiene deuda por pagar!');
+        } 
+        if($amount == 0){
+            return redirect('/taxes/ivapayment/'.$month.'/'.$year)->withDanger('El monto a pagar debe ser distinto de cero!');
+        } 
+        if($amount > $total_pay){
+            return redirect('/taxes/ivapayment/'.$month.'/'.$year)->withDanger('El monto a pagar no puede ser mayor al monto total del Pago!');
+        } 
+
 
         $datenow        = Carbon::now();
 
         $header_voucher  = new HeaderVoucher();
         $header_voucher->setConnection(Auth::user()->database_name);
-
-
-        $header_voucher->description = "Pago Iva Debito Fiscal ".request('month')."/".request('Fecha_Year')." ".request('description');
+        
+        $header_voucher->description = "Pago Iva Debito Fiscal ".$month."/".$year." ".request('description');
         $header_voucher->date = $datenow;
         $header_voucher->reference = request('Nro_Ref');
         
@@ -228,17 +248,7 @@ class TaxesController extends Controller
         $header_voucher->save();
 
         
-        $rate = str_replace(',', '.', str_replace('.', '',request('rate')));
-        $total_pay = str_replace(',', '.', str_replace('.', '',request('total_pay')));
-        $amount = str_replace(',', '.', str_replace('.', '',request('amount')));
-
-        if($amount == 0){
-            return redirect('/taxes/ivapaymentindex')->withDanger('El monto a pagar debe ser distinto de cero!');
-        } 
-        if($amount > $total_pay){
-            return redirect('/taxes/ivapaymentindex')->withDanger('El monto a pagar no puede ser mayor al monto total del Pago!');
-        } 
-
+        
         $account_iva = Account::on(Auth::user()->database_name)->where('code_one', 2)
         ->where('code_two', 1)
         ->where('code_three', 3)
@@ -254,12 +264,33 @@ class TaxesController extends Controller
         
         $this->add_movement($rate,$header_voucher->id,$account_counterpart->id,$user->id,0,$amount);
 
-        return redirect('/taxes/ivapayment')->withSuccess('Pago Exitoso!');
+        return redirect('/taxes/ivapayment/'.$month.'/'.$year)->withSuccess('Pago Exitoso!');
     }
 
 
     public function calculation_for_account($var,$coin,$date_begin,$date_end){
 
+            $total_pago = 0;
+            if($var->code_one == 2 && $var->code_two == 1 && $var->code_three == 3 && $var->code_four == 1 && $var->code_five == 4){ 
+                //Si la cuenta es debito fiscal, procedemos a buscar los movimientos de pago si existen.
+                $total_pago_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe) AS debe
+                            FROM accounts a
+                            INNER JOIN detail_vouchers d
+                                ON d.id_account = a.id
+                            INNER JOIN header_vouchers h
+                                ON h.id = d.id_header_voucher
+                            WHERE a.code_one = ? AND
+                            a.code_two = ? AND
+                            a.code_three = ? AND
+                            a.code_four = ? AND
+                            a.code_five = ? AND
+                            d.status = ? AND
+                            h.description LIKE ?
+                            '
+                        , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,$var->code_five,'C',"Pago Iva Debito Fiscal ".date('m', strtotime($date_begin)) ."/".date('Y', strtotime($date_begin))."%"]);
+                //dd("%Pago Iva Debito Fiscal ".date('m', strtotime($date_begin)) ."/".date('Y', strtotime($date_begin)));
+                $total_pago = $total_pago_debe[0]->debe;
+            }
             /*CALCULA LOS SALDOS DESDE DETALLE COMPROBANTE */
             if($coin == 'bolivares'){
                 $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe) AS debe
@@ -382,9 +413,9 @@ class TaxesController extends Controller
                 $var->balance =  $var->balance_previus;
             }
 
-        $total_resultado =($total_debe - $total_haber) + $var->balance_previus;
+        $total_resultado =($total_debe - $total_haber) + $var->balance_previus + $total_pago;
 
-        return $total_resultado * -1;
+        return $total_resultado;
 
     }
 
