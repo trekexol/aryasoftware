@@ -561,27 +561,6 @@ $(document).ready(function () {
     $("#amount_pay7").mask('000.000.000.000.000,00', { reverse: true });
 });
 
-$(document).ready(function () {
-    $("#reference").mask('000000000000000000000', { reverse: true });
-});
-$(document).ready(function () {
-    $("#reference2").mask('000000000000000000000', { reverse: true });
-});
-$(document).ready(function () {
-    $("#reference3").mask('000000000000000000000', { reverse: true });
-});
-$(document).ready(function () {
-    $("#reference4").mask('000000000000000000000', { reverse: true });
-});
-$(document).ready(function () {
-    $("#reference5").mask('000000000000000000000', { reverse: true });
-});
-$(document).ready(function () {
-    $("#reference6").mask('000000000000000000000', { reverse: true });
-});
-$(document).ready(function () {
-    $("#reference7").mask('000000000000000000000', { reverse: true });
-});
 
 $(document).ready(function () {
     $("#credit_days").mask('00000000', { reverse: true });

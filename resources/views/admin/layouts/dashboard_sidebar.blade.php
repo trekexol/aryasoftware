@@ -226,6 +226,7 @@
             <div class="bg-white py-2 collapse-inner rounded">
 
             <a class="collapse-item" href="{{ route('taxes.iva_paymentindex')}}" > <i class="fas fa-coins fa-sm fa-fw mr-2 text-black-400"></i><strong>Pago de Iva</strong></a>
+            <a class="collapse-item" href="{{ route('taxes.iva_retenido_payment')}}" > <i class="fas fa-coins fa-sm fa-fw mr-2 text-black-400"></i><strong>Pago de Iva<br><div style="text-indent: 22px;">Retenido Terceros</div></strong></a>
             
             </div>
         </div>

@@ -196,7 +196,43 @@ class TaxesController extends Controller
         }
 
        return view('admin.taxes.iva_payment',compact('total_pay','iva_retenido_terceros_total','total_excedente','debito_fiscal_total','iva_credito_fiscal_total','providers','branches','account_iva','bcv','datenow','nro_mes','mes_nombre'));
-   }
+    }
+
+    public function iva_retenido_payment()
+    {
+        $account = Account::on(Auth::user()->database_name)->where('code_one', 2)
+        ->where('code_two', 1)
+        ->where('code_three', 3)
+        ->where('code_four', 1)
+        ->where('code_five',4)
+        ->first();
+
+        $datenow        = Carbon::now();
+        $datenow     = $datenow->format('Y-m-d');
+
+        $coin = 'bolivares';
+
+        $providers = Provider::on(Auth::user()->database_name)->orderBy('id', 'asc')->get();
+
+        $branches = Branch::on(Auth::user()->database_name)->orderBY('description','asc')->pluck('description','id')->toArray(); 
+
+
+        /*Revisa si la tasa de la empresa es automatica o fija*/
+        $company = Company::on(Auth::user()->database_name)->find(1);
+
+       //Si la taza es automatica
+       if($company->tiporate_id == 1){
+           //esto es para que siempre se pueda guardar la tasa en la base de datos
+           $bcv = $this->search_bcv();
+       }else{
+           //si la tasa es fija
+           $bcv_quotation_product = $company->rate;
+           $bcv = $company->rate;
+       }
+
+
+       return view('admin.taxes.iva_retenido_payment',compact('account','providers','branches','bcv','datenow'));
+    }
 
    /**
     * Store a newly created resource in storage.
