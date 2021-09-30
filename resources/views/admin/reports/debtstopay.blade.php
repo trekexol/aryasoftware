@@ -50,6 +50,11 @@
   @if (isset($expenses))
   @foreach ($expenses as $expense)
     <?php 
+
+    if(isset($coin) && $coin == "bolivares"){
+      $expense->amount_with_iva = $expense->amount_with_iva / $expense->rate;
+      $expense->amount_anticipo = $expense->amount_anticipo / $expense->rate;
+    }
     
     $por_pagar = ($expense->amount_with_iva ?? 0) - ($expense->amount_anticipo ?? 0);
     $total_por_pagar += $por_pagar;
