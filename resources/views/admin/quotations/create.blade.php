@@ -119,7 +119,7 @@
                             </div>
 
                         </div>
-                        <form method="POST" action="{{ route('quotations.storeproduct') }}" enctype="multipart/form-data" onsubmit="return validacion()">
+                        <form id="formSendProduct" method="POST" action="{{ route('quotations.storeproduct') }}" enctype="multipart/form-data" onsubmit="return validacion()">
                             @csrf
                             <input id="id_quotation" type="hidden" class="form-control @error('id_quotation') is-invalid @enderror" name="id_quotation" value="{{ $quotation->id ?? -1}}" readonly required autocomplete="id_quotation">
                             <input id="id_inventory" type="hidden" class="form-control @error('id_inventory') is-invalid @enderror" name="id_inventory" value="{{ $inventory->id ?? -1 }}" readonly required autocomplete="id_inventory">
@@ -162,7 +162,7 @@
                                 <div class="form-row col-md-12">
                                     <div class="form-group col-md-2">
                                         <label for="description" >Código</label>
-                                        <input id="code" type="text" class="form-control @error('code') is-invalid @enderror" name="code" value="{{ $inventory->code ?? old('code') ?? '' }}" required autocomplete="code" autofocus>
+                                        <input id="code" type="text" class="form-control @error('code') is-invalid @enderror" name="code" value="{{ $inventory->code ?? old('code') ?? '' }}" onblur="searchCode()" required autocomplete="code" autofocus>
                                     </div>
                                    
                                     <div class="form-group col-md-1">
@@ -270,8 +270,7 @@
                                    
                                     <div class="form-group col-md-1">
                                         @if (isset($inventory))
-                                            <button type="submit" title="Agregar"><i class="fa fa-plus"></i></button>  
-                                        
+                                            <input type="button" title="Agregar" value=" + "  onclick="sendProduct()" >
                                         @endif
                                         
                                     </div>
@@ -490,6 +489,10 @@
             window.location = "{{route('quotations.create', [$quotation->id,''])}}"+"/"+coin;
         });
 
+
+    function sendProduct(){
+        document.getElementById("formSendProduct").submit();
+    }
     function deliveryNoteSend() {
        
             window.location = "{{route('quotations.createdeliverynote', [$quotation->id,$coin])}}";

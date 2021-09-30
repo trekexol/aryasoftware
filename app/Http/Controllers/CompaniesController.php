@@ -108,6 +108,32 @@ class CompaniesController extends Controller
         $companies->status          = '1';
 
         $companies->save();
+
+       // $company = Company::on(Auth::user()->database_name)->where('login',Auth::user()->database_name)->first();
+        
+        $companies  = Company::on(Auth::user()->database_name)->findOrFail(1);
+       
+
+        $companies->email           = $email;
+        $companies->code_rif        = request('Codigo');
+        $companies->razon_social    = $razon_social;
+        $companies->phone           = request('phone');
+        $companies->franqueo_postal = request('Franqueo_Postal');
+        $companies->address         = $direccion;
+        $companies->tax_1           = str_replace(',', '.', str_replace('.', '', request('Impuesto')));
+
+        $companies->tax_2           = str_replace(',', '.', str_replace('.', '', request('Impuesto_2')));
+        $companies->tax_3           = str_replace(',', '.', str_replace('.', '', request('Impuesto_3')));
+        $companies->retention_islr  = str_replace(',', '.', str_replace('.', '', request('Retencion_ISRL')));
+        $companies->tipoinv_id      = request('Tipo_Inventario');
+        $companies->tiporate_id     = request('rate_type');
+        $companies->rate            = str_replace(',', '.', str_replace('.', '', request('Tasa')));
+        $companies->rate_petro      = str_replace(',', '.', str_replace('.', '', request('Tasa_Petro')));
+        $companies->period          = request('Periodo');
+
+        $companies->status          = '1';
+
+        $companies->save();
         
         return redirect('/companies/register')->withSuccess('Actualizado Exitosamente!');
     }
