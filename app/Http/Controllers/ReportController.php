@@ -633,12 +633,12 @@ class ReportController extends Controller
     }
 
 
-    function debtstopay_pdf($date_end = null,$id_provider = null,$coin = null)
+    function debtstopay_pdf($coin,$date_end,$id_provider = null)
     {
       
         $pdf = App::make('dompdf.wrapper');
 
-        
+       
         $date = Carbon::now();
         $datenow = $date->format('d-m-Y'); 
         if(empty($date_end)){

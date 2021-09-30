@@ -51,7 +51,7 @@
   @foreach ($expenses as $expense)
     <?php 
 
-    if(isset($coin) && $coin == "bolivares"){
+    if(isset($coin) && $coin != "bolivares"){
       $expense->amount_with_iva = $expense->amount_with_iva / $expense->rate;
       $expense->amount_anticipo = $expense->amount_anticipo / $expense->rate;
     }

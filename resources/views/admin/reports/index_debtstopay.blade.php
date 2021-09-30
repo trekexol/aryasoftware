@@ -70,7 +70,7 @@
                         </div>
                     </form>
                         <div class="embed-responsive embed-responsive-16by9">
-                            <iframe class="embed-responsive-item" src="{{ route('reports.debtstopay_pdf',[$date_end ?? $datenow,$provider->id ?? null]) }}" allowfullscreen></iframe>
+                            <iframe class="embed-responsive-item" src="{{ route('reports.debtstopay_pdf',[$coin ?? "bolivares",$date_end ?? $datenow,$provider->id ?? null]) }}" allowfullscreen></iframe>
                           </div>
                         
                         </div>

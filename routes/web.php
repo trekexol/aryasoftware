@@ -784,7 +784,7 @@ Route::group(["prefix"=>'reports'],function(){
 
     Route::get('debtstopay/{id_provider?}','ReportController@index_debtstopay')->name('reports.debtstopay');
     Route::post('storedebtstopay','ReportController@store_debtstopay')->name('reports.store_debtstopay');
-    Route::get('debtstopaypdf/{date_end?}/{id_provider?}/{coin?}','ReportController@debtstopay_pdf')->name('reports.debtstopay_pdf');
+    Route::get('debtstopaypdf/{coin}/{date_end}/{id_provider?}','ReportController@debtstopay_pdf')->name('reports.debtstopay_pdf');
    
     Route::get('selectprovider','ReportController@select_provider')->name('reports.select_provider');
 
