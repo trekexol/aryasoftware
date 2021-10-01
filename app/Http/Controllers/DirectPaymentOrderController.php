@@ -359,12 +359,12 @@ class DirectPaymentOrderController extends Controller
         /*Buscar el indice bcv*/
         $urlToGet ='http://www.bcv.org.ve/tasas-informativas-sistema-bancario';
         $pageDocument = @file_get_contents($urlToGet);
-        preg_match_all('|<div class="col-sm-4 col-xs-4 centrado"><strong> (.*?) </strong> </div>|s', $pageDocument, $cap);
+        preg_match_all('|<div class="col-sm-6 col-xs-6 centrado"><strong> (.*?) </strong> </div>|s', $pageDocument, $cap);
 
         if ($cap[0] == array()){ // VALIDAR Concidencia
             $titulo = '0,00';
         }else {
-            $titulo = $cap[1][8];
+            $titulo = $cap[1][4];
         }
 
         $bcv_con_formato = $titulo;

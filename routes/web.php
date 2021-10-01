@@ -399,6 +399,9 @@ Route::group(["prefix"=>'detailvouchers'],function(){
     Route::get('contabilizar/{coin}/{id_header}','DetailVoucherController@contabilizar')->name('detailvouchers.contabilizar');
     
     Route::get('listheader/{var?}','DetailVoucherController@listheader')->name('detailvouchers.listheader');
+
+    
+    Route::get('validation/{coin}/{id_header?}/{id_account?}','DetailVoucherController@createvalidation')->name('detailvouchers.createvalidation');
 });
 
 Route::group(["prefix"=>'quotations'],function(){

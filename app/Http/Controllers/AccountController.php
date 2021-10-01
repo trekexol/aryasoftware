@@ -143,21 +143,24 @@ class AccountController extends Controller
                 }
             }
             
-
-            if($account->code_one == 1){
-                $total_saldo_anterior1 += $account->balance_previus;
+           
+            if(($account->code_one == 1)&&($account->code_two == 0)&&($account->code_three == 0)&&($account->code_four == 0)&&($account->code_five == 0)){
+            
+                $total_saldo_anterior1 += $account->balance;
             }
-            if($account->code_one == 2){
-                $total_saldo_anterior2 += $account->balance_previus;
+            if(($account->code_one == 2)&&($account->code_two == 0)&&($account->code_three == 0)&&($account->code_four == 0)&&($account->code_five == 0)){
+                $total_saldo_anterior2 += $account->balance;
             }
             if(($account->code_one == 3)&&($account->code_two == 0)&&($account->code_three == 0)&&($account->code_four == 0)&&($account->code_five == 0)){
                 $total_saldo_anterior3 += $account->balance;
             }
+            
         }
 
+        
         $total_saldo_anterior = $total_saldo_anterior1 + $total_saldo_anterior2 + $total_saldo_anterior3;
 
-        //dd($total_saldo_anterior);
+       
         
        return view('admin.accounts.index',compact('total_debe','total_haber','total_saldo_anterior','accounts','coin','level'));
    }
@@ -446,7 +449,9 @@ class AccountController extends Controller
                                             '
                                             , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,$var->code_five,'C']);
     
-                                           
+                                            if(($var->balance_previus != 0) && ($var->rate !=0)){
+                                                $var->balance_previus =  $var->balance_previus / $var->rate;
+                                            }
                                             
                                             
                                         }
@@ -464,9 +469,7 @@ class AccountController extends Controller
                                         $var->debe = $total_debe;
                                         $var->haber = $total_haber;
 
-                                        if(($var->balance_previus != 0) && ($var->rate !=0)){
-                                            $var->balance =  $var->balance_previus;
-                                        }
+                                        
                                     }
 
                                 }else{
@@ -1507,12 +1510,12 @@ class AccountController extends Controller
         /*Buscar el indice bcv*/
         $urlToGet ='http://www.bcv.org.ve/tasas-informativas-sistema-bancario';
         $pageDocument = @file_get_contents($urlToGet);
-        preg_match_all('|<div class="col-sm-4 col-xs-4 centrado"><strong> (.*?) </strong> </div>|s', $pageDocument, $cap);
+        preg_match_all('|<div class="col-sm-6 col-xs-6 centrado"><strong> (.*?) </strong> </div>|s', $pageDocument, $cap);
 
         if ($cap[0] == array()){ // VALIDAR Concidencia
             $titulo = '0,00';
         }else {
-            $titulo = $cap[1][8];
+            $titulo = $cap[1][4];
         }
 
         $bcv_con_formato = $titulo;
@@ -1522,6 +1525,7 @@ class AccountController extends Controller
         /*-------------------------- */
         return $bcv;
 
+     
     }
 
 

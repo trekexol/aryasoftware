@@ -83,6 +83,87 @@ class DetailVoucherController extends Controller
 
         return view('admin.detailvouchers.create',compact('detailvouchers_last','account','datenow','header_number','coin','bcv','header','detailvouchers'));
    }
+
+   public function createvalidation($coin,$id_header = null,$id_account = null)
+   {
+        $date = Carbon::now();
+        $datenow = $date->format('Y-m-d');    
+       // $detailvouchers = DetailVoucher::on(Auth::user()->database_name)->get();
+        $header_disponible = HeaderVoucher::on(Auth::user()->database_name)->orderBy('id','desc')->first();
+        $header_number = 1;
+
+        if(isset($header_disponible)){
+            $header_number = $header_disponible->id + 1;
+        }
+        
+        $company = Company::on(Auth::user()->database_name)->find(1);
+        //Si la taza es automatica
+        if($company->tiporate_id == 1){
+            $bcv = $this->search_bcv();
+        }else{
+            //si la tasa es fija
+            $bcv = $company->rate;
+        }
+
+
+        if(($coin == 'bolivares') ){
+            $coin = 'bolivares';
+        }else{
+            //$bcv = null;
+            $coin = 'dolares';
+        }
+        $header = null;
+        $detailvouchers = null;
+        $account = null;
+        $detailvouchers_last = null;
+
+        $details = HeaderVoucher::on(Auth::user()->database_name)
+                                    ->join('detail_vouchers','detail_vouchers.id_header_voucher','header_vouchers.id')
+                                    ->where('detail_vouchers.debe','<>','detail_vouchers.haber')
+                                    ->where('detail_vouchers.id_header_voucher','<>',1)
+                                    ->select('detail_vouchers.*')
+                                    ->get();
+/*
+        $old_header = 0;
+        $sum_debe = 0;
+        $sum_haber = 0;
+        foreach($details as $detail){
+            
+            if(($old_header == 0) || ($old_header <> $detail->id_header_voucher)){
+                if($sum_debe <> $sum_haber){
+                    dd($old_header);
+                    $id_header = $old_header;
+                }
+                $old_header = $detail->id_header_voucher;
+
+                $sum_debe = 0;
+                $sum_haber = 0;
+                $sum_debe += $detail->debe;
+                $sum_haber += $detail->haber;
+            }else{
+                $sum_debe += $detail->debe;
+                $sum_haber += $detail->haber;
+            }
+
+        }
+
+        */
+        
+        if(isset($id_header)){
+            $header = HeaderVoucher::on(Auth::user()->database_name)->find($id_header);
+            $detailvouchers = DetailVoucher::on(Auth::user()->database_name)->where('id_header_voucher',$id_header)->get();
+            //se usa el ultimo movimiento agregado de la cabecera para tomar cual fue la tasa que se uso
+            $detailvouchers_last = DetailVoucher::on(Auth::user()->database_name)->where('id_header_voucher',$id_header)->orderBy('id','desc')->first();
+            if(isset($id_account)){
+                $account = Account::on(Auth::user()->database_name)->find($id_account);
+            }
+        }
+        
+
+        return view('admin.detailvouchers.create',compact('detailvouchers_last','account','datenow','header_number','coin','bcv','header','detailvouchers'));
+   }
+
+
    public function createselect($id_header)
    {
         $header = HeaderVoucher::on(Auth::user()->database_name)->find($id_header); 
@@ -396,12 +477,12 @@ class DetailVoucherController extends Controller
         /*Buscar el indice bcv*/
         $urlToGet ='http://www.bcv.org.ve/tasas-informativas-sistema-bancario';
         $pageDocument = @file_get_contents($urlToGet);
-        preg_match_all('|<div class="col-sm-4 col-xs-4 centrado"><strong> (.*?) </strong> </div>|s', $pageDocument, $cap);
+        preg_match_all('|<div class="col-sm-6 col-xs-6 centrado"><strong> (.*?) </strong> </div>|s', $pageDocument, $cap);
 
         if ($cap[0] == array()){ // VALIDAR Concidencia
             $titulo = '0,00';
         }else {
-            $titulo = $cap[1][8];
+            $titulo = $cap[1][4];
         }
 
         $bcv_con_formato = $titulo;

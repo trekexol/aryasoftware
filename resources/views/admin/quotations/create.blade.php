@@ -162,7 +162,7 @@
                                 <div class="form-row col-md-12">
                                     <div class="form-group col-md-2">
                                         <label for="description" >Código</label>
-                                        <input id="code" type="text" class="form-control @error('code') is-invalid @enderror" name="code" value="{{ $inventory->code ?? old('code') ?? '' }}" onblur="searchCode()" required autocomplete="code" autofocus>
+                                        <input id="code" type="text" class="form-control @error('code') is-invalid @enderror" name="code" value="{{ $inventory->code ?? old('code') ?? '' }}" required autocomplete="code" autofocus>
                                     </div>
                                    
                                     <div class="form-group col-md-1">
@@ -548,8 +548,8 @@
             
             let reference_id = document.getElementById("code").value; 
             
-            
-            $.ajax({
+            if(reference_id != ""){
+                $.ajax({
                 
                 url:"{{ route('quotations.listinventory') }}" + '/' + reference_id,
                 beforSend:()=>{
@@ -566,14 +566,16 @@
                            
                         });
                     }else{
-                        alert('No se Encontro este numero de Referencia');
+                       //alert('No se Encontro este numero de Referencia');
                     }
                    
                 },
                 error:(xhr)=>{
-                    alert('Presentamos Inconvenientes');
+                   //alert('Presentamos Inconvenientes');
                 }
             })
+            }
+           
         }
         $("body").toggleClass("sidebar-toggled");
         $(".sidebar").toggleClass("toggled");
