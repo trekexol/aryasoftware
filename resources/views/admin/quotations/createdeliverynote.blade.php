@@ -132,16 +132,18 @@
                         
                         <br>
                         <div class="form-group row">
-                            <div class="col-md-2">
+                           
+                            <div class="col-sm-4 offset-sm-1">
+                                <a onclick="pdf();" id="btnfacturar" name="btnfacturar" class="btn btn-info" title="Guardar">Guardar e Imprimir Nota de Entrega</a>  
                             </div>
-                            <div class="col-md-4">
-                                <a onclick="pdf();" id="btnfacturar" name="btnfacturar" class="btn btn-info" title="facturar">Guardar e Imprimir Nota de Entrega</a>  
+                            <div class="col-sm-2">
+                                <a onclick="pdfmediacarta3();" id="btnfacturarmedia" name="btnfacturarmedia" class="btn btn-info" title="Guardar">Media Carta</a>  
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-sm-3">
                                 <a href="{{ route('quotations.indexdeliverynote') }}" id="btnfacturar" name="btnfacturar" class="btn btn-success" title="facturar">Ver Notas de Entrega</a>  
                             </div>
                             @if (empty($quotation->date_delivery_note))
-                            <div class="col-md-2">
+                            <div class="col-sm-2">
                                 <a href="{{ route('quotations.create',[$quotation->id,$coin ?? 'bolivares']) }}" id="btnfacturar" name="btnfacturar" class="btn btn-danger" title="facturar">Volver</a>  
                             </div>
                             @endif
@@ -159,12 +161,14 @@
 
 @section('consulta')
 <script type="text/javascript">
-   $("#coin").on('change',function(){
+    $("#coin").on('change',function()
+    {
                 coin = $(this).val();
                 window.location = "{{route('quotations.createdeliverynote', [$quotation->id,''])}}"+"/"+coin;
-            });
+    });
 
-    $("#iva").on('change',function(){
+    $("#iva").on('change',function()
+    {
                 //calculate();
                
                 let inputIva = document.getElementById("iva").value; 
@@ -216,7 +220,7 @@
 
                 document.getElementById("grand_total").value = total.toLocaleString('de-DE', {minimumFractionDigits: 2,maximumFractionDigits: 2});
                
-            });
+    });
 </script>
 <script type="text/javascript">
 
@@ -228,6 +232,13 @@
         
 
         var nuevaVentana= window.open("{{ route('pdf.deliverynote',[$quotation->id,$coin,''])}}"+"/"+inputIva,"ventana","left=800,top=800,height=800,width=1000,scrollbar=si,location=no ,resizable=si,menubar=no");
+ 
+    }
+
+    function pdfmediacarta3() {
+        let inputIva = document.getElementById("iva").value; 
+
+        var nuevaVentana= window.open("{{ route('pdf.deliverynotemediacarta',[$quotation->id,$coin,''])}}"+"/"+inputIva,"ventana","left=800,top=800,height=800,width=1000,scrollbar=si,location=no ,resizable=si,menubar=no");
  
     }
 

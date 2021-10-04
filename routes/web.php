@@ -531,6 +531,8 @@ Route::group(["prefix"=>'invoices'],function(){
  Route::group(["prefix"=>'pdf'],function(){
     Route::get('factura/{id_quotation}/{coin?}','PDFController@imprimirfactura')->name('pdf');
     Route::get('deliverynote/{id_quotation}/{coin}/{iva}','PDFController@deliverynote')->name('pdf.deliverynote');
+    Route::get('deliverynotemediacarta/{id_quotation}/{coin}/{iva}','PDFController@deliverynotemediacarta')->name('pdf.deliverynotemediacarta');
+    
     Route::get('inventory','PDFController@imprimirinventory')->name('pdf.inventory');
 
     Route::get('facturamedia/{id_quotation}/{coin?}','PDFController@imprimirfactura_media')->name('pdf.media');

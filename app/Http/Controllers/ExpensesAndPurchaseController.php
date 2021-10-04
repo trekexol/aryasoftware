@@ -2390,16 +2390,17 @@ class ExpensesAndPurchaseController extends Controller
                     $code_one = 0;  $code_two = 0;
                     
 
-                if($type == 1){
+                if($type == 1 || $type == 2){
                     //Inventario
-                    $code_one = 1;  $code_two = 1;
-                    
+                    $respuesta = Account::on(Auth::user()->database_name)->select('id','description')
+                                                                        ->where('code_one',1)
+                                                                        ->where('code_two', 1)
+                                                                        ->where('code_three', 3)
+                                                                        ->where('code_four',1)
+                                                                        ->where('code_five', '<>',0)
+                                                                        ->get();
                 }
-                if($type == 2){
-                    //Activos Fijos
-                    $code_one = 1;  $code_two = 2;
-                    
-                }
+                
                 if($type == 3){
                     $code_one = 5;  
                     $respuesta = Account::on(Auth::user()->database_name)->select('id','description')->where('code_one',$code_one)
@@ -2446,11 +2447,7 @@ class ExpensesAndPurchaseController extends Controller
                     return response()->json($respuesta,200);
                 }
                 
-                $respuesta = Account::on(Auth::user()->database_name)->select('id','description')->where('code_one',$code_one)
-                                                                ->where('code_two', $code_two)
-                                                                ->where('code_three', '<>',0)
-                                                                ->where('code_four', '<>',0)
-                                                                ->where('code_five', '<>',0)->get();
+                
                 return response()->json($respuesta,200);
 
             }catch(Throwable $th){

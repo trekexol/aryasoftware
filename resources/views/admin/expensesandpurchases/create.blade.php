@@ -472,7 +472,7 @@
     @else
     <script>
        
-        var type_var = 0;
+        var type_var = '-1';
     </script>
     @endif
     <script>
@@ -564,7 +564,6 @@
                 
                 },
                 error:(xhr)=>{
-                    alert('No se encontro la cuenta');
                 }
             })
         }
@@ -590,12 +589,12 @@
                            
                         });
                     }else{
-                        alert('No se Encontro este numero de Referencia');
+                       
                     }
                    
                 },
                 error:(xhr)=>{
-                    alert('No se Encontro');
+                   
                 }
             })
         }

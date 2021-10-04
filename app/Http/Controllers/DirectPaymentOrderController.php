@@ -102,7 +102,8 @@ class DirectPaymentOrderController extends Controller
 
             $check_amount = $this->check_amount($account);
 
-            if($check_amount->saldo_actual >= $amount){
+            /*se desabilita esta validacion por motivos que el senor nestor queria ingresar datos y que queden en negativo
+            if($check_amount->saldo_actual >= $amount){*/
 
                 $payment_order = new PaymentOrder();
                 $payment_order->setConnection(Auth::user()->database_name);
@@ -179,9 +180,9 @@ class DirectPaymentOrderController extends Controller
 
                 return redirect('/directpaymentorders')->withSuccess('Registro Exitoso!');
 
-            }else{
+           /* }else{
                 return redirect('/directpaymentorders'.request('id_account').'')->withDanger('El saldo de la Cuenta '.$check_amount->description.' es menor al monto del retiro!');
-            }
+            }*/
 
         }else{
             return redirect('/directpaymentorders'.request('id_account').'')->withDanger('No se puede hacer un movimiento a la misma cuenta!');
