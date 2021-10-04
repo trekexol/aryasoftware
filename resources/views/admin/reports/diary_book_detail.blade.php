@@ -57,25 +57,26 @@
       </tr>
       
       @foreach ($detailvouchers as $detail)
-        <?php 
-           
-            if((isset($detail->debe)) && ($detail->debe != 0)){
-              $total_debe += $detail->debe;
-            }else if((isset($detail->haber)) && ($detail->haber != 0)){
-              $total_haber += $detail->haber;
-            }
-          
-          
-        ?>
-        <tr>
-          <td style="text-align: center;">{{ $detail->date ?? ''}}</td>
-          <td style="text-align: center;">{{ $detail->id_header ?? ''}}</td>
-          <td style="text-align: left;">{{ $detail->header_description ?? ''}}</td>
+        @if($detail->id_account == $id_account)
+          <?php 
+            
+              if((isset($detail->debe)) && ($detail->debe != 0)){
+                $total_debe += $detail->debe;
+              }else if((isset($detail->haber)) && ($detail->haber != 0)){
+                $total_haber += $detail->haber;
+              }
+            
+          ?>
+          <tr>
+            <td style="text-align: center;">{{ $detail->date ?? ''}}</td>
+            <td style="text-align: center;">{{ $detail->id_header ?? ''}}</td>
+            <td style="text-align: left;">{{ $detail->header_description ?? ''}} / {{ $detail->account_counterpart ?? '' }}</td>
 
-          <td style="text-align: right;">{{ number_format($detail->debe ?? 0, 2, ',', '.')}}</td>
-          <td style="text-align: right;">{{ number_format($detail->haber ?? 0, 2, ',', '.')}}</td>
-          <td style="text-align: right;">{{ number_format($detail->saldo ?? 0, 2, ',', '.')}}</td>
-        </tr>
+            <td style="text-align: right;">{{ number_format($detail->debe ?? 0, 2, ',', '.')}}</td>
+            <td style="text-align: right;">{{ number_format($detail->haber ?? 0, 2, ',', '.')}}</td>
+            <td style="text-align: right;">{{ number_format($detail->saldo ?? 0, 2, ',', '.')}}</td>
+          </tr>
+        @endif
       @endforeach
     
 

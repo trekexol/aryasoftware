@@ -91,16 +91,37 @@ class DailyListingController extends Controller
 
         $pdf = App::make('dompdf.wrapper');
 
+        $id_account = request('id_account');
+
+        
         $company = Company::on(Auth::user()->database_name)->find(1);
 
-        $detailvouchers =  DB::connection(Auth::user()->database_name)->table('detail_vouchers')
-                            ->join('header_vouchers', 'header_vouchers.id', '=', 'detail_vouchers.id_header_voucher')
-                            ->join('accounts', 'accounts.id', '=', 'detail_vouchers.id_account')
-                            ->whereBetween('header_vouchers.date', [$date_begin, $date_end])
-                            ->select('detail_vouchers.*','header_vouchers.*'
-                            ,'accounts.description as account_description'
-                            ,'header_vouchers.id as id_header'
-                            ,'header_vouchers.description as header_description')->get();
+        if(isset($id_account)){
+            $detailvouchers =  DB::connection(Auth::user()->database_name)->table('header_vouchers')
+            ->join('detail_vouchers', 'detail_vouchers.id_header_voucher', '=', 'header_vouchers.id')
+            ->join('accounts', 'accounts.id', '=', 'detail_vouchers.id_account')
+            ->whereBetween('header_vouchers.date', [$date_begin, $date_end])
+            ->whereIn('header_vouchers.id', function($query) use ($id_account){
+                $query->select('id_header_voucher')
+                ->from('detail_vouchers')
+                ->where('id_account',$id_account);
+            })
+            ->select('detail_vouchers.*','header_vouchers.*'
+            ,'accounts.description as account_description'
+            ,'header_vouchers.id as id_header'
+            ,'header_vouchers.description as header_description')->get();
+        }else{
+            $detailvouchers =  DB::connection(Auth::user()->database_name)->table('detail_vouchers')
+            ->join('header_vouchers', 'header_vouchers.id', '=', 'detail_vouchers.id_header_voucher')
+            ->join('accounts', 'accounts.id', '=', 'detail_vouchers.id_account')
+            ->whereBetween('header_vouchers.date', [$date_begin, $date_end])
+            ->select('detail_vouchers.*','header_vouchers.*'
+            ,'accounts.description as account_description'
+            ,'header_vouchers.id as id_header'
+            ,'header_vouchers.description as header_description')->get();
+        }
+
+        
 
         
         
@@ -114,6 +135,8 @@ class DailyListingController extends Controller
                                 ,'datenow','date_begin','date_end'));
         return $pdf->stream();
     }
+
+    
 
 
     public function print_diary_book_detail(Request $request)
@@ -137,13 +160,16 @@ class DailyListingController extends Controller
             ->join('header_vouchers', 'header_vouchers.id', '=', 'detail_vouchers.id_header_voucher')
             ->join('accounts', 'accounts.id', '=', 'detail_vouchers.id_account')
             ->whereBetween('header_vouchers.date', [$date_begin, $date_end])
-            ->where('accounts.id',$id_account)
+            ->whereIn('header_vouchers.id', function($query) use ($id_account){
+                $query->select('id_header_voucher')
+                ->from('detail_vouchers')
+                ->where('id_account',$id_account);
+            })
             ->select('detail_vouchers.*','header_vouchers.*'
             ,'accounts.description as account_description'
             ,'header_vouchers.id as id_header'
             ,'header_vouchers.description as header_description')
             ->orderBy('detail_vouchers.id','asc')->get();
-
 
             //busca los saldos previos de la cuenta                    
             $detailvouchers_saldo_debe =  DB::connection(Auth::user()->database_name)->table('detail_vouchers')
@@ -218,27 +244,44 @@ class DailyListingController extends Controller
         $saldo_anterior = ($account->balance_previus ?? 0) + ($detailvouchers_saldo_debe ?? 0) - ($detailvouchers_saldo_haber ?? 0);
         $primer_movimiento = true;
         $saldo = 0;
+        $counterpart = "";
 
         foreach($detailvouchers as $detail){
-            /*esta parte convierte los saldos a dolares */
-            if(isset($coin) && $coin !="bolivares"){
-                if((isset($detail->debe)) && ($detail->debe != 0)){
-                  $detail->debe = $detail->debe / ($detail->tasa ?? 1);
+            if($detail->id_account == $id_account){
+                /*esta parte convierte los saldos a dolares */
+                if(isset($coin) && $coin !="bolivares"){
+                    if((isset($detail->debe)) && ($detail->debe != 0)){
+                    $detail->debe = $detail->debe / ($detail->tasa ?? 1);
+                    }
+                    if((isset($detail->haber)) && ($detail->haber != 0)){
+                    $detail->haber = $detail->haber / ($detail->tasa ?? 1);
+                    }
                 }
-                if((isset($detail->haber)) && ($detail->haber != 0)){
-                  $detail->haber = $detail->haber / ($detail->tasa ?? 1);
+                /*----------------------------- */
+                if($primer_movimiento){
+                    $detail->saldo = $detail->debe - $detail->haber + $saldo_anterior;
+                    $saldo += $detail->saldo;
+                    $primer_movimiento = false;
+                }else{
+                    $detail->saldo = $detail->debe - $detail->haber + $saldo;
+                    $saldo = $detail->saldo;
                 }
-              }
-              /*----------------------------- */
-            if($primer_movimiento){
-                $detail->saldo = $detail->debe - $detail->haber + $saldo_anterior;
-                $saldo += $detail->saldo;
-                $primer_movimiento = false;
+                
+                if($counterpart == ""){
+                    $last_detail = $detail;
+                }else{
+                    $detail->account_counterpart = $counterpart;
+                }
+                
             }else{
-                $detail->saldo = $detail->debe - $detail->haber + $saldo;
-                $saldo = $detail->saldo;
+                if(isset($last_detail)){
+                    $last_detail->account_counterpart = $detail->account_description;
+                   
+                }else{
+                    $counterpart = $detail->account_description;
+                }
+                
             }
-            
         }
 
         //voltea los movimientos para mostrarlos del mas actual al mas antiguo
@@ -247,10 +290,10 @@ class DailyListingController extends Controller
         
         $pdf = $pdf->loadView('admin.reports.diary_book_detail',compact('coin','company','detailvouchers'
                                 ,'datenow','date_begin','date_end','account'
-                                ,'detailvouchers_saldo_debe','detailvouchers_saldo_haber','saldo'));
+                                ,'detailvouchers_saldo_debe','detailvouchers_saldo_haber','saldo','id_account'));
         return $pdf->stream();
     }
    
-    
+   
 
 }
