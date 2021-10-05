@@ -70,15 +70,16 @@ class HeaderVoucherController extends Controller
 
             $header_id = request('reference');
             $header = HeaderVoucher::on(Auth::user()->database_name)->find($header_id);
+            $coin = request('coin');
 
             if(isset($header)){
-                return redirect('/detailvouchers/register')->withDanger('Ya el numero de cabecera existe! , elija uno correctamente');
+                return redirect('/detailvouchers/register/'.$coin.'')->withDanger('Ya el numero de cabecera existe! , elija uno correctamente');
             }
             $var->id = $header_id;
             $var->reference = $header_id;
             $var->description = request('description');
             $var->date = request('date');
-            $coin = request('coin');
+           
            
             //U porque son creados por el usuario
             $var->status =  "U";
@@ -122,13 +123,9 @@ class HeaderVoucherController extends Controller
     * @param  int  $id
     * @return \Illuminate\Http\Response
     */
-   public function update(Request $request, $id)
+   public function update(Request $request)
    {
-
-    $vars =  HeaderVoucher::on(Auth::user()->database_name)->find($id);
-
-    $vars_status = $vars->status;
-  
+    
     $data = request()->validate([
                 
                 
@@ -139,24 +136,31 @@ class HeaderVoucherController extends Controller
        
     
     ]);
+    $id = request('id_header');
+    $coin = request('coin');
 
-    $var = HeaderVoucher::on(Auth::user()->database_name)->findOrFail($id);
+    if(empty($coin)){
+        $coin = "bolivares";
+    }
 
-    $var->reference = request('reference');
-    $var->description = request('description');
-    $var->date = request('date');
-    
-
-    if(request('status') == null){
-        $var->status = $vars_status;
-    }else{
-        $var->status = request('status');
+    if(isset($id)){
+        $var = HeaderVoucher::on(Auth::user()->database_name)->findOrFail($id);
     }
    
-    $var->save();
-
-    return redirect('/headervouchers')->withSuccess('Actualizacion Exitosa!');
+    if(isset($var)){
+        $var->reference = request('reference_header');
+        $var->description = request('description');
+        $var->date = request('date');
+        
+    
+        $var->save();
+    
+        return redirect('/detailvouchers/register/'.$coin.'/'.$var->id.'')->withSuccess('Actualizacion Exitosa!');
+        
+    }else{
+        return redirect('/detailvouchers/register/'.$coin.'')->withDanger('El numero de cabecera no existe !!');
     }
+   }
 
 
    /**

@@ -354,7 +354,8 @@
                                                 ?>
                                                     <td style="text-align: right">
                                                         <a href="{{ route('expensesandpurchases.editproduct',[$var->id,$coin]) }}" title="Editar"><i class="fa fa-edit"></i></a>  
-                                                    </td>
+                                                        <a href="#" class="delete" data-id={{$var->id}} data-description={{$var->description}} data-coin={{$coin}} data-toggle="modal" data-target="#deleteModal" title="Eliminar"><i class="fa fa-trash text-danger"></i></a>  
+                                                   </td>
                                             
                                                 </tr>
                                             @endforeach
@@ -395,6 +396,35 @@
         </div>
     </div>
 </div>
+
+<!-- Delete Warning Modal -->
+<div class="modal modal-danger fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Eliminar</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            <form action="{{ route('expensesandpurchases.deleteDetail') }}" method="post">
+                @csrf
+                @method('DELETE')
+                <input id="id_detail_modal" type="hidden" class="form-control @error('id_detail_modal') is-invalid @enderror" name="id_detail_modal" readonly required autocomplete="id_detail_modal">
+                <input id="coin_modal" type="hidden" class="form-control @error('coin_modal') is-invalid @enderror" name="coin_modal" readonly required autocomplete="coin_modal">
+                       
+                <div id="description_modal" class="text-center h5"></div>
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-danger">Eliminar</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
 
 @if (isset($inventory))
@@ -432,7 +462,17 @@
             $("#amount_product").mask('000.000.000.000.000.000.000.000,00', { reverse: true });
             
         });
-        
+
+        $(document).on('click','.delete',function(){
+            let id = $(this).attr('data-id');
+            let coin = $(this).attr('data-coin');
+            let description = $(this).attr('data-description');
+
+            document.getElementById("description_modal").innerHTML = "Seguro desea eliminar "+description+"?";
+            $('#id_detail_modal').val(id);
+            $('#coin_modal').val(coin);
+            
+        });
         
         $("body").toggleClass("sidebar-toggled");
         $(".sidebar").toggleClass("toggled");

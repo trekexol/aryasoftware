@@ -26,7 +26,7 @@ class ProductController extends Controller
        $user       =   auth()->user();
        $users_role =   $user->role_id;
        
-        $products = Product::on(Auth::user()->database_name)->orderBy('id' ,'DESC')->get();
+        $products = Product::on(Auth::user()->database_name)->orderBy('id' ,'DESC')->where('status',1)->get();
 
 
        return view('admin.products.index',compact('products'));
@@ -289,9 +289,22 @@ class ProductController extends Controller
     * @param  int  $id
     * @return \Illuminate\Http\Response
     */
-   public function destroy($id)
+   public function destroy()
    {
-       //
+        $product = Product::on(Auth::user()->database_name)->find(request('id_product_modal')); 
+
+        if(isset($product)){
+            
+            Inventory::on(Auth::user()->database_name)
+                            ->where('product_id',$product->id)
+                            ->update(['status' => 'X']);
+
+            $product->status = 'X';
+
+            $product->save();
+    
+            return redirect('/products')->withSuccess('Se ha Deshabilitado el Producto Correctamente!!');
+        }
    }
 
 

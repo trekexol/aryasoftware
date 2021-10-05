@@ -48,7 +48,6 @@ class BankMovementController extends Controller
        $user       =   auth()->user();
        $users_role =   $user->role_id;
        if($users_role == '1'){
-        
         /*$detailvouchers = DB::connection(Auth::user()->database_name)->select('SELECT d.*, h.description as header_description, h.reference as header_reference, h.date as header_date
                             FROM header_vouchers h
                             LEFT JOIN detail_vouchers d 
@@ -62,9 +61,13 @@ class BankMovementController extends Controller
         $detailvouchers = DB::connection(Auth::user()->database_name)->table('detail_vouchers')
                             ->join('header_vouchers', 'header_vouchers.id', '=', 'detail_vouchers.id_header_voucher')
                             ->join('accounts', 'accounts.id', '=', 'detail_vouchers.id_account')
-                            ->where('header_vouchers.description','LIKE','Deposito%')
-                            ->orwhere('header_vouchers.description','LIKE','Retiro%')
-                            ->orwhere('header_vouchers.description','LIKE','Transferencia%')
+                            ->where('header_vouchers.status','LIKE','1')
+                            ->where(function ($query) {
+                                $query->where('header_vouchers.description','LIKE','Deposito%')
+                                        ->orwhere('header_vouchers.description','LIKE','Retiro%')
+                                        ->orwhere('header_vouchers.description','LIKE','Transferencia%');
+                            })
+                            
                             ->select('detail_vouchers.*','header_vouchers.description as header_description', 
                             'header_vouchers.reference as header_reference','header_vouchers.date as header_date',
                             'accounts.description as account_description','accounts.code_one as account_code_one',
@@ -1548,10 +1551,23 @@ class BankMovementController extends Controller
     * @param  int  $id
     * @return \Illuminate\Http\Response
     */
-   public function destroy($id)
-   {
-       //
-   }
+  public function destroy($id){
+    if(isset($id)){
+        $header = HeaderVoucher::on(Auth::user()->database_name)->findOrFail($id);
+
+        $detail = DetailVoucher::on(Auth::user()->database_name)->where('id_header_voucher',$header->id)
+            ->update(['status' => 'X']);
+
+        $header->status = "X";
+        $header->save();
+
+        return redirect('/bankmovements/seemovements')->withSuccess('Se deshabilitó con éxito el movimiento!');
+       
+       }else{
+        return redirect('/bankmovements/seemovements')->withDanger('Debe buscar un movimiento primero !!');
+       
+       }
+  }
 
    public function listbeneficiario(Request $request, $id_var = null){
     //validar si la peticion es asincrona

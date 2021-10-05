@@ -278,12 +278,10 @@ Route::group(["prefix"=>'products'],function(){
     Route::post('store','ProductController@store')->name('products.store');
    
     Route::get('{id}/edit','ProductController@edit')->name('products.edit');
-    Route::delete('{id}/delete','ProductController@destroy')->name('products.delete');
+    Route::delete('delete','ProductController@destroy')->name('products.delete');
     Route::patch('{id}/update','ProductController@update')->name('products.update');
 
     Route::get('listtwosubsegment/{id_subsegment}','TwoSubSegmentController@list2subsegment')->name('products.list2subsegment');
-    
-    
     Route::get('listtwosubsegment/{id_subsegment}','TwoSubSegmentController@list')->name('products.listtwosubsegment');
     Route::get('listthreesubsegment/{id_subsegment}','ThreeSubSegmentController@list')->name('products.listthreesubsegment');
 
@@ -376,7 +374,7 @@ Route::group(["prefix"=>'headervouchers'],function(){
     Route::post('store','HeaderVoucherController@store')->name('headervouchers.store');
     Route::get('{id}/edit','HeaderVoucherController@edit')->name('headervouchers.edit');
     Route::delete('{id}/delete','HeaderVoucherController@destroy')->name('headervouchers.delete');
-    Route::patch('{id}/update','HeaderVoucherController@update')->name('headervouchers.update');
+    Route::post('update','HeaderVoucherController@update')->name('headervouchers.update');
 
 });
 
@@ -385,7 +383,7 @@ Route::group(["prefix"=>'detailvouchers'],function(){
     Route::get('register/{coin}/{id_header?}/{id_account?}','DetailVoucherController@create')->name('detailvouchers.create');
     Route::post('store','DetailVoucherController@store')->name('detailvouchers.store');
     Route::get('edit/{coin}/{id}/{id_account?}','DetailVoucherController@edit')->name('detailvouchers.edit');
-    Route::delete('{id}/delete','DetailVoucherController@destroy')->name('detailvouchers.delete');
+    Route::get('delete/{id?}','DetailVoucherController@destroy')->name('detailvouchers.delete');
     Route::patch('{id}/update','DetailVoucherController@update')->name('detailvouchers.update');
    
     Route::get('selectaccount/{coin}/{id_header}/{id_detail?}','DetailVoucherController@selectaccount')->name('detailvouchers.selectaccount');
@@ -460,7 +458,7 @@ Route::group(["prefix"=>'bankmovements'],function(){
     Route::get('/','BankMovementController@index')->name('bankmovements');
     Route::post('store','BankMovementController@store')->name('bankmovements.store');
     Route::get('{id}/edit','BankMovementController@edit')->name('bankmovements.edit');
-    Route::delete('{id}/delete','BankMovementController@destroy')->name('bankmovements.delete');
+    Route::get('delete/{id}','BankMovementController@destroy')->name('bankmovements.delete');
     Route::patch('{id}/update','BankMovementController@update')->name('bankmovements.update');
 
     Route::get('registerdeposit/{id_account}','BankMovementController@createdeposit')->name('bankmovements.createdeposit');
@@ -606,7 +604,8 @@ Route::group(["prefix"=>'expensesandpurchases'],function(){
     Route::post('store', 'ExpensesAndPurchaseController@store')->name('expensesandpurchases.store');
    
     Route::get('{id}/edit','ExpensesAndPurchaseController@edit')->name('expensesandpurchases.edit');
-    Route::delete('{id}/delete','ExpensesAndPurchaseController@destroy')->name('expensesandpurchases.delete');
+    Route::delete('delete','ExpensesAndPurchaseController@destroy')->name('expensesandpurchases.delete');
+    Route::delete('deletedetail','ExpensesAndPurchaseController@deleteDetail')->name('expensesandpurchases.deleteDetail');
     Route::patch('{id}/update','ExpensesAndPurchaseController@update')->name('expensesandpurchases.update');
 
 

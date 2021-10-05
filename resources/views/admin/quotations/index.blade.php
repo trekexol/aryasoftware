@@ -140,10 +140,10 @@
 
     $(document).on('click','.delete',function(){
          
-         let id_quotation = $(this).attr('data-id-quotation');
+        let id_quotation = $(this).attr('data-id-quotation');
 
-         $('#id_quotation_modal').val(id_quotation);
-        });
+        $('#id_quotation_modal').val(id_quotation);
+    });
     </script> 
 
 @endsection

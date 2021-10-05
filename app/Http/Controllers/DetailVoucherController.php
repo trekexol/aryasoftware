@@ -62,7 +62,6 @@ class DetailVoucherController extends Controller
         if(($coin == 'bolivares') ){
             $coin = 'bolivares';
         }else{
-            //$bcv = null;
             $coin = 'dolares';
         }
         $header = null;
@@ -72,12 +71,17 @@ class DetailVoucherController extends Controller
         
         if(isset($id_header)){
             $header = HeaderVoucher::on(Auth::user()->database_name)->find($id_header);
-            $detailvouchers = DetailVoucher::on(Auth::user()->database_name)->where('id_header_voucher',$id_header)->get();
-            //se usa el ultimo movimiento agregado de la cabecera para tomar cual fue la tasa que se uso
-            $detailvouchers_last = DetailVoucher::on(Auth::user()->database_name)->where('id_header_voucher',$id_header)->orderBy('id','desc')->first();
-            if(isset($id_account)){
-                $account = Account::on(Auth::user()->database_name)->find($id_account);
+            if(isset($header) && $header->status != 'X'){
+                $detailvouchers = DetailVoucher::on(Auth::user()->database_name)->where('id_header_voucher',$id_header)->get();
+                //se usa el ultimo movimiento agregado de la cabecera para tomar cual fue la tasa que se uso
+                $detailvouchers_last = DetailVoucher::on(Auth::user()->database_name)->where('id_header_voucher',$id_header)->orderBy('id','desc')->first();
+                if(isset($id_account)){
+                    $account = Account::on(Auth::user()->database_name)->find($id_account);
+                }
+            }else{
+                return redirect('/detailvouchers/register/bolivares')->withDanger('Este movimiento fue Deshabilitado!');
             }
+            
         }
         
 
@@ -123,7 +127,7 @@ class DetailVoucherController extends Controller
                                     ->where('detail_vouchers.id_header_voucher','<>',1)
                                     ->select('detail_vouchers.*')
                                     ->get();
-/*
+        /*
         $old_header = 0;
         $sum_debe = 0;
         $sum_haber = 0;
@@ -216,8 +220,8 @@ class DetailVoucherController extends Controller
    public function contabilizar($coin,$id_header)
    {
 
-    //  dd($id_header);
-    $header = HeaderVoucher::on(Auth::user()->database_name)->find($id_header); 
+        //  dd($id_header);
+        $header = HeaderVoucher::on(Auth::user()->database_name)->find($id_header); 
 
         if(isset($header)){  
 
@@ -255,7 +259,7 @@ class DetailVoucherController extends Controller
                                         
             
         }else{
-            return redirect('/detailvouchers/register')->withDanger('No existe el Header!');
+            return redirect('/detailvouchers/register/bolivares')->withDanger('No existe el Header!');
         }                              
 
    }
@@ -269,8 +273,7 @@ class DetailVoucherController extends Controller
    public function store(Request $request)
     {
        
-        //dd($request);
-
+        
          $data = request()->validate([
                 
                 
@@ -311,9 +314,6 @@ class DetailVoucherController extends Controller
                
             }
 
-            
-            
-          
             $var->status =  "N";
         
             $var->save();
@@ -373,8 +373,9 @@ class DetailVoucherController extends Controller
     * @param  int  $id
     * @return \Illuminate\Http\Response
     */
-   public function update(Request $request, $id)
+   public function update(Request $request, $id = null)
     {
+        
         
         $data = request()->validate([
                     
@@ -387,47 +388,50 @@ class DetailVoucherController extends Controller
         
         ]);
         
-        $var = DetailVoucher::on(Auth::user()->database_name)->findOrFail($id);
+        if(isset($id)){
+            $var = DetailVoucher::on(Auth::user()->database_name)->findOrFail($id);
 
-        $coin = request('coin');
-        $type = request('type');
-        $id_account = request('id_account');
-
-        if($id_account != -1){
-            $var->id_account = $id_account;
-        }
-
-        $valor_sin_formato_amount = str_replace(',', '.', str_replace('.', '', request('amount')));
-        $valor_sin_formato_rate = str_replace(',', '.', str_replace('.', '', request('rate')));
-
-        if($coin == 'bolivares'){
-            if($type == 'debe'){
-                $var->debe = $valor_sin_formato_amount;
-                $var->tasa = $valor_sin_formato_rate;
-                $var->haber = 0;
-            }else{
-                $var->haber = $valor_sin_formato_amount;
-                $var->tasa = $valor_sin_formato_rate;
-                $var->debe = 0;
+            $coin = request('coin');
+            $type = request('type');
+            $id_account = request('id_account');
+    
+            if($id_account != -1){
+                $var->id_account = $id_account;
             }
-        }else{
-            if($type == 'debe'){
-                $var->debe = $valor_sin_formato_amount * $valor_sin_formato_rate;
-                $var->tasa = $valor_sin_formato_rate;
-                $var->haber = 0;
+    
+            $valor_sin_formato_amount = str_replace(',', '.', str_replace('.', '', request('amount')));
+            $valor_sin_formato_rate = str_replace(',', '.', str_replace('.', '', request('rate')));
+    
+            if($coin == 'bolivares'){
+                if($type == 'debe'){
+                    $var->debe = $valor_sin_formato_amount;
+                    $var->tasa = $valor_sin_formato_rate;
+                    $var->haber = 0;
+                }else{
+                    $var->haber = $valor_sin_formato_amount;
+                    $var->tasa = $valor_sin_formato_rate;
+                    $var->debe = 0;
+                }
             }else{
-                $var->haber = $valor_sin_formato_amount * $valor_sin_formato_rate;
-                $var->tasa = $valor_sin_formato_rate;
-                $var->debe = 0;
+                if($type == 'debe'){
+                    $var->debe = $valor_sin_formato_amount * $valor_sin_formato_rate;
+                    $var->tasa = $valor_sin_formato_rate;
+                    $var->haber = 0;
+                }else{
+                    $var->haber = $valor_sin_formato_amount * $valor_sin_formato_rate;
+                    $var->tasa = $valor_sin_formato_rate;
+                    $var->debe = 0;
+                }
             }
+            $var->save();
+    
+            $affected = DB::connection(Auth::user()->database_name)->table('detail_vouchers')->where('id_header_voucher', '=', $var->id_header_voucher)->update(array('status' => 'N'));
+    
+            $this->check_exist_movement_in_account();
+    
+            return redirect('/detailvouchers/register/'.$coin.'/'.$var->id_header_voucher.'')->withSuccess('Actualizacion Exitosa!');
         }
-        $var->save();
-
-        $affected = DB::connection(Auth::user()->database_name)->table('detail_vouchers')->where('id_header_voucher', '=', $var->id_header_voucher)->update(array('status' => 'N'));
-
-        $this->check_exist_movement_in_account();
-
-        return redirect('/detailvouchers/register/'.$coin.'/'.$var->id_header_voucher.'')->withSuccess('Actualizacion Exitosa!');
+        
     }
 
     public function check_exist_movement_in_account()
@@ -452,9 +456,25 @@ class DetailVoucherController extends Controller
     * @param  int  $id
     * @return \Illuminate\Http\Response
     */
-   public function destroy($id)
+   public function destroy($id = null)
    {
-       //
+       if(isset($id)){
+        $header = HeaderVoucher::on(Auth::user()->database_name)->findOrFail($id);
+
+        $detail = DetailVoucher::on(Auth::user()->database_name)->where('id_header_voucher',$header->id)
+            ->update(['status' => 'X']);
+
+        $header->status = "X";
+        $header->save();
+
+        return redirect('/detailvouchers/register/bolivares')->withSuccess('Se deshabilitó con éxito el movimiento!');
+       
+       }else{
+        return redirect('/detailvouchers/register/bolivares')->withDanger('Debe buscar un movimiento primero !!');
+       
+       }
+        
+
    }
 
 

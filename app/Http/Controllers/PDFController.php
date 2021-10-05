@@ -487,7 +487,7 @@ class PDFController extends Controller
                     if($coin == 'bolivares'){
                         $bcv = null;
                     }else{
-                        $bcv = $expense->bcv;
+                        $bcv = $expense->rate;
                     }
                 }else{
                     $bcv = null;

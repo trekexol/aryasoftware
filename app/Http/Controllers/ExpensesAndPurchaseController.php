@@ -2369,18 +2369,30 @@ class ExpensesAndPurchaseController extends Controller
         * @param  int  $id
         * @return \Illuminate\Http\Response
         */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        //
+        $expense = ExpensesAndPurchase::on(Auth::user()->database_name)->find(request('id_expense_modal')); 
+
+        ExpensesDetail::on(Auth::user()->database_name)->where('id_expense',$expense->id)->delete();
+
+        $expense->delete(); 
+
+        return redirect('/expensesandpurchases')->withDanger('Eliminacion exitosa!!');
     }
 
-    
-    
+    public function deleteDetail(Request $request)
+    {
+        $id_detail = request('id_detail_modal');
+        $coin = request('coin_modal');
+        
+        $detail_old = ExpensesDetail::on(Auth::user()->database_name)->find($id_detail); 
+        
 
+        ExpensesDetail::on(Auth::user()->database_name)->where('id',$id_detail)->delete();
+
+        return redirect('/expensesandpurchases/register/'.$detail_old->id_expense.'/'.$coin.'')->withDanger('Eliminacion exitosa!!');
+    }
     
-
-   
-
 
     public function listaccount(Request $request, $type = null)
     {

@@ -36,6 +36,7 @@
                                     <th class="text-center">Descripción</th>
                                     <th class="text-center">Debe</th>
                                     <th class="text-center">Haber</th>
+                                    <th class="text-center"></th>
                                 </tr>
                                 </thead>
                                 
@@ -52,8 +53,10 @@
                                        
                                         <td>{{ number_format($var->debe, 2, ',', '.')}}</td>
                                         <td>{{ number_format($var->haber, 2, ',', '.')}}</td>
-                    
-                                     
+                                        <td>
+                                            <a href="{{ route('bankmovements.delete',$var->id_header_voucher ?? null) }}" class="delete" title="Eliminar"><i class="fa fa-trash text-danger"></i></a>  
+                                        </td>  
+                                        
                                         </tr>
                                     @endforeach
                                 @endif
@@ -66,6 +69,7 @@
 </div>
 </div>
 </div>
+
   
 @endsection
 @section('javascript')

@@ -193,7 +193,11 @@ class DailyListingController extends Controller
             ->join('header_vouchers', 'header_vouchers.id', '=', 'detail_vouchers.id_header_voucher')
             ->join('accounts', 'accounts.id', '=', 'detail_vouchers.id_account')
             ->whereBetween('header_vouchers.date', [$date_begin, $date_end])
-            ->where('accounts.id',$id_account)
+            ->whereIn('header_vouchers.id', function($query) use ($id_account){
+                $query->select('id_header_voucher')
+                ->from('detail_vouchers')
+                ->where('id_account',$id_account);
+            })
             ->select('detail_vouchers.*','header_vouchers.*'
             ,'accounts.description as account_description'
             ,'header_vouchers.id as id_header'

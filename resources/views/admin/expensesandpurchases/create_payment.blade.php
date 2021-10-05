@@ -916,13 +916,8 @@
 
                
                 var numbertotalfactura = parseFloat(totalFactura).toFixed(2);
-
-                
-
                 var numbertotal_iva_exento = parseFloat(total_iva_exento).toFixed(2);
 
-               
-                
                 // var grand_total = parseFloat(totalFactura) + parseFloat(totalIva);
                 var grand_total = parseFloat(numbertotalfactura) + parseFloat(numbertotal_iva_exento) ;
                 
@@ -1050,9 +1045,12 @@
                 document.getElementById("iva_amount").value = iva_format;
 
 
+                var numbertotalfactura = parseFloat(totalFactura).toFixed(2);
+                var numbertotal_iva_exento = parseFloat(total_iva_exento).toFixed(2);
+                
                 // var grand_total = parseFloat(totalFactura) + parseFloat(totalIva);
-                var grand_total = parseFloat(totalFactura) + parseFloat(total_iva_exento);
-
+                var grand_total = parseFloat(numbertotalfactura) + parseFloat(numbertotal_iva_exento) ;
+                
                 var grand_totalformat = grand_total.toLocaleString('de-DE', {minimumFractionDigits: 2,maximumFractionDigits: 2});
 
                 document.getElementById("grand_total").value = grand_totalformat;
@@ -1177,9 +1175,12 @@
                 document.getElementById("iva_amount").value = iva_format;
 
 
+                var numbertotalfactura = parseFloat(totalFactura).toFixed(2);
+                var numbertotal_iva_exento = parseFloat(total_iva_exento).toFixed(2);
+                
                 // var grand_total = parseFloat(totalFactura) + parseFloat(totalIva);
-                var grand_total = parseFloat(totalFactura) + parseFloat(total_iva_exento);
-
+                var grand_total = parseFloat(numbertotalfactura) + parseFloat(numbertotal_iva_exento) ;
+                
                 var grand_totalformat = grand_total.toLocaleString('de-DE', {minimumFractionDigits: 2,maximumFractionDigits: 2});
 
 

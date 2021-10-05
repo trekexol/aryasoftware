@@ -31,17 +31,18 @@ $suma_haber = 0;
                 <div class="card-header text-center font-weight-bold h3">Registro Comprobante Detalle</div>
 
                 <div class="card-body">
-                    <form method="POST" action="{{ route('headervouchers.store') }}" enctype="multipart/form-data">
+                    <form id="headerForm" method="POST" action="{{ route('headervouchers.store') }}" enctype="multipart/form-data">
                         @csrf
 
                         <input type="hidden" name="coin" value="{{$coin ?? 'bolivares'}}" readonly>
+                        <input type="hidden" name="id_header" value="{{$header->id ?? null}}" readonly>
                        
                         <div class="form-group row">
-                            <label for="reference" class="col-md-2 col-form-label text-md-right">Referencia</label>
+                            <label for="reference" class="col-sm-2 col-form-label text-md-right">Número</label>
 
-                            <div class="col-md-3">
+                            <div class="col-sm-3">
                                 @if(isset($header))
-                                    <input id="reference" type="text" class="form-control @error('reference') is-invalid @enderror" name="reference" value="{{ $header->reference ?? old('reference') }}" required autocomplete="reference">
+                                    <input id="reference" type="text" class="form-control @error('reference') is-invalid @enderror" name="reference" value="{{ $header->id ?? '' }}" required autocomplete="reference">
                                 @else
                                      <input id="reference" type="text" class="form-control @error('reference') is-invalid @enderror" name="reference" placeholder="Numero Disponible: {{ $header_number ?? 0 }}" required autocomplete="reference">
                                 @endif
@@ -51,53 +52,74 @@ $suma_haber = 0;
                                     </span>
                                 @enderror
                             </div>
-                            <!--<div class="col-md-1">
-                                <a href="{{ route('detailvouchers.selectheadervouche') }}" title="Seleccionar"><i class="fa fa-eye"></i></a>    
-                                <a href="" title="Editar"><i class="fa fa-trash-alt"></i></a>  
-                            </div>-->
-                            <div class="col-md-1">
+                            
+                            <div class="col-sm-1">
                                 <a id="btn_search_reference" class="btn btn-info " onclick="searchReference()" title="Buscar Referencia">Buscar</a>  
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-sm-3">
                                 <button type="submit" class="btn btn-success" title="Agregarheader">Registrar Cabecera</button>  
                             </div>
-                            <div class="col-md-1">
+                            <div class="col-sm-2">
+                               <a class="btn btn-danger" href="{{ route('detailvouchers.delete',$header->id ?? null) }}" title="Deshabilitar">Deshabilitar</a>  
+                            </div>
+                            <div class="col-sm-1">
                                 <a id="btn_clean" class="btn btn-light2" href="{{ route('detailvouchers.create','bolivares') }}" title="Limpiar Referencia">Limpiar</a>  
                             </div>
                         </div>
-                        <div class="form-group row">
-                            <label for="description" class="col-md-2 col-form-label text-md-right">Descripción</label>
+                        
+                            @if (isset($header) && ($header->reference))
+                                <div class="form-group row">
+                                    <label for="reference_header" class="col-md-2 col-form-label text-md-right">Referencia</label>
 
-                            <div class="col-md-4">
-                                @if(isset($header))
-                                    <input id="description" type="text" class="form-control @error('description') is-invalid @enderror" name="description" value="{{ $header->description ?? old('description') }}" readonly required autocomplete="description" >
-                                @else
-                                    <input id="description" type="text" class="form-control @error('description') is-invalid @enderror" name="description"  required autocomplete="description" >
-                                @endif
-                                @error('description')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                            </div>
-                        </div>
-                      
-                        <div class="form-group row">
-                            <label for="date" class="col-md-2 col-form-label text-md-right">Fecha del Comprobante</label>
+                                    <div class="col-md-3">
+                                            <input id="reference_header" type="text" class="form-control @error('reference_header') is-invalid @enderror" name="reference_header" value="{{ $header->reference ?? '' }}" required autocomplete="reference_header">
+                                        
+                                        @error('reference_header')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            @endif
 
-                            <div class="col-md-4">
-                                @if(isset($header))
-                                    <input id="date_begin" type="date" class="form-control @error('date') is-invalid @enderror" name="date" value="{{ $header->date ?? '' }}" readonly required autocomplete="date">
-                                @else
-                                    <input id="date_begin" type="date" class="form-control @error('date') is-invalid @enderror" name="date" value="{{ $datenow ?? '' }}" required autocomplete="date">
-                                @endif
-                                @error('date')
+                            <div class="form-group row">
+                                <label for="description" class="col-md-2 col-form-label text-md-right">Descripción</label>
+
+                                <div class="col-md-4">
+                                    @if(isset($header))
+                                        <input id="description" type="text" class="form-control @error('description') is-invalid @enderror" name="description" value="{{ $header->description ?? old('description') }}"  required autocomplete="description" >
+                                    @else
+                                        <input id="description" type="text" class="form-control @error('description') is-invalid @enderror" name="description"  required autocomplete="description" >
+                                    @endif
+                                    @error('description')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                 @enderror
+                                </div>
+                                @if (isset($header))
+                                    <div class="col-sm-3">
+                                        <button onclick="updateForm()" class="btn btn-light" title="Actualizar">Actualizar Cabecera</button>  
+                                    </div>
+                                @endif
                             </div>
-                            
+                        
+                            <div class="form-group row">
+                                <label for="date" class="col-md-2 col-form-label text-md-right">Fecha del Comprobante</label>
+
+                                <div class="col-md-4">
+                                    @if(isset($header))
+                                        <input id="date_begin" type="date" class="form-control @error('date') is-invalid @enderror" name="date" value="{{ $header->date ?? '' }}"  required autocomplete="date">
+                                    @else
+                                        <input id="date_begin" type="date" class="form-control @error('date') is-invalid @enderror" name="date" value="{{ $datenow ?? '' }}" required autocomplete="date">
+                                    @endif
+                                    @error('date')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
                         </form>
                             <!--<label for="date" class="col-md-2 col-form-label text-md-right"><h5>Total</h5></label>
                             <div class="col-md-2 col-form-label text-md-left">
@@ -342,7 +364,10 @@ $suma_haber = 0;
         
     });
 
-    
+    function updateForm(){
+        document.getElementById("headerForm").action =  "{{route('headervouchers.update')}}";
+        document.getElementById("headerForm").submit();
+    }
 
 
 </script>
