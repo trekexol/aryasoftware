@@ -4,11 +4,11 @@
 
 
 
-    {{-- VALIDACIONES-RESPUESTA--}}
-    @include('admin.layouts.success')   {{-- SAVE --}}
-    @include('admin.layouts.danger')    {{-- EDITAR --}}
-    @include('admin.layouts.delete')    {{-- DELELTE --}}
-    {{-- VALIDACIONES-RESPUESTA --}}
+{{-- VALIDACIONES-RESPUESTA--}}
+@include('admin.layouts.success')   {{-- SAVE --}}
+@include('admin.layouts.danger')    {{-- EDITAR --}}
+@include('admin.layouts.delete')    {{-- DELELTE --}}
+{{-- VALIDACIONES-RESPUESTA --}}
     
 @if ($errors->any())
         <div class="alert alert-danger">
@@ -23,16 +23,16 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header">Ordenes de Pago Directas</div>
+                <div class="card-header">Orden de Cobro</div>
 
                 <div class="card-body">
-                    <form method="POST" action="{{ route('directpaymentorders.store') }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('directchargeorders.store') }}" enctype="multipart/form-data">
                         @csrf
                        <input id="user_id" type="hidden" class="form-control @error('user_id') is-invalid @enderror" name="user_id" value="{{ Auth::user()->id }}" required autocomplete="user_id">
                         
                         <div class="form-group row">
                             @if (isset($accounts))
-                            <label for="account" class="col-md-2 col-form-label text-md-right">Retirar desde:</label>
+                            <label for="account" class="col-md-2 col-form-label text-md-right">Depositar en:</label>
                         
                             <div class="col-md-4">
                             <select id="account"  name="account" class="form-control" required>

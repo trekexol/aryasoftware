@@ -152,13 +152,10 @@
     <th style="text-align: right; font-weight: normal; width: 21%;">{{ number_format($iva, 2, ',', '.') }}</th>
   </tr> 
   <tr>
-    <th style="text-align: right; font-weight: normal; width: 79%; border-bottom-color: white;">MONTO TOTAL</th>
-    <th style="text-align: right; font-weight: normal; width: 21%;">{{ number_format($total, 2, ',', '.') }}</th>
+    <th style="text-align: right; font-weight: normal; width: 79%; border-top-color: rgb(17, 9, 9); ">MONTO TOTAL</th>
+    <th style="text-align: right; font-weight: normal; width: 21%; border-top-color: rgb(17, 9, 9);">{{ number_format($total, 2, ',', '.') }}</th>
   </tr> 
-  <tr>
-    <th style="text-align: left; font-weight: normal; width: 79%; border-top-color: rgb(17, 9, 9); border-right-color: white;"><pre>NOTA DE ENTREGA        </pre></th>
-    <th style="text-align: right; font-weight: normal; width: 21%; "></th>
-  </tr> 
+  
 </table>
 
 <div style="color: black;font-size: xx-small; text-align: center;">Original Cliente</div>
@@ -290,15 +287,11 @@
     <th style="text-align: right; font-weight: normal; width: 21%;">{{ number_format($iva, 2, ',', '.') }}</th>
   </tr> 
   <tr>
-    <th style="text-align: right; font-weight: normal; width: 79%; border-bottom-color: white;">MONTO TOTAL</th>
-    <th style="text-align: right; font-weight: normal; width: 21%;">{{ number_format($total, 2, ',', '.') }}</th>
-  </tr> 
-  <tr>
-    <th style="text-align: left; font-weight: normal; width: 79%; border-top-color: rgb(17, 9, 9); border-right-color: white;"><pre>NOTA DE ENTREGA        </pre></th>
-    <th style="text-align: right; font-weight: normal; width: 21%; "></th>
+    <th style="text-align: right; font-weight: normal; width: 79%; border-top-color: rgb(17, 9, 9); ">MONTO TOTAL</th>
+    <th style="text-align: right; font-weight: normal; width: 21%; border-top-color: rgb(17, 9, 9);">{{ number_format($total, 2, ',', '.') }}</th>
   </tr> 
 </table>
-<div style="color: black;font-size: xx-small; text-align: center;">Copia Cliente (Sin Derecho a Crédito Fiscal)</div>
+<div style="color: black;font-size: xx-small; text-align: center;">Copia (Sin Derecho a Crédito Fiscal)</div>
 
 <table>
   <tr>
@@ -429,15 +422,11 @@
     <th style="text-align: right; font-weight: normal; width: 21%;">{{ number_format($iva, 2, ',', '.') }}</th>
   </tr> 
   <tr>
-    <th style="text-align: right; font-weight: normal; width: 79%; border-bottom-color: white;">MONTO TOTAL</th>
-    <th style="text-align: right; font-weight: normal; width: 21%;">{{ number_format($total, 2, ',', '.') }}</th>
-  </tr> 
-  <tr>
-    <th style="text-align: left; font-weight: normal; width: 79%; border-top-color: rgb(17, 9, 9); border-right-color: white;"><pre>NOTA DE ENTREGA        </pre></th>
-    <th style="text-align: right; font-weight: normal; width: 21%; "></th>
+    <th style="text-align: right; font-weight: normal; width: 79%; border-top-color: rgb(17, 9, 9); ">MONTO TOTAL</th>
+    <th style="text-align: right; font-weight: normal; width: 21%; border-top-color: rgb(17, 9, 9);">{{ number_format($total, 2, ',', '.') }}</th>
   </tr> 
 </table>
-<div style="color: black;font-size: xx-small; text-align: center;">Copia Cliente (Sin Derecho a Crédito Fiscal)</div>
+<div style="color: black;font-size: xx-small; text-align: center;">Copia Contabilidad (Sin Derecho a Crédito Fiscal)</div>
 
 </body>
 </html>

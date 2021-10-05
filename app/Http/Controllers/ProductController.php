@@ -39,8 +39,6 @@ class ProductController extends Controller
     */
    public function create()
    {
-
-
         $segments     = Segment::on(Auth::user()->database_name)->orderBY('description','asc')->pluck('description','id')->toArray();
       
         $subsegments  = Subsegment::on(Auth::user()->database_name)->orderBY('description','asc')->get();

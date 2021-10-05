@@ -122,7 +122,8 @@
                 <a class="collapse-item" href="{{route('invoices')}}" > <i class="fas fa-file-alt fa-sm fa-fw mr-2 text-blue-400"></i><strong>Facturas</strong></a>
                 <a class="collapse-item" href="{{route('quotations.indexdeliverynote')}}" > <i class="fas fa-sort-amount-up-alt fa-sm fa-fw mr-2 text-blue-400"></i><strong>Notas de Entrega</strong></a>
                 <a class="collapse-item" href="{{route('payments')}}" > <i class="fas fa-coins fa-sm fa-fw mr-2 text-blue-400"></i><strong>Cobros</strong></a>
-                 <a class="collapse-item" href="{{route('clients')}}" ><i class="fas fa-user fa-sm fa-fw mr-2 text-blue-400"></i><strong>Clientes</strong></a>
+                <a class="collapse-item" href="{{route('directchargeorders.create')}}" > <i class="fas fa-dollar-sign fa-sm fa-fw mr-2 text-black-400"></i><strong>Orden de Cobro</strong></a>
+                <a class="collapse-item" href="{{route('clients')}}" ><i class="fas fa-user fa-sm fa-fw mr-2 text-blue-400"></i><strong>Clientes</strong></a>
                 <a class="collapse-item" href="{{route('vendors')}}" ><i class="fas fa-user fa-sm fa-fw mr-2 text-blue-400"></i><strong>Vendedores</strong></a>
                 <a class="collapse-item" href="{{route('sales')}}" ><i class="fas fa-dollar-sign fa-sm fa-fw mr-2 text-blue-400"></i><strong>Ventas</strong></a>
                 <a class="collapse-item" href="{{route('anticipos')}}" ><i class="fas fa-hand-holding-usd fa-sm fa-fw mr-2 text-blue-400"></i><strong>Anticipos Clientes</strong></a>

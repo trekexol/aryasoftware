@@ -265,7 +265,9 @@ class QuotationController extends Controller
         $inventories = DB::connection(Auth::user()->database_name)->table('inventories')
             ->join('products', 'products.id', '=', 'inventories.product_id')
             ->where('products.type','MERCANCIA')
+            ->where('products.status',1)
             ->select('products.*','inventories.amount as amount','inventories.id as id_inventory')
+            ->orderBy('products.code_comercial','desc')
             ->get();
         
         $quotation = Quotation::on(Auth::user()->database_name)->find($id_quotation);
@@ -287,7 +289,9 @@ class QuotationController extends Controller
             $services = DB::connection(Auth::user()->database_name)->table('inventories')
             ->join('products', 'products.id', '=', 'inventories.product_id')
             ->where('products.type','SERVICIO')
+            ->where('products.status',1)
             ->select('products.*','inventories.id as id_inventory')
+            ->orderBy('products.code_comercial','desc')
             ->get();
             
             return view('admin.quotations.selectservice',compact('type','services','id_quotation','coin','bcv','bcv_quotation_product'));
@@ -337,11 +341,9 @@ class QuotationController extends Controller
 
     public function selectclient()
     {
-
-
-            $clients     = Client::on(Auth::user()->database_name)->get();
-        
-            return view('admin.quotations.selectclient',compact('clients'));
+        $clients     = Client::on(Auth::user()->database_name)->get();
+    
+        return view('admin.quotations.selectclient',compact('clients'));
     }
     
 
@@ -829,7 +831,7 @@ class QuotationController extends Controller
         if($request->ajax()){
             try{
                 
-                $respuesta = Inventory::on(Auth::user()->database_name)->select('id')->where('code',$var)->get();
+                $respuesta = Inventory::on(Auth::user()->database_name)->select('id')->where('code',$var)->where('status',1)->get();
                 return response()->json($respuesta,200);
 
             }catch(Throwable $th){

@@ -663,9 +663,6 @@ Route::group(["prefix"=>'directpaymentorders'],function(){
 
     Route::get('listbeneficiary/{type_var?}','DirectPaymentOrderController@listbeneficiary')->name('directpaymentorders.listbeneficiary');
     Route::get('listcontrapartida/{type_var?}','DirectPaymentOrderController@listcontrapartida')->name('directpaymentorders.listcontrapartida');
-
-   
-
 });
 
 
@@ -869,3 +866,10 @@ Route::group(["prefix"=>'taxes'],function(){
     Route::get('ivaretenidopayment','TaxesController@iva_retenido_payment')->name('taxes.iva_retenido_payment');
 });
 
+Route::group(["prefix"=>'directchargeorders'],function(){
+    Route::get('/','DirectChargeOrderController@create')->name('directchargeorders.create');
+
+    Route::post('store','DirectChargeOrderController@store')->name('directchargeorders.store');
+    Route::get('listbeneficiary/{type_var?}','DirectChargeOrderController@listbeneficiary')->name('directchargeorders.listbeneficiary');
+    Route::get('listcontrapartida/{type_var?}','DirectChargeOrderController@listcontrapartida')->name('directchargeorders.listcontrapartida');
+});

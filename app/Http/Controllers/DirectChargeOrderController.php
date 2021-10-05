@@ -6,20 +6,20 @@ use App\Account;
 use App\BankMovement;
 use App\BankVoucher;
 use App\Branch;
+use App\ChargeOrder;
 use App\Client;
 use App\Company;
 use App\DetailVoucher;
 use App\HeaderVoucher;
-use App\PaymentOrder;
 use App\Provider;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
-class DirectPaymentOrderController extends Controller
+class DirectChargeOrderController extends Controller
 {
-    public function createretirement()
+    public function create()
    {
         $accounts = DB::connection(Auth::user()->database_name)->table('accounts')->where('code_one', 1)
                                         ->where('code_two', 1)
@@ -54,18 +54,17 @@ class DirectPaymentOrderController extends Controller
                 $bcv = $company->rate;
             }
 
-           return view('admin.directpaymentorder.createretirement',compact('accounts','datenow','contrapartidas','branches','bcv','coin'));
+           return view('admin.directchargeorder.create',compact('accounts','datenow','contrapartidas','branches','bcv','coin'));
 
         }else{
-            return redirect('/directpaymentorders')->withDanger('No hay Cuentas!');
+            return redirect('/directchargeorders')->withDanger('No hay Cuentas!');
        }
    }
 
 
     public function store(Request $request)
     {
-
-       
+        
         $data = request()->validate([
             
         
@@ -82,7 +81,7 @@ class DirectPaymentOrderController extends Controller
         
         
         ]);
-        //dd($request);
+        
         $account = request('account');
         $contrapartida = request('Subcontrapartida');
         $coin = request('coin');
@@ -97,40 +96,44 @@ class DirectPaymentOrderController extends Controller
             }
 
             if($rate == 0){
-                return redirect('/directpaymentorders')->withDanger('La tasa no puede ser cero!');
+                return redirect('/directchargeorders')->withDanger('La tasa no puede ser cero!');
             }
 
             /*$check_amount = $this->check_amount($account);
+
             se desabilita esta validacion por motivos que el senor nestor queria ingresar datos y que queden en negativo
             if($check_amount->saldo_actual >= $amount){*/
 
-                $payment_order = new PaymentOrder();
-                $payment_order->setConnection(Auth::user()->database_name);
+                $charge_order = new ChargeOrder();
+                $charge_order->setConnection(Auth::user()->database_name);
 
                 if(request('beneficiario') == 1){
-                    $payment_order->id_client = request('Subbeneficiario');
+                    $charge_order->id_client = request('Subbeneficiario');
                     
                 }else{
-                    $payment_order->id_provider = request('Subbeneficiario');
+                    $charge_order->id_provider = request('Subbeneficiario');
                 }
-                $payment_order->id_user = request('user_id');
-                if(request('branch') != 'ninguno'){
-                    $payment_order->id_branch = request('branch');
-                }
-                $payment_order->date = request('date');
-                $payment_order->reference = request('reference');
-                $payment_order->description = request('description');
-                $payment_order->amount = $amount;
-                $payment_order->rate = $rate;
-                $payment_order->coin = $coin;
-                $payment_order->status = 1;
+                $charge_order->id_user = request('user_id');
 
-                $payment_order->save();
+                if(request('branch') != 'ninguno'){
+                    $charge_order->id_branch = request('branch');
+                }
+
+                $charge_order->date = request('date');
+                $charge_order->reference = request('reference');
+                $charge_order->description = request('description');
+                $charge_order->amount = $amount;
+                $charge_order->rate = $rate;
+                $charge_order->coin = $coin;
+
+                $charge_order->status = 1;
+
+                $charge_order->save();
 
                 $header = new HeaderVoucher();
                 $header->setConnection(Auth::user()->database_name);
 
-                $header->description = "Orden de Pago ". request('description');
+                $header->description = "Orden de Cobro ". request('description');
                 $header->date = request('date');
                 $header->reference = request('reference');
                 $header->status =  1;
@@ -144,8 +147,8 @@ class DirectPaymentOrderController extends Controller
                 $movement->id_header_voucher = $header->id;
                 $movement->id_account = $account;
                 $movement->user_id = request('user_id');
-                $movement->debe = 0;
-                $movement->haber = $amount;
+                $movement->debe = $amount;
+                $movement->haber = 0;
                 $movement->tasa = $rate;
                 $movement->status = "C";
             
@@ -164,8 +167,8 @@ class DirectPaymentOrderController extends Controller
                 $movement_counterpart->id_header_voucher = $header->id;
                 $movement_counterpart->id_account = $contrapartida;
                 $movement_counterpart->user_id = request('user_id');
-                $movement_counterpart->debe = $amount;
-                $movement_counterpart->haber = 0;
+                $movement_counterpart->debe = 0;
+                $movement_counterpart->haber = $amount;
                 $movement_counterpart->tasa = $rate;
                 $movement_counterpart->status = "C";
 
@@ -185,14 +188,14 @@ class DirectPaymentOrderController extends Controller
                     $account->save();
                 }
 
-                return redirect('/directpaymentorders')->withSuccess('Registro Exitoso!');
+                return redirect('/directchargeorders')->withSuccess('Registro Exitoso!');
 
            /* }else{
-                return redirect('/directpaymentorders'.request('id_account').'')->withDanger('El saldo de la Cuenta '.$check_amount->description.' es menor al monto del retiro!');
+                return redirect('/directchargeorders'.request('id_account').'')->withDanger('El saldo de la Cuenta '.$check_amount->description.' es menor al monto del retiro!');
             }*/
 
         }else{
-            return redirect('/directpaymentorders')->withDanger('No se puede hacer un movimiento a la misma cuenta!');
+            return redirect('/directchargeorders')->withDanger('No se puede hacer un movimiento a la misma cuenta!');
         }
     }
 
