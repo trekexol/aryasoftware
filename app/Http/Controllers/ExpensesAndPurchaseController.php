@@ -390,20 +390,20 @@ class ExpensesAndPurchaseController extends Controller
 
             $anticipos_sum_bolivares = Anticipo::on(Auth::user()->database_name)->where('status',1)
                                                 ->where('id_provider',$expense->id_provider)
-                                                ->where('id_expense',null)
-                                                ->orWhere('id_expense',$expense->id)
+                                                ->where(function ($query) use ($expense){
+                                                    $query->where('id_expense',null)
+                                                        ->orWhere('id_expense',$expense->id);
+                                                })
                                                 ->where('coin','like','bolivares')
                                                 ->sum('amount');
 
             $total_dolar_anticipo =    DB::connection(Auth::user()->database_name)->select('SELECT SUM(amount/rate) AS dolar
                                         FROM anticipos
                                         WHERE id_provider = ? AND
-                                        id_expense = null OR
-                                        id_expense = ? AND
                                         coin not like ? AND
                                         status = ?
                                         '
-                                        , [$expense->id_provider,$expense->id,'bolivares',1]);
+                                        , [$expense->id_provider,'bolivares',1]);
 
 
             
@@ -519,8 +519,10 @@ class ExpensesAndPurchaseController extends Controller
 
             $anticipos_sum_bolivares = Anticipo::on(Auth::user()->database_name)->where('status',1)
                                         ->where('id_provider',$expense->id_provider)
-                                        ->where('id_expense',null)
-                                        ->orWhere('id_expense',$expense->id)
+                                        ->where(function ($query) use ($expense){
+                                            $query->where('id_expense',null)
+                                                ->orWhere('id_expense',$expense->id);
+                                        })
                                         ->where('coin','like','bolivares')
                                         ->sum('amount');
 
@@ -528,12 +530,10 @@ class ExpensesAndPurchaseController extends Controller
                                         ->select('SELECT SUM(amount/rate) AS dolar
                                         FROM anticipos
                                         WHERE id_provider = ? AND
-                                        id_expense = null OR
-                                        id_expense = ? AND
                                         coin not like ? AND
                                         status = ?
                                         '
-                                        , [$expense->id_provider,$expense->id,'bolivares',1]);
+                                        , [$expense->id_provider,'bolivares',1]);
 
 
 
@@ -1714,7 +1714,23 @@ class ExpensesAndPurchaseController extends Controller
                     }
                 }
                 /*------------------------------- */
+                $anticipo = request('anticipo_form');
 
+                if(isset($anticipo) && ($anticipo != 0)){
+                  $expense->anticipo =  $anticipo;
+
+                    $account_anticipo_proveedor = Account::on(Auth::user()->database_name)->where('code_one',1)
+                                                            ->where('code_two',1)
+                                                            ->where('code_three',4)
+                                                            ->where('code_four',2)
+                                                            ->where('code_five',1)->first(); 
+                
+                    if(isset($account_anticipo_proveedor)){
+                        $this->add_movement($bcv,$header_voucher->id,$account_anticipo_proveedor->id,$expense->id,$user_id,0,$anticipo);
+                    }
+                }else{
+                    $expense->anticipo = 0;
+                }
 
 
                 //Al final de agregar los movimientos de los pagos, agregamos el monto total de los pagos a cuentas por cobrar clientes
@@ -1777,23 +1793,7 @@ class ExpensesAndPurchaseController extends Controller
 
                     $expense->iva_percentage = $iva_percentage;
 
-                    $anticipo = request('anticipo_form');
-
-                    if(isset($anticipo) && ($anticipo != 0)){
-                      $expense->anticipo =  $anticipo;
-
-                        $account_anticipo_proveedor = Account::on(Auth::user()->database_name)->where('code_one',1)
-                                                                ->where('code_two',1)
-                                                                ->where('code_three',4)
-                                                                ->where('code_four',2)
-                                                                ->where('code_five',1)->first(); 
-                    
-                        if(isset($account_anticipo_proveedor)){
-                            $this->add_movement($bcv,$header_voucher->id,$account_anticipo_proveedor->id,$expense->id,$user_id,0,$anticipo);
-                        }
-                    }else{
-                        $expense->anticipo = 0;
-                    }
+                   
 
                     $id_islr_concept = request('id_islr_concept');
 
@@ -1831,16 +1831,20 @@ class ExpensesAndPurchaseController extends Controller
                 /*Verificamos si el cliente tiene anticipos activos */
                     DB::connection(Auth::user()->database_name)->table('anticipos')
                     ->where('id_provider', '=', $expense->id_provider)
-                    ->where('id_expense',null)
-                    ->orWhere('id_expense',$expense->id)
+                    ->where(function ($query) use ($expense){
+                        $query->where('id_expense',null)
+                            ->orWhere('id_expense',$expense->id);
+                    })
                     ->where('status', '=', '1')
                     ->update(['status' => 'C']);
 
                     //los que quedaron en espera, pasan a estar activos
                     DB::connection(Auth::user()->database_name)->table('anticipos')
                     ->where('id_provider', '=', $expense->id_provider)
-                    ->where('id_expense',null)
-                    ->orWhere('id_expense',$expense->id)
+                    ->where(function ($query) use ($expense){
+                        $query->where('id_expense',null)
+                            ->orWhere('id_expense',$expense->id);
+                    })
                     ->where('status', '=', 'M')
                     ->update(['status' => '1']);
                 /*------------------------------------------------- */

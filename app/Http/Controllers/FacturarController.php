@@ -31,27 +31,28 @@ class FacturarController extends Controller
                                                             
             $payment_quotations = QuotationPayment::on(Auth::user()->database_name)->where('id_quotation',$quotation->id)->get();
 
+            
             $anticipos_sum_bolivares = Anticipo::on(Auth::user()->database_name)->where('status',1)
                                         ->where('id_client',$quotation->id_client)
-                                        ->where('id_quotation',null)
-                                        ->orWhere('id_quotation',$quotation->id)
+                                        ->where(function ($query) use ($quotation){
+                                            $query->where('id_quotation',null)
+                                                ->orWhere('id_quotation',$quotation->id);
+                                        })
                                         ->where('coin','like','bolivares')
                                         ->sum('amount');
 
             $total_dolar_anticipo =    DB::connection(Auth::user()->database_name)->select('SELECT SUM(amount/rate) AS dolar
                                         FROM anticipos
-                                        WHERE id_client = ? AND
-                                        id_quotation = null OR
-                                        id_quotation = ? AND
-                                        coin not like ? AND
-                                        status = ?
+                                        WHERE id_client = ? AND coin not like ? AND status = ? 
                                         '
-                                        , [$quotation->id_client,$quotation->id,'bolivares',1]);
+                                        , [$quotation->id_client,'bolivares',1,]);
 
+            
             $anticipos_sum_dolares = 0;
             if(isset($total_dolar_anticipo[0]->dolar)){
                 $anticipos_sum_dolares = $total_dolar_anticipo[0]->dolar;
             }
+            
 
              $accounts_bank = DB::connection(Auth::user()->database_name)->table('accounts')->where('code_one', 1)
                                             ->where('code_two', 1)
@@ -186,6 +187,10 @@ class FacturarController extends Controller
 
             $anticipos_sum_bolivares = Anticipo::on(Auth::user()->database_name)->where('status',1)
                                         ->where('id_client',$quotation->id_client)
+                                        ->where(function ($query) use ($quotation){
+                                            $query->where('id_quotation',null)
+                                                ->orWhere('id_quotation',$quotation->id);
+                                        })
                                         ->where('coin','like','bolivares')
                                         ->sum('amount');
 
@@ -1558,16 +1563,20 @@ class FacturarController extends Controller
 
             /*Verificamos si el cliente tiene anticipos activos */
                 DB::connection(Auth::user()->database_name)->table('anticipos')->where('id_client', '=', $quotation->id_client)
-                                                                                ->where('id_quotation',null)
-                                                                                ->orWhere('id_quotation',$quotation->id)
+                                                                                ->where(function ($query) use ($quotation){
+                                                                                    $query->where('id_quotation',null)
+                                                                                        ->orWhere('id_quotation',$quotation->id);
+                                                                                })
                                                                                 ->where('status', '=', 1)
                                                                                 ->update(['status' => 'C']);
 
                 
                 //los que quedaron en espera, pasan a estar activos
                 DB::connection(Auth::user()->database_name)->table('anticipos')->where('id_client', '=', $quotation->id_client)
-                                                                                ->where('id_quotation',null)
-                                                                                ->orWhere('id_quotation',$quotation->id)
+                                                                                ->where(function ($query) use ($quotation){
+                                                                                    $query->where('id_quotation',null)
+                                                                                        ->orWhere('id_quotation',$quotation->id);
+                                                                                })
                                                                                 ->where('status', '=', 'M')
                                                                                 ->update(['status' => 1]);
     

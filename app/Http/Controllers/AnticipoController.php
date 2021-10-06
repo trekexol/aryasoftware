@@ -316,7 +316,7 @@ class AnticipoController extends Controller
 
     public function store_provider(Request $request)
     {
-   
+        
         
         $data = request()->validate([
             
@@ -335,21 +335,21 @@ class AnticipoController extends Controller
         $var->setConnection(Auth::user()->database_name);
 
         $var->date = request('date_begin');
-        if(request('id_provider') != -1){
-            $var->id_provider = request('id_provider');
-        }
+        
+        $var->id_provider = request('id_provider');
+        
         $var->id_account = request('id_account');
         $var->id_user = request('id_user');
         $var->coin = request('coin');
-
-        if(request('id_expense') != -1){
+        $id_expense = request('id_expense');
+        
+        if(isset($id_expense) && request('id_expense') != -1){
             $var->id_expense = request('id_expense');
             $expense =  ExpensesAndPurchase::on(Auth::user()->database_name)->findOrFail($var->id_expense);
             $var->id_provider = $expense->id_provider;
         }
-
-       
-        if(($var->id_provider == -1) && ($var->id_expense == -1)){
+        
+        if(($var->id_provider == -1 || empty($var->id_provider)) && ($var->id_expense == -1 || empty($var->id_expense))){
             return redirect('/anticipos/registerprovider')->withDanger('Debe Seleccionar un Proveedor o una Compra!');
         }
         

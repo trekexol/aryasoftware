@@ -19,7 +19,7 @@
                         @csrf
                         
                         <input id="id_user" type="hidden" class="form-control @error('id_user') is-invalid @enderror" name="id_user" value="{{ Auth::user()->id }}" required autocomplete="id_user">
-                        <input id="id_provider" type="hidden" class="form-control @error('id_provider') is-invalid @enderror" name="id_provider" value="{{ $provider->id ?? -1 }}" required autocomplete="id_provider">
+                        <input id="id_provider" type="hidden" class="form-control @error('id_provider') is-invalid @enderror" name="id_provider" value="{{ $provider->id ?? null }}" required autocomplete="id_provider">
                        
                         <div class="form-group row">
                             <label for="providers" class="col-md-3 col-form-label text-md-right">Proveedor</label>
