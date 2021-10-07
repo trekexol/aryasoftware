@@ -15,6 +15,8 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Exports\ProductsExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 Route::get('/', function () {
     return view('welcome');
@@ -528,8 +530,8 @@ Route::group(["prefix"=>'invoices'],function(){
 
  Route::group(["prefix"=>'pdf'],function(){
     Route::get('factura/{id_quotation}/{coin?}','PDFController@imprimirfactura')->name('pdf');
-    Route::get('deliverynote/{id_quotation}/{coin}/{iva}','PDFController@deliverynote')->name('pdf.deliverynote');
-    Route::get('deliverynotemediacarta/{id_quotation}/{coin}/{iva}','PDFController@deliverynotemediacarta')->name('pdf.deliverynotemediacarta');
+    Route::get('deliverynote/{id_quotation}/{coin}/{iva}/{date}','PDFController@deliverynote')->name('pdf.deliverynote');
+    Route::get('deliverynotemediacarta/{id_quotation}/{coin}/{iva}/{date}','PDFController@deliverynotemediacarta')->name('pdf.deliverynotemediacarta');
     
     Route::get('inventory','PDFController@imprimirinventory')->name('pdf.inventory');
 
@@ -541,7 +543,7 @@ Route::group(["prefix"=>'invoices'],function(){
 
     Route::get('previousexercise/{date_begin}/{date_end}','PDFController@print_previousexercise')->name('pdf.previousexercise');
     
-    Route::get('deliverynoteexpense/{id_expense}/{coin}/{iva}','PDFController@deliverynote_expense')->name('pdf.deliverynote_expense');
+    Route::get('deliverynoteexpense/{id_expense}/{coin}/{iva}/{date}','PDFController@deliverynote_expense')->name('pdf.deliverynote_expense');
  });
 
 
@@ -583,6 +585,7 @@ Route::group(["prefix"=>'anticipos'],function(){
     Route::post('storeprovider', 'AnticipoController@store_provider')->name('anticipos.store_provider');
 
     Route::delete('delete','AnticipoController@delete_anticipo')->name('anticipos.delete');
+    Route::delete('deleteprovider','AnticipoController@delete_anticipo_provider')->name('anticipos.delete_provider');
 });
 
 
@@ -873,3 +876,9 @@ Route::group(["prefix"=>'directchargeorders'],function(){
     Route::get('listbeneficiary/{type_var?}','DirectChargeOrderController@listbeneficiary')->name('directchargeorders.listbeneficiary');
     Route::get('listcontrapartida/{type_var?}','DirectChargeOrderController@listcontrapartida')->name('directchargeorders.listcontrapartida');
 });
+
+
+Route::group(["prefix"=>'export'],function(){
+    Route::get('expense/{id}','ExcelController@export')->name('export');
+    Route::post('expenseimport','ExcelController@import')->name('import');
+  });

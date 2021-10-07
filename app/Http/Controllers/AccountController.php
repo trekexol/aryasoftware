@@ -332,893 +332,7 @@ class AccountController extends Controller
 
 
  
-    public function calculation($coin)
-    {
-        
-        $accounts = Account::on(Auth::user()->database_name)->orderBy('code_one', 'asc')
-                         ->orderBy('code_two', 'asc')
-                         ->orderBy('code_three', 'asc')
-                         ->orderBy('code_four', 'asc')
-                         ->orderBy('code_five', 'asc')
-                         ->get();
-        
-                       
-        if(isset($accounts)) {
-            
-            foreach ($accounts as $var) 
-            {
-                if($var->code_one != 0)
-                {
-                    if($var->code_two != 0)
-                    {
-                        if($var->code_three != 0)
-                        {
-                            if($var->code_four != 0)
-                            {
-                                if($var->code_five != 0)
-                                {
-                                    //Calculo de superavit
-                                    if(($var->code_one == 3) && ($var->code_two == 2) && ($var->code_three == 1) && 
-                                    ($var->code_four == 1) && ($var->code_five == 1)){
-                                        
-                                        $var = $this->calculation_superavit($var,4,$coin);
-                                        
-                                    }else
-                                    {
-                                        /*CALCULA LOS SALDOS DESDE DETALLE COMPROBANTE */    
-                                        if($coin == 'bolivares')
-                                        {
-                                            $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe) AS debe
-                                                            FROM accounts a
-                                                            INNER JOIN detail_vouchers d 
-                                                                ON d.id_account = a.id
-                                                            WHERE a.code_one = ? AND
-                                                            a.code_two = ? AND
-                                                            a.code_three = ? AND
-                                                            a.code_four = ? AND
-                                                            a.code_five = ? AND
-                                                            d.status = ?
-                                                            '
-                                                            , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,$var->code_five,'C']);
-                                            $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber) AS haber
-                                                            FROM accounts a
-                                                            INNER JOIN detail_vouchers d 
-                                                                ON d.id_account = a.id
-                                                            WHERE a.code_one = ? AND
-                                                            a.code_two = ? AND
-                                                            a.code_three = ? AND
-                                                            a.code_four = ? AND
-                                                            a.code_five = ? AND
-                                                            d.status = ?
-                                                            '
-                                                            , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,$var->code_five,'C']);
-        
-                                            $total_dolar_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS dolar
-                                                            FROM accounts a
-                                                            INNER JOIN detail_vouchers d 
-                                                                ON d.id_account = a.id
-                                                            WHERE a.code_one = ? AND
-                                                            a.code_two = ? AND
-                                                            a.code_three = ? AND
-                                                            a.code_four = ? AND
-                                                            a.code_five = ? AND
-                                                            d.status = ?
-                                                            '
-                                                            , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,$var->code_five,'C']);
-        
-                                            $total_dolar_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS dolar
-                                                            FROM accounts a
-                                                            INNER JOIN detail_vouchers d 
-                                                                ON d.id_account = a.id
-                                                            WHERE a.code_one = ? AND
-                                                            a.code_two = ? AND
-                                                            a.code_three = ? AND
-                                                            a.code_four = ? AND
-                                                            a.code_five = ? AND
-                                                            d.status = ?
-                                                            '
-                                                            , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,$var->code_five,'C']);
-        
-                                                            $var->balance =  $var->balance_previus;
-        
-                                        
-                                        }else{
-                                            $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS debe
-                                            FROM accounts a
-                                            INNER JOIN detail_vouchers d 
-                                                ON d.id_account = a.id
-                                            WHERE a.code_one = ? AND
-                                            a.code_two = ? AND
-                                            a.code_three = ? AND
-                                            a.code_four = ? AND
-                                            a.code_five = ? AND
-                                            d.status = ?
-                                            '
-                                            , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,$var->code_five,'C']);
-                                            
-                                            $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS haber
-                                            FROM accounts a
-                                            INNER JOIN detail_vouchers d 
-                                                ON d.id_account = a.id
-                                            WHERE a.code_one = ? AND
-                                            a.code_two = ? AND
-                                            a.code_three = ? AND
-                                            a.code_four = ? AND
-                                            a.code_five = ? AND
-                                            d.status = ?
-                                            '
-                                            , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,$var->code_five,'C']);
-    
-                                            if(($var->balance_previus != 0) && ($var->rate !=0)){
-                                                $var->balance_previus =  $var->balance_previus / $var->rate;
-                                            }
-                                            
-                                            
-                                        }
-                                        $total_debe = $total_debe[0]->debe;
-                                        $total_haber = $total_haber[0]->haber;
-                                        if(isset($total_dolar_debe[0]->dolar)){
-                                            $total_dolar_debe = $total_dolar_debe[0]->dolar;
-                                            $var->dolar_debe = $total_dolar_debe;
-                                        }
-                                        if(isset($total_dolar_haber[0]->dolar)){
-                                            $total_dolar_haber = $total_dolar_haber[0]->dolar;
-                                            $var->dolar_haber = $total_dolar_haber;
-                                        }
-                                    
-                                        $var->debe = $total_debe;
-                                        $var->haber = $total_haber;
-
-                                        
-                                    }
-
-                                }else{
-                            
-                                    //Calculo de superavit
-                                    if(($var->code_one == 3) && ($var->code_two == 2) && ($var->code_three == 1) && 
-                                    ($var->code_four == 1) ){
-                                        $var = $this->calculation_superavit($var,4,$coin);
-                                    }else{
-                                    /*CALCULA LOS SALDOS DESDE DETALLE COMPROBANTE */                                                   
-                                
-                                        if($coin == 'bolivares'){
-                                        $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe) AS debe
-                                                        FROM accounts a
-                                                        INNER JOIN detail_vouchers d 
-                                                            ON d.id_account = a.id
-                                                        WHERE a.code_one = ? AND
-                                                        a.code_two = ? AND
-                                                        a.code_three = ? AND
-                                                        a.code_four = ? AND
-                                                        d.status = ?
-                                                        '
-                                                        , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,'C']);
-                                        $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber) AS haber
-                                                        FROM accounts a
-                                                        INNER JOIN detail_vouchers d 
-                                                            ON d.id_account = a.id
-                                                        WHERE a.code_one = ? AND
-                                                        a.code_two = ? AND
-                                                        a.code_three = ? AND
-                                                        a.code_four = ? AND
-                                                        d.status = ?
-                                                        '
-                                                        , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,'C']);
-
-                                        $total_dolar_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS dolar
-                                                        FROM accounts a
-                                                        INNER JOIN detail_vouchers d 
-                                                            ON d.id_account = a.id
-                                                        WHERE a.code_one = ? AND
-                                                        a.code_two = ? AND
-                                                        a.code_three = ? AND
-                                                        a.code_four = ? AND
-                                                        d.status = ?
-                                                        '
-                                                        , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,'C']);
-
-                                        $total_dolar_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS dolar
-                                                        FROM accounts a
-                                                        INNER JOIN detail_vouchers d 
-                                                            ON d.id_account = a.id
-                                                        WHERE a.code_one = ? AND
-                                                        a.code_two = ? AND
-                                                        a.code_three = ? AND
-                                                        a.code_four = ? AND
-                                                        d.status = ?
-                                                        '
-                                                        , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,'C']);
-
-                                                        $var->balance =  $var->balance_previus;
-                                    
-
-                                        $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus) AS balance
-                                                        FROM accounts a
-                                                        WHERE a.code_one = ? AND
-                                                        a.code_two = ?  AND
-                                                        a.code_three = ? AND
-                                                        a.code_four = ?
-                                                        '
-                                                        , [$var->code_one,$var->code_two,$var->code_three,$var->code_four]);
-                                    
-                                        }else{
-                                            $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS debe
-                                            FROM accounts a
-                                            INNER JOIN detail_vouchers d 
-                                                ON d.id_account = a.id
-                                            WHERE a.code_one = ? AND
-                                            a.code_two = ? AND
-                                            a.code_three = ? AND
-                                            a.code_four = ? AND
-                                            d.status = ?
-                                            '
-                                            , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,'C']);
-                                            
-                                            $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS haber
-                                            FROM accounts a
-                                            INNER JOIN detail_vouchers d 
-                                                ON d.id_account = a.id
-                                            WHERE a.code_one = ? AND
-                                            a.code_two = ? AND
-                                            a.code_three = ? AND
-                                            a.code_four = ? AND
-                                            d.status = ?
-                                            '
-                                            , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,'C']);
-
-                                            $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus/a.rate) AS balance
-                                                        FROM accounts a
-                                                        WHERE a.code_one = ? AND
-                                                        a.code_two = ?  AND
-                                                        a.code_three = ? AND
-                                                        a.code_four = ?
-                                                        '
-                                                        , [$var->code_one,$var->code_two,$var->code_three,$var->code_four]);
-
-                                            /*if(($var->balance_previus != 0) && ($var->rate !=0))
-                                            $var->balance =  $var->balance_previus / $var->rate;*/
-                                        }
-                                
-                                        $total_debe = $total_debe[0]->debe;
-                                        $total_haber = $total_haber[0]->haber;
-                                        if(isset($total_dolar_debe[0]->dolar)){
-                                            $total_dolar_debe = $total_dolar_debe[0]->dolar;
-                                            $var->dolar_debe = $total_dolar_debe;
-                                        }
-                                        if(isset($total_dolar_haber[0]->dolar)){
-                                            $total_dolar_haber = $total_dolar_haber[0]->dolar;
-                                            $var->dolar_haber = $total_dolar_haber;
-                                        }
-                                    
-                                        $var->debe = $total_debe;
-                                        $var->haber = $total_haber;
-
-                                        $total_balance = $total_balance[0]->balance;
-                                        $var->balance = $total_balance;
-                                    }
-                                }
-                            }else{    
-                                //Calculo de superavit
-                                if(($var->code_one == 3) && ($var->code_two == 2) && ($var->code_three == 1)){
-                                    $var = $this->calculation_superavit($var,4,$coin);
-                                }else{      
-                            
-                                    if($coin == 'bolivares'){
-                                    $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe) AS debe
-                                                    FROM accounts a
-                                                    INNER JOIN detail_vouchers d 
-                                                        ON d.id_account = a.id
-                                                    WHERE a.code_one = ? AND
-                                                    a.code_two = ? AND
-                                                    a.code_three = ? AND
-                                                    
-                                                    d.status = ?
-                                                    '
-                                                    , [$var->code_one,$var->code_two,$var->code_three,'C']);
-                                    $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber) AS haber
-                                                    FROM accounts a
-                                                    INNER JOIN detail_vouchers d 
-                                                        ON d.id_account = a.id
-                                                    WHERE a.code_one = ? AND
-                                                    a.code_two = ? AND
-                                                    a.code_three = ? AND
-                                                    
-                                                    d.status = ?
-                                                    '
-                                                    , [$var->code_one,$var->code_two,$var->code_three,'C']);
-
-                                    $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus) AS balance
-                                                FROM accounts a
-                                                WHERE a.code_one = ? AND
-                                                a.code_two = ?  AND
-                                                a.code_three = ?
-                                                '
-                                                , [$var->code_one,$var->code_two,$var->code_three]);
-                                    
-                                    }else{
-                                            $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS debe
-                                            FROM accounts a
-                                            INNER JOIN detail_vouchers d 
-                                                ON d.id_account = a.id
-                                            WHERE a.code_one = ? AND
-                                            a.code_two = ? AND
-                                            a.code_three = ? AND
-                                            
-                                            d.status = ?
-                                            '
-                                            , [$var->code_one,$var->code_two,$var->code_three,'C']);
-                                            
-                                            $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS haber
-                                            FROM accounts a
-                                            INNER JOIN detail_vouchers d 
-                                                ON d.id_account = a.id
-                                            WHERE a.code_one = ? AND
-                                            a.code_two = ? AND
-                                            a.code_three = ? AND
-                                            
-                                            d.status = ?
-                                            '
-                                            , [$var->code_one,$var->code_two,$var->code_three,'C']);
-                            
-                                            $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus/a.rate) AS balance
-                                                FROM accounts a
-                                                WHERE a.code_one = ? AND
-                                                a.code_two = ? AND
-                                                a.code_three = ?
-                                                '
-                                                , [$var->code_one,$var->code_two,$var->code_three]);
-
-                                        }
-                                        $total_debe = $total_debe[0]->debe;
-                                        $total_haber = $total_haber[0]->haber;
-                                    
-                                        $var->debe = $total_debe;
-                                        $var->haber = $total_haber;
-
-                                        
-
-                                        $total_balance = $total_balance[0]->balance;
-                                        $var->balance = $total_balance;
-                                      
-                                }           
-                            }           
-                        }else{
-                            //Calculo de superavit
-                            if(($var->code_one == 3) && ($var->code_two == 2)){
-                                $var = $this->calculation_superavit($var,4,$coin);
-                            }else{
-                                            
-                                if($coin == 'bolivares'){
-                                    $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe) AS debe
-                                                    FROM accounts a
-                                                    INNER JOIN detail_vouchers d 
-                                                        ON d.id_account = a.id
-                                                    WHERE a.code_one = ? AND
-                                                    a.code_two = ? AND
-                                                    d.status = ?
-                                                    '
-                                                    , [$var->code_one,$var->code_two,'C']);
-                                    $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber) AS haber
-                                                    FROM accounts a
-                                                    INNER JOIN detail_vouchers d 
-                                                        ON d.id_account = a.id
-                                                    WHERE a.code_one = ? AND
-                                                    a.code_two = ? AND
-                                                    d.status = ?
-                                                    '
-                                                    , [$var->code_one,$var->code_two,'C']);
-                                    
-                                    $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus) AS balance
-                                                FROM accounts a
-                                                WHERE a.code_one = ? AND
-                                                a.code_two = ?
-                                                '
-                                                , [$var->code_one,$var->code_two]);
-                                    
-                                    }else{
-                                        $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS debe
-                                        FROM accounts a
-                                        INNER JOIN detail_vouchers d 
-                                            ON d.id_account = a.id
-                                        WHERE a.code_one = ? AND
-                                        a.code_two = ? AND
-                                        d.status = ?
-                                        '
-                                        , [$var->code_one,$var->code_two,'C']);
-                                        
-                                        $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS haber
-                                        FROM accounts a
-                                        INNER JOIN detail_vouchers d 
-                                            ON d.id_account = a.id
-                                        WHERE a.code_one = ? AND
-                                        a.code_two = ? AND
-                                        d.status = ?
-                                        '
-                                        , [$var->code_one,$var->code_two,'C']);
-
-                                        $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus/a.rate) AS balance
-                                                FROM accounts a
-                                                WHERE a.code_one = ? AND
-                                                a.code_two = ?
-                                                '
-                                                , [$var->code_one,$var->code_two]);
-                        
-                                    }
-                                    
-                                    $total_debe = $total_debe[0]->debe;
-                                    $total_haber = $total_haber[0]->haber;
-                                    $var->debe = $total_debe;
-                                    $var->haber = $total_haber;
-
-                                    
-
-                                    $total_balance = $total_balance[0]->balance;
-                                    $var->balance = $total_balance;
-                            }
-                        }
-                    }else{
-                        //Calcular patrimonio con las cuentas mayores o iguales a 3.0.0.0.0
-                        if($var->code_one == 3){
-                            $var = $this->calculation_capital($var,$coin);
-                           
-                        }else{
-                            if($coin == 'bolivares'){
-                                $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe) AS debe
-                                                FROM accounts a
-                                                INNER JOIN detail_vouchers d 
-                                                    ON d.id_account = a.id
-                                                WHERE a.code_one = ? AND
-                                                d.status = ?
-                                                '
-                                                , [$var->code_one,'C']);
-                                $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber) AS haber
-                                                FROM accounts a
-                                                INNER JOIN detail_vouchers d 
-                                                    ON d.id_account = a.id
-                                                WHERE a.code_one = ? AND
-                                                d.status = ?
-                                                '
-                                                , [$var->code_one,'C']);
-    
-                                $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus) AS balance
-                                                FROM accounts a
-                                                WHERE a.code_one = ?
-                                                '
-                                                , [$var->code_one]);
-                                
-                                }else{
-                                    $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS debe
-                                    FROM accounts a
-                                    INNER JOIN detail_vouchers d 
-                                        ON d.id_account = a.id
-                                    WHERE a.code_one = ? AND
-                                    d.status = ?
-                                    '
-                                    , [$var->code_one,'C']);
-                                    
-                                    $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS haber
-                                    FROM accounts a
-                                    INNER JOIN detail_vouchers d 
-                                        ON d.id_account = a.id
-                                    WHERE a.code_one = ? AND
-                                    d.status = ?
-                                    '
-                                    , [$var->code_one,'C']);
-    
-                                    $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus/a.rate) AS balance
-                                                FROM accounts a
-                                                WHERE a.code_one = ?
-                                                '
-                                                , [$var->code_one]);
-                    
-                                }
-                                $total_debe = $total_debe[0]->debe;
-                                $total_haber = $total_haber[0]->haber;
-                                $var->debe = $total_debe;
-                                $var->haber = $total_haber;
-    
-                                $total_balance = $total_balance[0]->balance;
-    
-                                $var->balance = $total_balance;
-                        }
-                    }
-                }else{
-                    return redirect('/accounts/menu')->withDanger('El codigo uno es igual a cero!');
-                }
-            } 
-        
-        }else{
-            return redirect('/accounts/menu')->withDanger('No hay Cuentas');
-        }              
-                 
-       
-        
-         return $accounts;
-    }
-
-    public function calculation_capital($var,$coin)
-    {
-        if($coin == 'bolivares'){
-            $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe) AS debe
-                            FROM accounts a
-                            INNER JOIN detail_vouchers d 
-                                ON d.id_account = a.id
-                            WHERE a.code_one >= ? AND
-                            d.status = ?
-                            '
-                            , [$var->code_one,'C']);
-            $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber) AS haber
-                            FROM accounts a
-                            INNER JOIN detail_vouchers d 
-                                ON d.id_account = a.id
-                            WHERE a.code_one >= ? AND
-                            d.status = ?
-                            '
-                            , [$var->code_one,'C']);
-
-            $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus) AS balance
-                            FROM accounts a
-                            WHERE a.code_one = ?
-                            '
-                            , [$var->code_one]);
-            
-            }else{
-                $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS debe
-                FROM accounts a
-                INNER JOIN detail_vouchers d 
-                    ON d.id_account = a.id
-                WHERE a.code_one >= ? AND
-                d.status = ?
-                '
-                , [$var->code_one,'C']);
-                
-                $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS haber
-                FROM accounts a
-                INNER JOIN detail_vouchers d 
-                    ON d.id_account = a.id
-                WHERE a.code_one >= ? AND
-                d.status = ?
-                '
-                , [$var->code_one,'C']);
-
-                $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus/a.rate) AS balance
-                            FROM accounts a
-                            WHERE a.code_one = ?
-                            '
-                            , [$var->code_one]);
-
-            }
-            $total_debe = $total_debe[0]->debe;
-            $total_haber = $total_haber[0]->haber;
-            $var->debe = $total_debe;
-            $var->haber = $total_haber;
-
-            $total_balance = $total_balance[0]->balance;
-
-            $var->balance = $total_balance;
-
-            return $var;
-    }
-
-    public function calculation_superavit($var,$code,$coin)
-    {
-        //Primero el suma todos los movimientos del 4 para arriba, y luego suma los movimientos que se le hayan hecho al superavit
-     if($coin == 'bolivares'){
-         $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe) AS debe
-                         FROM accounts a
-                         INNER JOIN detail_vouchers d 
-                             ON d.id_account = a.id
-                         WHERE a.code_one >= ? AND
-                         d.status = ?
-                         '
-                         , [$code,'C']);
-         $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber) AS haber
-                         FROM accounts a
-                         INNER JOIN detail_vouchers d 
-                             ON d.id_account = a.id
-                         WHERE a.code_one >= ? AND
-                         d.status = ?
-                         '
-                         , [$code,'C']);
-        $total_debe2 =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe) AS debe
-                         FROM accounts a
-                         INNER JOIN detail_vouchers d 
-                             ON d.id_account = a.id
-                         WHERE a.code_one >= 3 AND a.code_two >= 2 AND a.code_three >= 1 AND a.code_four >= 1 AND a.code_five >= 1 AND
-                         d.status = ?
-                         '
-                         , [$code,'C']);
-         $total_haber2 =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber) AS haber
-                         FROM accounts a
-                         INNER JOIN detail_vouchers d 
-                             ON d.id_account = a.id
-                         WHERE a.code_one >= 3 AND a.code_two >= 2 AND a.code_three >= 1 AND a.code_four >= 1 AND a.code_five >= 1 AND
-                         d.status = ?
-                         '
-                         , [$code,'C']);
-         
-        $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus) AS balance
-                         FROM accounts a
-                         WHERE a.code_one = ? AND
-                         a.code_two = ?  
-                         '
-                         , [$var->code_one,$var->code_two]);
-                         
-
-         }else{
-             $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS debe
-             FROM accounts a
-             INNER JOIN detail_vouchers d 
-                 ON d.id_account = a.id
-             WHERE a.code_one >= ? AND
-             d.status = ?
-             '
-             , [$code,'C']);
-             
-             $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS haber
-             FROM accounts a
-             INNER JOIN detail_vouchers d 
-                 ON d.id_account = a.id
-             WHERE a.code_one >= ? AND
-             d.status = ?
-             '
-             , [$code,'C']);
-
-             $total_debe2 =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS debe
-             FROM accounts a
-             INNER JOIN detail_vouchers d 
-                 ON d.id_account = a.id
-             WHERE a.code_one >= 3 AND a.code_two >= 2 AND a.code_three >= 1 AND a.code_four >= 1 AND a.code_five >= 1 AND
-             d.status = ?
-             '
-             , [$code,'C']);
-             
-             $total_haber2 =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS haber
-             FROM accounts a
-             INNER JOIN detail_vouchers d 
-                 ON d.id_account = a.id
-             WHERE a.code_one >= 3 AND a.code_two >= 2 AND a.code_three >= 1 AND a.code_four >= 1 AND a.code_five >= 1 AND
-             d.status = ?
-             '
-             , [$code,'C']);
-
-             $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus/a.rate) AS balance
-            FROM accounts a
-            WHERE a.code_one = ? AND
-            a.code_two = ?  
-            '
-            , [$var->code_one,$var->code_two]);
-         }
-         
-         $total_debe = $total_debe[0]->debe + $total_debe2[0]->debe;
-         $total_haber = $total_haber[0]->haber + $total_haber2[0]->haber;
-         $var->debe = $total_debe;
-         $var->haber = $total_haber;
-
-         $total_balance = $total_balance[0]->balance;
-        $var->balance_previus = $total_balance;
- 
-         $var->balance = $var->balance_previus;
- 
-         return $var;
- 
-    }
- 
-    public function calculation_superavit_level4($var,$code,$coin)
-   {
-    if($coin == 'bolivares'){
-        $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe) AS debe
-                        FROM accounts a
-                        INNER JOIN detail_vouchers d 
-                            ON d.id_account = a.id
-                        WHERE a.code_one >= ? AND
-                        d.status = ?
-                        '
-                        , [$code,'C']);
-        $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber) AS haber
-                        FROM accounts a
-                        INNER JOIN detail_vouchers d 
-                            ON d.id_account = a.id
-                        WHERE a.code_one >= ? AND
-                        d.status = ?
-                        '
-                        , [$code,'C']);
-
-        $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus) AS balance
-                                        FROM accounts a
-                                        WHERE a.code_one = ? AND
-                                        a.code_two = ?  AND
-                                        a.code_three = ? 
-                                        '
-                                        , [$var->code_one,$var->code_two,$var->code_three,$var->code_four]);
-        
-        }else{
-            $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS debe
-            FROM accounts a
-            INNER JOIN detail_vouchers d 
-                ON d.id_account = a.id
-            WHERE a.code_one >= ? AND
-            d.status = ?
-            '
-            , [$code,'C']);
-            
-            $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS haber
-            FROM accounts a
-            INNER JOIN detail_vouchers d 
-                ON d.id_account = a.id
-            WHERE a.code_one >= ? AND
-            d.status = ?
-            '
-            , [$code,'C']);
-
-            $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus/a.rate) AS balance
-            FROM accounts a
-            WHERE a.code_one = ? AND
-            a.code_two = ?  AND
-            a.code_three = ? AND
-            a.code_four = ?
-            '
-            , [$var->code_one,$var->code_two,$var->code_three,$var->code_four]);
-
-
-        }
-        
-        $total_debe = $total_debe[0]->debe;
-        $total_haber = $total_haber[0]->haber;
-        $var->debe = $total_debe;
-        $var->haber = $total_haber;
-
-        //$total_balance = $total_balance[0]->balance;
-        $total_balance = $total_balance[0]->balance;
-        $var->balance_previus = $total_balance;
-        $var->balance = $var->balance_previus;
-
-        return $var;
-
-   }
-
-   public function calculation_superavit_level3($var,$code,$coin)
-   {
-    if($coin == 'bolivares'){
-        $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe) AS debe
-                        FROM accounts a
-                        INNER JOIN detail_vouchers d 
-                            ON d.id_account = a.id
-                        WHERE a.code_one >= ? AND
-                        d.status = ?
-                        '
-                        , [$code,'C']);
-        $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber) AS haber
-                        FROM accounts a
-                        INNER JOIN detail_vouchers d 
-                            ON d.id_account = a.id
-                        WHERE a.code_one >= ? AND
-                        d.status = ?
-                        '
-                        , [$code,'C']);
-
-        $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus) AS balance
-                                        FROM accounts a
-                                        WHERE a.code_one = ? AND
-                                        a.code_two = ?  AND
-                                        a.code_three = ? 
-                                        '
-                                        , [$var->code_one,$var->code_two,$var->code_three]);
-        
-        }else{
-            $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS debe
-            FROM accounts a
-            INNER JOIN detail_vouchers d 
-                ON d.id_account = a.id
-            WHERE a.code_one >= ? AND
-            d.status = ?
-            '
-            , [$code,'C']);
-            
-            $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS haber
-            FROM accounts a
-            INNER JOIN detail_vouchers d 
-                ON d.id_account = a.id
-            WHERE a.code_one >= ? AND
-            d.status = ?
-            '
-            , [$code,'C']);
-
-            $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus/a.rate) AS balance
-            FROM accounts a
-            WHERE a.code_one = ? AND
-            a.code_two = ?  AND
-            a.code_three = ? 
-            '
-            , [$var->code_one,$var->code_two,$var->code_three]);
-
-
-        }
-        
-        $total_debe = $total_debe[0]->debe;
-        $total_haber = $total_haber[0]->haber;
-        $var->debe = $total_debe;
-        $var->haber = $total_haber;
-
-        //$total_balance = $total_balance[0]->balance;
-        $total_balance = $total_balance[0]->balance;
-        $var->balance_previus = $total_balance;
-        $var->balance = $var->balance_previus;
-
-        return $var;
-
-   }
-
-   public function calculation_superavit_level2($var,$code,$coin)
-   {
-    if($coin == 'bolivares'){
-        $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe) AS debe
-                        FROM accounts a
-                        INNER JOIN detail_vouchers d 
-                            ON d.id_account = a.id
-                        WHERE a.code_one >= ? AND
-                        d.status = ?
-                        '
-                        , [$code,'C']);
-        $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber) AS haber
-                        FROM accounts a
-                        INNER JOIN detail_vouchers d 
-                            ON d.id_account = a.id
-                        WHERE a.code_one >= ? AND
-                        d.status = ?
-                        '
-                        , [$code,'C']);
-
-        $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus) AS balance
-                                        FROM accounts a
-                                        WHERE a.code_one = ? AND
-                                        a.code_two = ? 
-                                        
-                                        '
-                                        , [$var->code_one,$var->code_two]);
-        
-        }else{
-            $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS debe
-            FROM accounts a
-            INNER JOIN detail_vouchers d 
-                ON d.id_account = a.id
-            WHERE a.code_one >= ? AND
-            d.status = ?
-            '
-            , [$code,'C']);
-            
-            $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS haber
-            FROM accounts a
-            INNER JOIN detail_vouchers d 
-                ON d.id_account = a.id
-            WHERE a.code_one >= ? AND
-            d.status = ?
-            '
-            , [$code,'C']);
-
-            $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus/a.rate) AS balance
-            FROM accounts a
-            WHERE a.code_one = ? AND
-            a.code_two = ?  
-            '
-            , [$var->code_one,$var->code_two]);
-
-
-        }
-        
-        $total_debe = $total_debe[0]->debe;
-        $total_haber = $total_haber[0]->haber;
-        $var->debe = $total_debe;
-        $var->haber = $total_haber;
-
-        //$total_balance = $total_balance[0]->balance;
-        $total_balance = $total_balance[0]->balance;
-        $var->balance_previus = $total_balance;
-        $var->balance = $var->balance_previus;
-
-        return $var;
-
-   }
+   
 
    public function store(Request $request)
     {
@@ -1503,7 +617,893 @@ class AccountController extends Controller
 
 
 
+public function calculation($coin)
+{
+    
+    $accounts = Account::on(Auth::user()->database_name)->orderBy('code_one', 'asc')
+                     ->orderBy('code_two', 'asc')
+                     ->orderBy('code_three', 'asc')
+                     ->orderBy('code_four', 'asc')
+                     ->orderBy('code_five', 'asc')
+                     ->get();
+    
+                   
+    if(isset($accounts)) {
+        
+        foreach ($accounts as $var) 
+        {
+            if($var->code_one != 0)
+            {
+                if($var->code_two != 0)
+                {
+                    if($var->code_three != 0)
+                    {
+                        if($var->code_four != 0)
+                        {
+                            if($var->code_five != 0)
+                            {
+                                //Calculo de superavit
+                                if(($var->code_one == 3) && ($var->code_two == 2) && ($var->code_three == 1) && 
+                                ($var->code_four == 1) && ($var->code_five == 1)){
+                                    
+                                    $var = $this->calculation_superavit($var,4,$coin);
+                                    
+                                }else
+                                {
+                                    /*CALCULA LOS SALDOS DESDE DETALLE COMPROBANTE */    
+                                    if($coin == 'bolivares')
+                                    {
+                                        $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe) AS debe
+                                                        FROM accounts a
+                                                        INNER JOIN detail_vouchers d 
+                                                            ON d.id_account = a.id
+                                                        WHERE a.code_one = ? AND
+                                                        a.code_two = ? AND
+                                                        a.code_three = ? AND
+                                                        a.code_four = ? AND
+                                                        a.code_five = ? AND
+                                                        d.status = ?
+                                                        '
+                                                        , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,$var->code_five,'C']);
+                                        $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber) AS haber
+                                                        FROM accounts a
+                                                        INNER JOIN detail_vouchers d 
+                                                            ON d.id_account = a.id
+                                                        WHERE a.code_one = ? AND
+                                                        a.code_two = ? AND
+                                                        a.code_three = ? AND
+                                                        a.code_four = ? AND
+                                                        a.code_five = ? AND
+                                                        d.status = ?
+                                                        '
+                                                        , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,$var->code_five,'C']);
+    
+                                        $total_dolar_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS dolar
+                                                        FROM accounts a
+                                                        INNER JOIN detail_vouchers d 
+                                                            ON d.id_account = a.id
+                                                        WHERE a.code_one = ? AND
+                                                        a.code_two = ? AND
+                                                        a.code_three = ? AND
+                                                        a.code_four = ? AND
+                                                        a.code_five = ? AND
+                                                        d.status = ?
+                                                        '
+                                                        , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,$var->code_five,'C']);
+    
+                                        $total_dolar_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS dolar
+                                                        FROM accounts a
+                                                        INNER JOIN detail_vouchers d 
+                                                            ON d.id_account = a.id
+                                                        WHERE a.code_one = ? AND
+                                                        a.code_two = ? AND
+                                                        a.code_three = ? AND
+                                                        a.code_four = ? AND
+                                                        a.code_five = ? AND
+                                                        d.status = ?
+                                                        '
+                                                        , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,$var->code_five,'C']);
+    
+                                                        $var->balance =  $var->balance_previus;
+    
+                                    
+                                    }else{
+                                        $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS debe
+                                        FROM accounts a
+                                        INNER JOIN detail_vouchers d 
+                                            ON d.id_account = a.id
+                                        WHERE a.code_one = ? AND
+                                        a.code_two = ? AND
+                                        a.code_three = ? AND
+                                        a.code_four = ? AND
+                                        a.code_five = ? AND
+                                        d.status = ?
+                                        '
+                                        , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,$var->code_five,'C']);
+                                        
+                                        $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS haber
+                                        FROM accounts a
+                                        INNER JOIN detail_vouchers d 
+                                            ON d.id_account = a.id
+                                        WHERE a.code_one = ? AND
+                                        a.code_two = ? AND
+                                        a.code_three = ? AND
+                                        a.code_four = ? AND
+                                        a.code_five = ? AND
+                                        d.status = ?
+                                        '
+                                        , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,$var->code_five,'C']);
 
+                                        if(($var->balance_previus != 0) && ($var->rate !=0)){
+                                            $var->balance_previus =  $var->balance_previus / $var->rate;
+                                        }
+                                        
+                                        
+                                    }
+                                    $total_debe = $total_debe[0]->debe;
+                                    $total_haber = $total_haber[0]->haber;
+                                    if(isset($total_dolar_debe[0]->dolar)){
+                                        $total_dolar_debe = $total_dolar_debe[0]->dolar;
+                                        $var->dolar_debe = $total_dolar_debe;
+                                    }
+                                    if(isset($total_dolar_haber[0]->dolar)){
+                                        $total_dolar_haber = $total_dolar_haber[0]->dolar;
+                                        $var->dolar_haber = $total_dolar_haber;
+                                    }
+                                
+                                    $var->debe = $total_debe;
+                                    $var->haber = $total_haber;
+
+                                    
+                                }
+
+                            }else{
+                        
+                                //Calculo de superavit
+                                if(($var->code_one == 3) && ($var->code_two == 2) && ($var->code_three == 1) && 
+                                ($var->code_four == 1) ){
+                                    $var = $this->calculation_superavit($var,4,$coin);
+                                }else{
+                                /*CALCULA LOS SALDOS DESDE DETALLE COMPROBANTE */                                                   
+                            
+                                    if($coin == 'bolivares'){
+                                    $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe) AS debe
+                                                    FROM accounts a
+                                                    INNER JOIN detail_vouchers d 
+                                                        ON d.id_account = a.id
+                                                    WHERE a.code_one = ? AND
+                                                    a.code_two = ? AND
+                                                    a.code_three = ? AND
+                                                    a.code_four = ? AND
+                                                    d.status = ?
+                                                    '
+                                                    , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,'C']);
+                                    $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber) AS haber
+                                                    FROM accounts a
+                                                    INNER JOIN detail_vouchers d 
+                                                        ON d.id_account = a.id
+                                                    WHERE a.code_one = ? AND
+                                                    a.code_two = ? AND
+                                                    a.code_three = ? AND
+                                                    a.code_four = ? AND
+                                                    d.status = ?
+                                                    '
+                                                    , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,'C']);
+
+                                    $total_dolar_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS dolar
+                                                    FROM accounts a
+                                                    INNER JOIN detail_vouchers d 
+                                                        ON d.id_account = a.id
+                                                    WHERE a.code_one = ? AND
+                                                    a.code_two = ? AND
+                                                    a.code_three = ? AND
+                                                    a.code_four = ? AND
+                                                    d.status = ?
+                                                    '
+                                                    , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,'C']);
+
+                                    $total_dolar_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS dolar
+                                                    FROM accounts a
+                                                    INNER JOIN detail_vouchers d 
+                                                        ON d.id_account = a.id
+                                                    WHERE a.code_one = ? AND
+                                                    a.code_two = ? AND
+                                                    a.code_three = ? AND
+                                                    a.code_four = ? AND
+                                                    d.status = ?
+                                                    '
+                                                    , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,'C']);
+
+                                                    $var->balance =  $var->balance_previus;
+                                
+
+                                    $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus) AS balance
+                                                    FROM accounts a
+                                                    WHERE a.code_one = ? AND
+                                                    a.code_two = ?  AND
+                                                    a.code_three = ? AND
+                                                    a.code_four = ?
+                                                    '
+                                                    , [$var->code_one,$var->code_two,$var->code_three,$var->code_four]);
+                                
+                                    }else{
+                                        $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS debe
+                                        FROM accounts a
+                                        INNER JOIN detail_vouchers d 
+                                            ON d.id_account = a.id
+                                        WHERE a.code_one = ? AND
+                                        a.code_two = ? AND
+                                        a.code_three = ? AND
+                                        a.code_four = ? AND
+                                        d.status = ?
+                                        '
+                                        , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,'C']);
+                                        
+                                        $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS haber
+                                        FROM accounts a
+                                        INNER JOIN detail_vouchers d 
+                                            ON d.id_account = a.id
+                                        WHERE a.code_one = ? AND
+                                        a.code_two = ? AND
+                                        a.code_three = ? AND
+                                        a.code_four = ? AND
+                                        d.status = ?
+                                        '
+                                        , [$var->code_one,$var->code_two,$var->code_three,$var->code_four,'C']);
+
+                                        $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus/a.rate) AS balance
+                                                    FROM accounts a
+                                                    WHERE a.code_one = ? AND
+                                                    a.code_two = ?  AND
+                                                    a.code_three = ? AND
+                                                    a.code_four = ?
+                                                    '
+                                                    , [$var->code_one,$var->code_two,$var->code_three,$var->code_four]);
+
+                                        /*if(($var->balance_previus != 0) && ($var->rate !=0))
+                                        $var->balance =  $var->balance_previus / $var->rate;*/
+                                    }
+                            
+                                    $total_debe = $total_debe[0]->debe;
+                                    $total_haber = $total_haber[0]->haber;
+                                    if(isset($total_dolar_debe[0]->dolar)){
+                                        $total_dolar_debe = $total_dolar_debe[0]->dolar;
+                                        $var->dolar_debe = $total_dolar_debe;
+                                    }
+                                    if(isset($total_dolar_haber[0]->dolar)){
+                                        $total_dolar_haber = $total_dolar_haber[0]->dolar;
+                                        $var->dolar_haber = $total_dolar_haber;
+                                    }
+                                
+                                    $var->debe = $total_debe;
+                                    $var->haber = $total_haber;
+
+                                    $total_balance = $total_balance[0]->balance;
+                                    $var->balance = $total_balance;
+                                }
+                            }
+                        }else{    
+                            //Calculo de superavit
+                            if(($var->code_one == 3) && ($var->code_two == 2) && ($var->code_three == 1)){
+                                $var = $this->calculation_superavit($var,4,$coin);
+                            }else{      
+                        
+                                if($coin == 'bolivares'){
+                                $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe) AS debe
+                                                FROM accounts a
+                                                INNER JOIN detail_vouchers d 
+                                                    ON d.id_account = a.id
+                                                WHERE a.code_one = ? AND
+                                                a.code_two = ? AND
+                                                a.code_three = ? AND
+                                                
+                                                d.status = ?
+                                                '
+                                                , [$var->code_one,$var->code_two,$var->code_three,'C']);
+                                $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber) AS haber
+                                                FROM accounts a
+                                                INNER JOIN detail_vouchers d 
+                                                    ON d.id_account = a.id
+                                                WHERE a.code_one = ? AND
+                                                a.code_two = ? AND
+                                                a.code_three = ? AND
+                                                
+                                                d.status = ?
+                                                '
+                                                , [$var->code_one,$var->code_two,$var->code_three,'C']);
+
+                                $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus) AS balance
+                                            FROM accounts a
+                                            WHERE a.code_one = ? AND
+                                            a.code_two = ?  AND
+                                            a.code_three = ?
+                                            '
+                                            , [$var->code_one,$var->code_two,$var->code_three]);
+                                
+                                }else{
+                                        $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS debe
+                                        FROM accounts a
+                                        INNER JOIN detail_vouchers d 
+                                            ON d.id_account = a.id
+                                        WHERE a.code_one = ? AND
+                                        a.code_two = ? AND
+                                        a.code_three = ? AND
+                                        
+                                        d.status = ?
+                                        '
+                                        , [$var->code_one,$var->code_two,$var->code_three,'C']);
+                                        
+                                        $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS haber
+                                        FROM accounts a
+                                        INNER JOIN detail_vouchers d 
+                                            ON d.id_account = a.id
+                                        WHERE a.code_one = ? AND
+                                        a.code_two = ? AND
+                                        a.code_three = ? AND
+                                        
+                                        d.status = ?
+                                        '
+                                        , [$var->code_one,$var->code_two,$var->code_three,'C']);
+                        
+                                        $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus/a.rate) AS balance
+                                            FROM accounts a
+                                            WHERE a.code_one = ? AND
+                                            a.code_two = ? AND
+                                            a.code_three = ?
+                                            '
+                                            , [$var->code_one,$var->code_two,$var->code_three]);
+
+                                    }
+                                    $total_debe = $total_debe[0]->debe;
+                                    $total_haber = $total_haber[0]->haber;
+                                
+                                    $var->debe = $total_debe;
+                                    $var->haber = $total_haber;
+
+                                    
+
+                                    $total_balance = $total_balance[0]->balance;
+                                    $var->balance = $total_balance;
+                                  
+                            }           
+                        }           
+                    }else{
+                        //Calculo de superavit
+                        if(($var->code_one == 3) && ($var->code_two == 2)){
+                            $var = $this->calculation_superavit($var,4,$coin);
+                        }else{
+                                        
+                            if($coin == 'bolivares'){
+                                $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe) AS debe
+                                                FROM accounts a
+                                                INNER JOIN detail_vouchers d 
+                                                    ON d.id_account = a.id
+                                                WHERE a.code_one = ? AND
+                                                a.code_two = ? AND
+                                                d.status = ?
+                                                '
+                                                , [$var->code_one,$var->code_two,'C']);
+                                $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber) AS haber
+                                                FROM accounts a
+                                                INNER JOIN detail_vouchers d 
+                                                    ON d.id_account = a.id
+                                                WHERE a.code_one = ? AND
+                                                a.code_two = ? AND
+                                                d.status = ?
+                                                '
+                                                , [$var->code_one,$var->code_two,'C']);
+                                
+                                $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus) AS balance
+                                            FROM accounts a
+                                            WHERE a.code_one = ? AND
+                                            a.code_two = ?
+                                            '
+                                            , [$var->code_one,$var->code_two]);
+                                
+                                }else{
+                                    $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS debe
+                                    FROM accounts a
+                                    INNER JOIN detail_vouchers d 
+                                        ON d.id_account = a.id
+                                    WHERE a.code_one = ? AND
+                                    a.code_two = ? AND
+                                    d.status = ?
+                                    '
+                                    , [$var->code_one,$var->code_two,'C']);
+                                    
+                                    $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS haber
+                                    FROM accounts a
+                                    INNER JOIN detail_vouchers d 
+                                        ON d.id_account = a.id
+                                    WHERE a.code_one = ? AND
+                                    a.code_two = ? AND
+                                    d.status = ?
+                                    '
+                                    , [$var->code_one,$var->code_two,'C']);
+
+                                    $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus/a.rate) AS balance
+                                            FROM accounts a
+                                            WHERE a.code_one = ? AND
+                                            a.code_two = ?
+                                            '
+                                            , [$var->code_one,$var->code_two]);
+                    
+                                }
+                                
+                                $total_debe = $total_debe[0]->debe;
+                                $total_haber = $total_haber[0]->haber;
+                                $var->debe = $total_debe;
+                                $var->haber = $total_haber;
+
+                                
+
+                                $total_balance = $total_balance[0]->balance;
+                                $var->balance = $total_balance;
+                        }
+                    }
+                }else{
+                    //Calcular patrimonio con las cuentas mayores o iguales a 3.0.0.0.0
+                    if($var->code_one == 3){
+                        $var = $this->calculation_capital($var,$coin);
+                       
+                    }else{
+                        if($coin == 'bolivares'){
+                            $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe) AS debe
+                                            FROM accounts a
+                                            INNER JOIN detail_vouchers d 
+                                                ON d.id_account = a.id
+                                            WHERE a.code_one = ? AND
+                                            d.status = ?
+                                            '
+                                            , [$var->code_one,'C']);
+                            $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber) AS haber
+                                            FROM accounts a
+                                            INNER JOIN detail_vouchers d 
+                                                ON d.id_account = a.id
+                                            WHERE a.code_one = ? AND
+                                            d.status = ?
+                                            '
+                                            , [$var->code_one,'C']);
+
+                            $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus) AS balance
+                                            FROM accounts a
+                                            WHERE a.code_one = ?
+                                            '
+                                            , [$var->code_one]);
+                            
+                            }else{
+                                $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS debe
+                                FROM accounts a
+                                INNER JOIN detail_vouchers d 
+                                    ON d.id_account = a.id
+                                WHERE a.code_one = ? AND
+                                d.status = ?
+                                '
+                                , [$var->code_one,'C']);
+                                
+                                $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS haber
+                                FROM accounts a
+                                INNER JOIN detail_vouchers d 
+                                    ON d.id_account = a.id
+                                WHERE a.code_one = ? AND
+                                d.status = ?
+                                '
+                                , [$var->code_one,'C']);
+
+                                $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus/a.rate) AS balance
+                                            FROM accounts a
+                                            WHERE a.code_one = ?
+                                            '
+                                            , [$var->code_one]);
+                
+                            }
+                            $total_debe = $total_debe[0]->debe;
+                            $total_haber = $total_haber[0]->haber;
+                            $var->debe = $total_debe;
+                            $var->haber = $total_haber;
+
+                            $total_balance = $total_balance[0]->balance;
+
+                            $var->balance = $total_balance;
+                    }
+                }
+            }else{
+                return redirect('/accounts/menu')->withDanger('El codigo uno es igual a cero!');
+            }
+        } 
+    
+    }else{
+        return redirect('/accounts/menu')->withDanger('No hay Cuentas');
+    }              
+             
+   
+    
+     return $accounts;
+}
+
+public function calculation_capital($var,$coin)
+{
+    if($coin == 'bolivares'){
+        $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe) AS debe
+                        FROM accounts a
+                        INNER JOIN detail_vouchers d 
+                            ON d.id_account = a.id
+                        WHERE a.code_one >= ? AND
+                        d.status = ?
+                        '
+                        , [$var->code_one,'C']);
+        $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber) AS haber
+                        FROM accounts a
+                        INNER JOIN detail_vouchers d 
+                            ON d.id_account = a.id
+                        WHERE a.code_one >= ? AND
+                        d.status = ?
+                        '
+                        , [$var->code_one,'C']);
+
+        $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus) AS balance
+                        FROM accounts a
+                        WHERE a.code_one = ?
+                        '
+                        , [$var->code_one]);
+        
+        }else{
+            $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS debe
+            FROM accounts a
+            INNER JOIN detail_vouchers d 
+                ON d.id_account = a.id
+            WHERE a.code_one >= ? AND
+            d.status = ?
+            '
+            , [$var->code_one,'C']);
+            
+            $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS haber
+            FROM accounts a
+            INNER JOIN detail_vouchers d 
+                ON d.id_account = a.id
+            WHERE a.code_one >= ? AND
+            d.status = ?
+            '
+            , [$var->code_one,'C']);
+
+            $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus/a.rate) AS balance
+                        FROM accounts a
+                        WHERE a.code_one = ?
+                        '
+                        , [$var->code_one]);
+
+        }
+        $total_debe = $total_debe[0]->debe;
+        $total_haber = $total_haber[0]->haber;
+        $var->debe = $total_debe;
+        $var->haber = $total_haber;
+
+        $total_balance = $total_balance[0]->balance;
+
+        $var->balance = $total_balance;
+
+        return $var;
+}
+
+public function calculation_superavit($var,$code,$coin)
+{
+    //Primero el suma todos los movimientos del 4 para arriba, y luego suma los movimientos que se le hayan hecho al superavit
+ if($coin == 'bolivares'){
+     $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe) AS debe
+                     FROM accounts a
+                     INNER JOIN detail_vouchers d 
+                         ON d.id_account = a.id
+                     WHERE a.code_one >= ? AND
+                     d.status = ?
+                     '
+                     , [$code,'C']);
+     $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber) AS haber
+                     FROM accounts a
+                     INNER JOIN detail_vouchers d 
+                         ON d.id_account = a.id
+                     WHERE a.code_one >= ? AND
+                     d.status = ?
+                     '
+                     , [$code,'C']);
+    $total_debe2 =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe) AS debe
+                     FROM accounts a
+                     INNER JOIN detail_vouchers d 
+                         ON d.id_account = a.id
+                     WHERE a.code_one >= 3 AND a.code_two >= 2 AND a.code_three >= 1 AND a.code_four >= 1 AND a.code_five >= 1 AND
+                     d.status = ?
+                     '
+                     , [$code,'C']);
+     $total_haber2 =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber) AS haber
+                     FROM accounts a
+                     INNER JOIN detail_vouchers d 
+                         ON d.id_account = a.id
+                     WHERE a.code_one >= 3 AND a.code_two >= 2 AND a.code_three >= 1 AND a.code_four >= 1 AND a.code_five >= 1 AND
+                     d.status = ?
+                     '
+                     , [$code,'C']);
+     
+    $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus) AS balance
+                     FROM accounts a
+                     WHERE a.code_one = ? AND
+                     a.code_two = ?  
+                     '
+                     , [$var->code_one,$var->code_two]);
+                     
+
+     }else{
+         $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS debe
+         FROM accounts a
+         INNER JOIN detail_vouchers d 
+             ON d.id_account = a.id
+         WHERE a.code_one >= ? AND
+         d.status = ?
+         '
+         , [$code,'C']);
+         
+         $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS haber
+         FROM accounts a
+         INNER JOIN detail_vouchers d 
+             ON d.id_account = a.id
+         WHERE a.code_one >= ? AND
+         d.status = ?
+         '
+         , [$code,'C']);
+
+         $total_debe2 =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS debe
+         FROM accounts a
+         INNER JOIN detail_vouchers d 
+             ON d.id_account = a.id
+         WHERE a.code_one >= 3 AND a.code_two >= 2 AND a.code_three >= 1 AND a.code_four >= 1 AND a.code_five >= 1 AND
+         d.status = ?
+         '
+         , [$code,'C']);
+         
+         $total_haber2 =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS haber
+         FROM accounts a
+         INNER JOIN detail_vouchers d 
+             ON d.id_account = a.id
+         WHERE a.code_one >= 3 AND a.code_two >= 2 AND a.code_three >= 1 AND a.code_four >= 1 AND a.code_five >= 1 AND
+         d.status = ?
+         '
+         , [$code,'C']);
+
+         $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus/a.rate) AS balance
+        FROM accounts a
+        WHERE a.code_one = ? AND
+        a.code_two = ?  
+        '
+        , [$var->code_one,$var->code_two]);
+     }
+     
+     $total_debe = $total_debe[0]->debe + $total_debe2[0]->debe;
+     $total_haber = $total_haber[0]->haber + $total_haber2[0]->haber;
+     $var->debe = $total_debe;
+     $var->haber = $total_haber;
+
+     $total_balance = $total_balance[0]->balance;
+    $var->balance_previus = $total_balance;
+
+     $var->balance = $var->balance_previus;
+
+     return $var;
+
+}
+
+public function calculation_superavit_level4($var,$code,$coin)
+{
+    if($coin == 'bolivares'){
+        $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe) AS debe
+                        FROM accounts a
+                        INNER JOIN detail_vouchers d 
+                            ON d.id_account = a.id
+                        WHERE a.code_one >= ? AND
+                        d.status = ?
+                        '
+                        , [$code,'C']);
+        $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber) AS haber
+                        FROM accounts a
+                        INNER JOIN detail_vouchers d 
+                            ON d.id_account = a.id
+                        WHERE a.code_one >= ? AND
+                        d.status = ?
+                        '
+                        , [$code,'C']);
+
+        $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus) AS balance
+                                        FROM accounts a
+                                        WHERE a.code_one = ? AND
+                                        a.code_two = ?  AND
+                                        a.code_three = ? 
+                                        '
+                                        , [$var->code_one,$var->code_two,$var->code_three,$var->code_four]);
+        
+    }else{
+        $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS debe
+        FROM accounts a
+        INNER JOIN detail_vouchers d 
+            ON d.id_account = a.id
+        WHERE a.code_one >= ? AND
+        d.status = ?
+        '
+        , [$code,'C']);
+        
+        $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS haber
+        FROM accounts a
+        INNER JOIN detail_vouchers d 
+            ON d.id_account = a.id
+        WHERE a.code_one >= ? AND
+        d.status = ?
+        '
+        , [$code,'C']);
+
+        $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus/a.rate) AS balance
+        FROM accounts a
+        WHERE a.code_one = ? AND
+        a.code_two = ?  AND
+        a.code_three = ? AND
+        a.code_four = ?
+        '
+        , [$var->code_one,$var->code_two,$var->code_three,$var->code_four]);
+
+
+    }
+    
+    $total_debe = $total_debe[0]->debe;
+    $total_haber = $total_haber[0]->haber;
+    $var->debe = $total_debe;
+    $var->haber = $total_haber;
+
+    //$total_balance = $total_balance[0]->balance;
+    $total_balance = $total_balance[0]->balance;
+    $var->balance_previus = $total_balance;
+    $var->balance = $var->balance_previus;
+
+    return $var;
+
+}
+
+public function calculation_superavit_level3($var,$code,$coin)
+{
+    if($coin == 'bolivares'){
+    $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe) AS debe
+                    FROM accounts a
+                    INNER JOIN detail_vouchers d 
+                        ON d.id_account = a.id
+                    WHERE a.code_one >= ? AND
+                    d.status = ?
+                    '
+                    , [$code,'C']);
+    $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber) AS haber
+                    FROM accounts a
+                    INNER JOIN detail_vouchers d 
+                        ON d.id_account = a.id
+                    WHERE a.code_one >= ? AND
+                    d.status = ?
+                    '
+                    , [$code,'C']);
+
+    $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus) AS balance
+                                    FROM accounts a
+                                    WHERE a.code_one = ? AND
+                                    a.code_two = ?  AND
+                                    a.code_three = ? 
+                                    '
+                                    , [$var->code_one,$var->code_two,$var->code_three]);
+    
+    }else{
+        $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS debe
+        FROM accounts a
+        INNER JOIN detail_vouchers d 
+            ON d.id_account = a.id
+        WHERE a.code_one >= ? AND
+        d.status = ?
+        '
+        , [$code,'C']);
+        
+        $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS haber
+        FROM accounts a
+        INNER JOIN detail_vouchers d 
+            ON d.id_account = a.id
+        WHERE a.code_one >= ? AND
+        d.status = ?
+        '
+        , [$code,'C']);
+
+        $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus/a.rate) AS balance
+        FROM accounts a
+        WHERE a.code_one = ? AND
+        a.code_two = ?  AND
+        a.code_three = ? 
+        '
+        , [$var->code_one,$var->code_two,$var->code_three]);
+
+
+    }
+    
+    $total_debe = $total_debe[0]->debe;
+    $total_haber = $total_haber[0]->haber;
+    $var->debe = $total_debe;
+    $var->haber = $total_haber;
+
+    //$total_balance = $total_balance[0]->balance;
+    $total_balance = $total_balance[0]->balance;
+    $var->balance_previus = $total_balance;
+    $var->balance = $var->balance_previus;
+
+    return $var;
+
+}
+
+public function calculation_superavit_level2($var,$code,$coin)
+{
+    if($coin == 'bolivares'){
+    $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe) AS debe
+                    FROM accounts a
+                    INNER JOIN detail_vouchers d 
+                        ON d.id_account = a.id
+                    WHERE a.code_one >= ? AND
+                    d.status = ?
+                    '
+                    , [$code,'C']);
+    $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber) AS haber
+                    FROM accounts a
+                    INNER JOIN detail_vouchers d 
+                        ON d.id_account = a.id
+                    WHERE a.code_one >= ? AND
+                    d.status = ?
+                    '
+                    , [$code,'C']);
+
+    $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus) AS balance
+                                    FROM accounts a
+                                    WHERE a.code_one = ? AND
+                                    a.code_two = ? 
+                                    
+                                    '
+                                    , [$var->code_one,$var->code_two]);
+    
+    }else{
+        $total_debe =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.debe/d.tasa) AS debe
+        FROM accounts a
+        INNER JOIN detail_vouchers d 
+            ON d.id_account = a.id
+        WHERE a.code_one >= ? AND
+        d.status = ?
+        '
+        , [$code,'C']);
+        
+        $total_haber =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(d.haber/d.tasa) AS haber
+        FROM accounts a
+        INNER JOIN detail_vouchers d 
+            ON d.id_account = a.id
+        WHERE a.code_one >= ? AND
+        d.status = ?
+        '
+        , [$code,'C']);
+
+        $total_balance =   DB::connection(Auth::user()->database_name)->select('SELECT SUM(a.balance_previus/a.rate) AS balance
+        FROM accounts a
+        WHERE a.code_one = ? AND
+        a.code_two = ?  
+        '
+        , [$var->code_one,$var->code_two]);
+
+
+    }
+    
+    $total_debe = $total_debe[0]->debe;
+    $total_haber = $total_haber[0]->haber;
+    $var->debe = $total_debe;
+    $var->haber = $total_haber;
+
+    //$total_balance = $total_balance[0]->balance;
+    $total_balance = $total_balance[0]->balance;
+    $var->balance_previus = $total_balance;
+    $var->balance = $var->balance_previus;
+
+    return $var;
+
+}
 
     public function search_bcv()
     {

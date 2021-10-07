@@ -249,7 +249,8 @@ class AnticipoController extends Controller
             $var->id_client = request('id_client');
         }
         
-        if(request('id_invoice') != -1){
+        $id_invoice = request('id_invoice');
+        if(isset($id_invoice) &&  $id_invoice != -1){
             $var->id_quotation = request('id_invoice');
             $quotation =  Quotation::on(Auth::user()->database_name)->findOrFail($var->id_quotation);
             $var->id_client = $quotation->id_client;
@@ -259,7 +260,7 @@ class AnticipoController extends Controller
         $var->id_user = request('id_user');
         $var->coin = request('coin');
 
-        if(($var->id_client == -1) && ($var->id_quotation == -1)){
+        if((empty($var->id_client) || $var->id_client == -1) && (empty($var->id_quotation) || $var->id_quotation == -1)){
             return redirect('/anticipos/register')->withDanger('Debe Seleccionar un Cliente o una Factura!');
         }
         
@@ -584,7 +585,6 @@ class AnticipoController extends Controller
     }
     public function delete_anticipo(Request $request)
     {
-       
         $anticipo = Anticipo::on(Auth::user()->database_name)->find(request('id_anticipo_modal')); 
 
         if(isset($anticipo)){
@@ -594,8 +594,17 @@ class AnticipoController extends Controller
             return redirect('/anticipos')->withDanger('No se pudo encontrar el anticipo!!');
         }
         
+    }
+    public function delete_anticipo_provider(Request $request)
+    {
+        $anticipo = Anticipo::on(Auth::user()->database_name)->find(request('id_anticipo_modal')); 
 
-       
+        if(isset($anticipo)){
+            $anticipo->delete(); 
+            return redirect('/anticipos/indexprovider')->withSuccess('Eliminacion exitosa!!');
+        }else{
+            return redirect('/anticipos/indexprovider')->withDanger('No se pudo encontrar el anticipo!!');
+        }
         
     }
    /**

@@ -66,7 +66,7 @@
             <thead>
             <tr> 
                 <th class="text-center"></th>
-                <th class="text-center">N° de Control/Serie</th>
+                <th class="text-center">N°</th>
                 <th class="text-center">Cliente</th>
                 <th class="text-center">Vendedor</th>
                 <th class="text-center">Transporte</th>
@@ -86,9 +86,9 @@
                                 <a href="{{ route('quotations.createdeliverynote',[$quotation->id,$quotation->coin])}}" title="Mostrar"><i class="fa fa-file-alt"></i></a>
                                 <a href="{{ route('quotations.reversarQuotation',$quotation->id)}}" title="Borrar"><i class="fa fa-trash text-danger"></i></a>
                            </td>
-                            <td class="text-center">{{ $quotation->serie}}</td>
+                            <td class="text-center">{{ $quotation->id}}</td>
                             <td class="text-center">{{ $quotation->clients['name']}}</td>
-                            <td class="text-center">{{ $quotation->vendors['name']}}</td>
+                            <td class="text-center">{{ $quotation->vendors['name']}} {{ $quotation->vendors['surname']}}</td>
                             <td class="text-center">{{ $quotation->transports['placa'] ?? ''}}</td>
                             <td class="text-center">{{ $quotation->date_quotation}}</td>
                             <td class="text-center">{{ $quotation->date_delivery_note}}</td>

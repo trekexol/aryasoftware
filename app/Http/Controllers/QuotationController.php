@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Client;
 use App\Company;
 use App\DetailVoucher;
+use App\Exports\ProductsExport;
 use App\Inventory;
 use App\Product;
 use App\Quotation;
@@ -17,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
+
 class QuotationController extends Controller
 {
  
@@ -24,6 +26,8 @@ class QuotationController extends Controller
 
        $this->middleware('auth');
    }
+
+   
 
    public function index()
    {

@@ -376,7 +376,7 @@
                             </div>
                             <div class="form-group row mb-0">
                                 @if (empty($expense->date_delivery_note))
-                                <div class="col-md-4">
+                                <div class="col-sm-3 offset-sm-1">
                                     @if($suma == 0)
                                         <a onclick="validate()" id="btnSendNote" name="btnfacturar" class="btn btn-success" title="facturar">Orden de Compra</a>  
                                     @else
@@ -384,10 +384,26 @@
                                     @endif
                                 </div>
                                 @endif
-                                <div class="col-md-4">
+                                <div class="col-sm-2">
                                     <a id="btnpayment" href="{{ route('expensesandpurchases.create_payment',[$expense->id,$coin]) }}" name="btnpayment" class="btn btn-info" title="Registrar">Registrar</a>  
                                 </div>
-                                
+                                <div class="col-sm-3  dropdown mb-4">
+                                    <button class="btn btn-dark" type="button"
+                                        id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="false"
+                                        aria-expanded="false">
+                                        <i class="fas fa-bars"></i>
+                                        Opciones
+                                    </button>
+                                    <div class="dropdown-menu animated--fade-in" aria-labelledby="dropdownMenuButton">
+                                        
+                                        <a href="{{ route('export',$expense->id) }}" class="dropdown-item bg-info text-white h5">Descargar Plantilla Excel</a> 
+                                        <a href="{{ route('export',$expense->id) }}" class="dropdown-item bg-info text-white h5">Descargar Guia Excel</a> 
+                                        <form method="POST" action="{{ route('import') }}" enctype="multipart/form-data" >
+                                        @csrf
+                                            <input id="file" type="file" value="import" accept=".csv" name="file" class="file">
+                                        </form>
+                                    </div> 
+                                </div> 
                             </div>
                            
                    
@@ -484,6 +500,28 @@
             coin = $(this).val();
             window.location = "{{route('expensesandpurchases.create_detail', [$expense->id,'','',''])}}"+"/"+coin+"/"+"{{ $type ?? 'SERVICIO' }}"+"/"+"{{ $inventory->id ?? '' }}";
             
+        });
+
+        $("#file").on('change',function(){
+            
+            var file = document.getElementById("file").value;
+
+            /*Extrae la extencion del archivo*/
+            var basename = file.split(/[\\/]/).pop(),  // extract file name from full path ...
+                                               // (supports `\\` and `/` separators)
+            pos = basename.lastIndexOf(".");       // get last position of `.`
+
+            if (basename === "" || pos < 1) {
+                alert("El archivo no tiene extension");
+            }          
+            /*-------------------------------*/     
+
+            if(basename.slice(pos + 1) == 'csv'){
+
+            }else{
+                alert("Solo puede cargar archivos .CSV");
+            }            
+               
         });
 
         function deliveryNoteSend() {

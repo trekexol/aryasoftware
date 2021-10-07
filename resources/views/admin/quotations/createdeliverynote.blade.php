@@ -126,7 +126,16 @@
                                     </span>
                                 @enderror
                             </div>
-                            
+                            <label for="date-begin" class="col-md-2 col-form-label text-md-right">Fecha:</label>
+                            <div class="col-md-3">
+                                <input id="date-begin" type="date" class="form-control @error('date-begin') is-invalid @enderror" name="date-begin" value="{{ $quotation->date_delivery_note ?? $datenow }}" autocomplete="date-begin">
+    
+                                @error('date')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
                         </div>
                       
                         
@@ -229,16 +238,17 @@
     function pdf() {
         let inputIva = document.getElementById("iva").value; 
 
-        
+        let date = document.getElementById("date-begin").value; 
 
-        var nuevaVentana= window.open("{{ route('pdf.deliverynote',[$quotation->id,$coin,''])}}"+"/"+inputIva,"ventana","left=800,top=800,height=800,width=1000,scrollbar=si,location=no ,resizable=si,menubar=no");
+        var nuevaVentana= window.open("{{ route('pdf.deliverynote',[$quotation->id,$coin,'',''])}}"+"/"+inputIva+"/"+date,"ventana","left=800,top=800,height=800,width=1000,scrollbar=si,location=no ,resizable=si,menubar=no");
  
     }
 
     function pdfmediacarta3() {
         let inputIva = document.getElementById("iva").value; 
+        let date = document.getElementById("date-begin").value; 
 
-        var nuevaVentana= window.open("{{ route('pdf.deliverynotemediacarta',[$quotation->id,$coin,''])}}"+"/"+inputIva,"ventana","left=800,top=800,height=800,width=1000,scrollbar=si,location=no ,resizable=si,menubar=no");
+        var nuevaVentana= window.open("{{ route('pdf.deliverynotemediacarta',[$quotation->id,$coin,'',''])}}"+"/"+inputIva+"/"+date,"ventana","left=800,top=800,height=800,width=1000,scrollbar=si,location=no ,resizable=si,menubar=no");
  
     }
 

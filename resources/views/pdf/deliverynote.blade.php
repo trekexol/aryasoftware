@@ -27,7 +27,7 @@
 
 
   <br><br><br><br><br><br><br><br><br>
-  <h4 style="color: black">NOTA DE ENTREGA NRO: {{ str_pad($quotation->id, 6, "0", STR_PAD_LEFT)}}</h4>
+  <h4 style="color: black">NOTA DE ENTREGA NRO: {{ str_pad($quotation->number_delivery_note ?? $quotation->id, 6, "0", STR_PAD_LEFT)}}</h4>
 
  
    

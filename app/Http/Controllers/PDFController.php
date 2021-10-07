@@ -146,7 +146,7 @@ class PDFController extends Controller
         
     }
 
-    function deliverynote($id_quotation,$coin,$iva)
+    function deliverynote($id_quotation,$coin,$iva,$date)
     {
       
 
@@ -156,21 +156,27 @@ class PDFController extends Controller
                  
             if(isset($id_quotation)){
                  $quotation = Quotation::on(Auth::user()->database_name)->findOrFail($id_quotation);
+                
+                 
 
                  if(!(isset($quotation->date_delivery_note))){
+
+                    //Me busco el ultimo numero en notas de entrega
+                    $last_number = Quotation::on(Auth::user()->database_name)->where('number_delivery_note','<>',NULL)->orderBy('number_delivery_note','desc')->first();
+
+                   
+                    //Asigno un numero incrementando en 1
+                    if(isset($last_number)){
+                        $quotation->number_delivery_note = $last_number->number_delivery_note + 1;
+                    }else{
+                        $quotation->number_delivery_note = 1;
+                    }
 
                     $retorno = $this->discount_inventory($id_quotation);
 
                     if($retorno != 'exito'){
                         return redirect('quotations/register/'.$id_quotation.'/'.$coin.'')->withDanger($retorno);                     
                     }
-
-                    $date = Carbon::now();
-                    $datenow = $date->format('Y-m-d');   
-   
-                    $quotation->iva_percentage = $iva;
-   
-                    $quotation->date_delivery_note = $datenow;
 
                  }else{
                     if(isset($quotation->bcv)){
@@ -230,6 +236,8 @@ class PDFController extends Controller
                 $quotation->base_imponible = $base_imponible;
                 $quotation->amount_iva = $base_imponible * $quotation->iva_percentage / 100;
                 $quotation->amount_with_iva = $quotation->amount + $quotation->amount_iva;
+                $quotation->iva_percentage = $iva;
+                 $quotation->date_delivery_note = $date;
                 $quotation->save();
 
 
@@ -270,7 +278,7 @@ class PDFController extends Controller
         
     }
 
-    function deliverynotemediacarta($id_quotation,$coin,$iva)
+    function deliverynotemediacarta($id_quotation,$coin,$iva,$date)
     {
       
 
@@ -281,6 +289,8 @@ class PDFController extends Controller
             if(isset($id_quotation)){
                  $quotation = Quotation::on(Auth::user()->database_name)->findOrFail($id_quotation);
 
+                 
+
                  if(!(isset($quotation->date_delivery_note))){
 
                     $retorno = $this->discount_inventory($id_quotation);
@@ -288,13 +298,6 @@ class PDFController extends Controller
                     if($retorno != 'exito'){
                         return redirect('quotations/register/'.$id_quotation.'/'.$coin.'')->withDanger($retorno);                     
                     }
-
-                    $date = Carbon::now();
-                    $datenow = $date->format('Y-m-d');   
-   
-                    $quotation->iva_percentage = $iva;
-   
-                    $quotation->date_delivery_note = $datenow;
 
                  }else{
                     if(isset($quotation->bcv)){
@@ -354,6 +357,8 @@ class PDFController extends Controller
                 $quotation->base_imponible = $base_imponible;
                 $quotation->amount_iva = $base_imponible * $quotation->iva_percentage / 100;
                 $quotation->amount_with_iva = $quotation->amount + $quotation->amount_iva;
+                $quotation->iva_percentage = $iva;
+                 $quotation->date_delivery_note = $date;
                 $quotation->save();
 
 
@@ -394,7 +399,8 @@ class PDFController extends Controller
         
     }
     
-    function deliverynote_expense($id_expense,$coin,$iva){
+    function deliverynote_expense($id_expense,$coin,$iva,$date)
+    {
       
 
         $pdf = App::make('dompdf.wrapper');
@@ -404,20 +410,18 @@ class PDFController extends Controller
              if(isset($id_expense)){
                 $expense = ExpensesAndPurchase::on(Auth::user()->database_name)->findOrFail($id_expense);
 
-                if(!(isset($expense->date_delivery_note))){
+                
+                $date = Carbon::now();
+                $datenow = $date->format('Y-m-d');   
 
-                    $date = Carbon::now();
-                    $datenow = $date->format('Y-m-d');   
+                $expense->iva_percentage = $iva;
+                $expense->date_delivery_note = $date;
 
-                    $expense->iva_percentage = $iva;
-
-                    $expense->date_delivery_note = $datenow;
-
-                }else{
+                
                 if(isset($expense->bcv)){
                     $bcv = $expense->bcv;
                     }
-                }
+                
                  
                                      
              }else{

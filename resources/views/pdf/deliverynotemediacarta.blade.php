@@ -32,13 +32,15 @@
       <th style="text-align: left; font-weight: normal; width: 90%; border-color: white; font-weight: bold;"><h4>{{Auth::user()->company->code_rif ?? ''}} </h4></th>
     </tr> 
   </table>
-<div style="color: black;font-size: xx-small;font-weight: bold;">NOTA DE ENTREGA NRO: {{ str_pad($quotation->id, 6, "0", STR_PAD_LEFT)}}</div>
+<div style="color: black;font-size: xx-small;font-weight: bold; text-align: right;">NOTA DE ENTREGA NRO: {{ str_pad($quotation->number_delivery_note ?? $quotation->id, 6, "0", STR_PAD_LEFT)}}</div>
 <table>
+  @if (isset($company->franqueo_postal))
   <tr>
     <th style="font-weight: normal; width: 40%;">Concesión Postal:</th>
     <th style="font-weight: normal;">Nº {{ $company->franqueo_postal ?? ''}}</th>
    
   </tr>
+  @endif
   <tr>
     <td style="width: 40%;">Fecha de Emisión:</td>
     <td>{{ $quotation->date_delivery_note ?? ''}}</td>
@@ -48,17 +50,15 @@
 </table>
 <table style="width: 100%;">
   <tr>
-    <th style="font-weight: normal;">Nombre / Razón Social: &nbsp;  {{ $quotation->clients['name'] ?? ''}}</th>
+    <th style="font-weight: normal;">Nombre / Razón Social: &nbsp;  {{ $quotation->clients['name'] ?? ''}} </th>
+    <th style="font-weight: normal;">Vendedor: {{ $quotation->vendors['name'] ?? 'No aplica' }} {{ $quotation->vendors['surname'] ?? ''}} </th>
     
-   
   </tr>
+</table>
+<table style="width: 100%;">
   <tr>
-    <td>Domicilio Fiscal: &nbsp;  {{ $quotation->clients['direction'] ?? ''}}
-    </td>
-    
-    
+    <th style="font-weight: normal;">Domicilio Fiscal: &nbsp;  {{ $quotation->clients['direction'] ?? ''}}</th>
   </tr>
-  
 </table>
 <table style="width: 100%;">
   <tr>
@@ -167,13 +167,15 @@
   </tr> 
 </table>
 <!-- Repeticion de lo mismo -->
-<div style="color: black;font-size: xx-small;font-weight: bold;">NOTA DE ENTREGA NRO: {{ str_pad($quotation->id, 6, "0", STR_PAD_LEFT)}}</div>
+<div style="color: black;font-size: xx-small;font-weight: bold; text-align: right;">NOTA DE ENTREGA NRO: {{ str_pad($quotation->number_delivery_note ?? $quotation->id, 6, "0", STR_PAD_LEFT)}}</div>
 <table>
+  @if (isset($company->franqueo_postal))
   <tr>
     <th style="font-weight: normal; width: 40%;">Concesión Postal:</th>
     <th style="font-weight: normal;">Nº {{ $company->franqueo_postal ?? ''}}</th>
    
   </tr>
+  @endif
   <tr>
     <td style="width: 40%;">Fecha de Emisión:</td>
     <td>{{ $quotation->date_delivery_note ?? ''}}</td>
@@ -183,17 +185,15 @@
 </table>
 <table style="width: 100%;">
   <tr>
-    <th style="font-weight: normal;">Nombre / Razón Social: &nbsp;  {{ $quotation->clients['name'] ?? ''}}</th>
+    <th style="font-weight: normal;">Nombre / Razón Social: &nbsp;  {{ $quotation->clients['name'] ?? ''}} </th>
+    <th style="font-weight: normal;">Vendedor: {{ $quotation->vendors['name'] ?? 'No aplica' }} {{ $quotation->vendors['surname'] ?? ''}} </th>
     
-   
   </tr>
+</table>
+<table style="width: 100%;">
   <tr>
-    <td>Domicilio Fiscal: &nbsp;  {{ $quotation->clients['direction'] ?? ''}}
-    </td>
-    
-    
+    <th style="font-weight: normal;">Domicilio Fiscal: &nbsp;  {{ $quotation->clients['direction'] ?? ''}}</th>
   </tr>
-  
 </table>
 <table style="width: 100%;">
   <tr>
@@ -302,13 +302,15 @@
 </table>
 
 <!-- Repeticion de lo mismo -->
-<div style="color: black;font-size: xx-small;font-weight: bold;">NOTA DE ENTREGA NRO: {{ str_pad($quotation->id, 6, "0", STR_PAD_LEFT)}}</div>
+<div style="color: black;font-size: xx-small;font-weight: bold; text-align: right;">NOTA DE ENTREGA NRO: {{ str_pad($quotation->number_delivery_note ?? $quotation->id, 6, "0", STR_PAD_LEFT)}}</div>
 <table>
+  @if (isset($company->franqueo_postal))
   <tr>
     <th style="font-weight: normal; width: 40%;">Concesión Postal:</th>
     <th style="font-weight: normal;">Nº {{ $company->franqueo_postal ?? ''}}</th>
-   
   </tr>
+  @endif
+  
   <tr>
     <td style="width: 40%;">Fecha de Emisión:</td>
     <td>{{ $quotation->date_delivery_note ?? ''}}</td>
@@ -318,17 +320,15 @@
 </table>
 <table style="width: 100%;">
   <tr>
-    <th style="font-weight: normal;">Nombre / Razón Social: &nbsp;  {{ $quotation->clients['name'] ?? ''}}</th>
+    <th style="font-weight: normal;">Nombre / Razón Social: &nbsp;  {{ $quotation->clients['name'] ?? ''}} </th>
+    <th style="font-weight: normal;">Vendedor: {{ $quotation->vendors['name'] ?? 'No aplica' }} {{ $quotation->vendors['surname'] ?? ''}} </th>
     
-   
   </tr>
+</table>
+<table style="width: 100%;">
   <tr>
-    <td>Domicilio Fiscal: &nbsp;  {{ $quotation->clients['direction'] ?? ''}}
-    </td>
-    
-    
+    <th style="font-weight: normal;">Domicilio Fiscal: &nbsp;  {{ $quotation->clients['direction'] ?? ''}}</th>
   </tr>
-  
 </table>
 <table style="width: 100%;">
   <tr>

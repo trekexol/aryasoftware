@@ -19,7 +19,7 @@
                         @csrf
                         
                         <input id="id_user" type="hidden" class="form-control @error('id_user') is-invalid @enderror" name="id_user" value="{{ Auth::user()->id }}" required autocomplete="id_user">
-                        <input id="id_client" type="hidden" class="form-control @error('id_client') is-invalid @enderror" name="id_client" value="{{ $client->id ?? -1 }}" required autocomplete="id_client">
+                        <input id="id_client" type="hidden" class="form-control @error('id_client') is-invalid @enderror" name="id_client" value="{{ $client->id ?? null }}" required autocomplete="id_client">
                        
                         <div class="form-group row">
                             <label for="clients" class="col-md-3 col-form-label text-md-right">Cliente</label>
@@ -41,7 +41,7 @@
                             <label for="clients" class="col-md-3 col-form-label text-md-right">Facturas</label>
                             <div class="col-md-6">
                                 <select  id="id_invoice"  name="id_invoice" class="form-control">
-                                    <option selected value="-1">Seleccione una Factura</option>
+                                    <option selected >Seleccione una Factura</option>
                                     @foreach($invoices_to_pay as $invoice)
                                             <option  value="{{$invoice->id}}">{{ $invoice->clients['name'] ?? ''}} - {{ $invoice->serie }}</option>
                                     @endforeach

@@ -19,6 +19,8 @@ class CreateQuotationsTable extends Migration
             $table->unsignedBigInteger('id_vendor')->nullable();
             $table->unsignedBigInteger('id_transport')->nullable();
             $table->unsignedBigInteger('id_user');
+            $table->bigInteger('number_invoice')->nullable();
+            $table->bigInteger('number_delivery_note')->nullable();
 
             $table->string('serie',30)->nullable();
             
