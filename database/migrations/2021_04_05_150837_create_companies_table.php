@@ -32,6 +32,7 @@ class CreateCompaniesTable extends Migration
             $table->decimal('rate',64,2);
             $table->decimal('rate_petro',64,2);
             $table->string('foto_company',255)->nullable();
+            $table->string('pie_pagina',20)->nullable();
             $table->string('status',1);
             $table->timestamps();
 

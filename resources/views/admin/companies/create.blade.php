@@ -219,11 +219,21 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="periodo" class="col-sm-2 col-form-label">Periodo Actual</label>
+                            <label for="periodo" class="col-sm-2 col-form-label">Periodo Actual:</label>
                             <div class="col-sm-4">
                                 <input id="periodo" type="text" class="form-control @error('periodo') is-invalid @enderror" name="Periodo" value="{{ $periodo }}" required autocomplete="periodo" readonly>
 
                                 @error('periodo')
+                                <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                            <label for="pie_factura" class="col-sm-2 col-form-label">Pie de Factura:</label>
+                            <div class="col-sm-4">
+                                <input id="pie_factura" type="text" class="form-control @error('pie_factura') is-invalid @enderror" name="pie_factura" value="{{ $company->pie_factura ?? null }}" autocomplete="pie_factura" >
+
+                                @error('pie_factura')
                                 <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>

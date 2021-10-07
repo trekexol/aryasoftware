@@ -48,10 +48,10 @@ class PDFController extends Controller
                                             ->get();
 
                 foreach($payment_quotations as $var){
-                $var->payment_type = $this->asignar_payment_type($var->payment_type);
-                if($coin == 'dolares'){
-                    $var->amount = $var->amount / $var->rate;
-                }
+                    $var->payment_type = $this->asignar_payment_type($var->payment_type);
+                    if($coin == 'dolares'){
+                        $var->amount = $var->amount / $var->rate;
+                    }
                 }
 
 
@@ -64,7 +64,7 @@ class PDFController extends Controller
                                                                 ,'quotation_products.retiene_islr as retiene_islr_quotation')
                                                                 ->get(); 
 
-            
+                
                 if($coin == 'bolivares'){
                     $bcv = null;
                     

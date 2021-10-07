@@ -219,14 +219,26 @@
     <th style="text-align: right; font-weight: normal; width: 79%; border-bottom-color: white;">MONTO TOTAL</th>
     <th style="text-align: right; font-weight: normal; width: 21%;">{{ number_format($total , 2, ',', '.') }}</th>
   </tr> 
-  <tr>
-    <th style="text-align: right; font-weight: normal; width: 79%; border-bottom-color: white; font-size: small;">MONTO TOTAL Petro</th>
-    <th style="text-align: right; font-weight: normal; width: 21%;">{{ number_format($total_petro, 6, ',', '.') }}</th>
-  </tr> 
-  <tr>
-    <th style="text-align: left; font-weight: normal; width: 79%; border-top-color: rgb(17, 9, 9); border-right-color: white; font-size: small;"><pre>ESTA FACTURA VA SIN TACHADURAS NI ENMIENDAS        </pre></th>
-    <th style="text-align: right; font-weight: normal; width: 21%; "></th>
-  </tr> 
+  @if (isset($company->pie_nota))
+    <tr>
+      <th style="text-align: right; font-weight: normal; width: 79%; border-bottom-color: white; font-size: small;">MONTO TOTAL Petro</th>
+      <th style="text-align: right; font-weight: normal; width: 21%;">{{ number_format($total_petro, 6, ',', '.') }}</th>
+    </tr> 
+    <tr>
+      <th style="text-align: left; font-weight: normal; width: 79%; border-top-color: rgb(17, 9, 9); border-right-color: white; font-size: small;"><pre>ESTA FACTURA VA SIN TACHADURAS NI ENMIENDAS</pre></th>
+      <th style="text-align: right; font-weight: normal; width: 21%; "></th>
+    </tr> 
+  @else
+    <tr>
+      <th style="text-align: right; font-weight: normal; width: 79%; border-bottom-color: white; font-size: small;">MONTO TOTAL Petro</th>
+      <th style="text-align: right; font-weight: normal; width: 21%;">{{ number_format($total_petro, 6, ',', '.') }}</th>
+    </tr> 
+    <tr>
+      <th style="text-align: left; font-weight: normal; width: 79%; border-top-color: rgb(17, 9, 9); border-right-color: white; font-size: small;"></th>
+      <th style="text-align: right; font-weight: normal; width: 21%; "></th>
+    </tr> 
+  @endif
+  
   
   
   

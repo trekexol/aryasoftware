@@ -63,7 +63,6 @@ class CompaniesController extends Controller
             'Codigo'            =>'required|max:160',
             'Razon_Social'      =>'required|max:160',
             'phone'          =>'required|max:20',
-            'Franqueo_Postal'   =>'required|max:255',
             'Direccion'         =>'required|max:255',
             'Impuesto'          =>'required|max:255',
             'Impuesto_2'        =>'max:10',
@@ -106,6 +105,7 @@ class CompaniesController extends Controller
         $companies->period          = request('Periodo');
 
         $companies->status          = '1';
+        $companies->pie_factura     = request('pie_factura');
 
         $companies->save();
 
@@ -132,6 +132,8 @@ class CompaniesController extends Controller
         $companies->period          = request('Periodo');
 
         $companies->status          = '1';
+
+        $companies->pie_factura     = request('pie_factura');
 
         $companies->save();
         
