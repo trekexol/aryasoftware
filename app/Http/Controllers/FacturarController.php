@@ -386,6 +386,15 @@ class FacturarController extends Controller
         //P de por pagar
         $quotation->status = 'P';
 
+        $last_number = Quotation::on(Auth::user()->database_name)->where('number_invoice','<>',NULL)->orderBy('number_invoice','desc')->first();
+ 
+        //Asigno un numero incrementando en 1
+        if(isset($last_number)){
+            $quotation->number_invoice = $last_number->number_invoice + 1;
+        }else{
+            $quotation->number_invoice = 1;
+        }
+
         $quotation->save();
 
 
@@ -1467,6 +1476,19 @@ class FacturarController extends Controller
                 $this->add_movement($bcv,$header_voucher->id,$account_cuentas_por_cobrar->id,$quotation->id,$user_id,0,$sin_formato_grandtotal);
             }
             
+            
+            if(($quotation_status != 'C') && ($quotation_status != 'P')){
+                //Me busco el ultimo numero en notas de entrega
+                $last_number = Quotation::on(Auth::user()->database_name)->where('number_invoice','<>',NULL)->orderBy('number_invoice','desc')->first();
+
+                    
+                //Asigno un numero incrementando en 1
+                if(isset($last_number)){
+                    $quotation->number_invoice = $last_number->number_invoice + 1;
+                }else{
+                    $quotation->number_invoice = 1;
+                }
+            }
             /*Modifica la cotizacion */
             $quotation->date_billing = $datenow;
                 

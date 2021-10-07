@@ -18,7 +18,7 @@ class DeliveryNoteController extends Controller
         $user       =   auth()->user();
         $users_role =   $user->role_id;
         
-         $quotations = Quotation::on(Auth::user()->database_name)->orderBy('id' ,'DESC')
+         $quotations = Quotation::on(Auth::user()->database_name)->orderBy('number_delivery_note' ,'DESC')
                                  ->where('date_delivery_note','<>',null)
                                  ->where('date_billing',null)
                                  ->whereIn('status',[1,'M'])

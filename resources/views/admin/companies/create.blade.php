@@ -85,7 +85,7 @@
                             <label for="franqueo_postal" class="col-sm-2 col-form-label">Franqueo Postal(*)</label>
 
                             <div class="col-sm-4">
-                                <input id="franqueo_postal" type="text" class="form-control @error('franqueo_postal') is-invalid @enderror" name="Franqueo_Postal" value="{{ $company->franqueo_postal ?? '' }}" required autocomplete="franqueo_postal" >
+                                <input id="franqueo_postal" type="text" class="form-control @error('franqueo_postal') is-invalid @enderror" name="Franqueo_Postal" value="{{ $company->franqueo_postal ?? '' }}" autocomplete="franqueo_postal" >
 
                                 @error('franqueo_postal')
                                 <span class="invalid-feedback" role="alert">

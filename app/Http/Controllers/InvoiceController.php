@@ -28,7 +28,7 @@ class InvoiceController extends Controller
         $user       =   auth()->user();
         $users_role =   $user->role_id;
         
-         $quotations = Quotation::on(Auth::user()->database_name)->orderBy('id' ,'desc')
+         $quotations = Quotation::on(Auth::user()->database_name)->orderBy('number_invoice' ,'desc')
                                         ->where('date_billing','<>',null)
                                         ->get();
         

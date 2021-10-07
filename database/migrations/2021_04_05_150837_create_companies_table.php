@@ -22,7 +22,7 @@ class CreateCompaniesTable extends Migration
             $table->string('period',4);
             $table->string('phone',15);
             $table->string('address',500);
-            $table->string('franqueo_postal',15);
+            $table->string('franqueo_postal',15)->nullable();
             $table->decimal('tax_1',15,2)->default(0);
             $table->decimal('tax_2',15,2)->default(0);
             $table->decimal('tax_3',15,2)->default(0);

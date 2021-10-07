@@ -86,12 +86,12 @@
                                 <a href="{{ route('quotations.createdeliverynote',[$quotation->id,$quotation->coin])}}" title="Mostrar"><i class="fa fa-file-alt"></i></a>
                                 <a href="{{ route('quotations.reversarQuotation',$quotation->id)}}" title="Borrar"><i class="fa fa-trash text-danger"></i></a>
                            </td>
-                            <td class="text-center">{{ $quotation->id}}</td>
-                            <td class="text-center">{{ $quotation->clients['name']}}</td>
-                            <td class="text-center">{{ $quotation->vendors['name']}} {{ $quotation->vendors['surname']}}</td>
+                            <td class="text-center">{{ $quotation->number_delivery_note ?? $quotation->id ?? ''}}</td>
+                            <td class="text-center">{{ $quotation->clients['name'] ?? ''}}</td>
+                            <td class="text-center">{{ $quotation->vendors['name'] ?? ''}} {{ $quotation->vendors['surname'] ?? ''}}</td>
                             <td class="text-center">{{ $quotation->transports['placa'] ?? ''}}</td>
-                            <td class="text-center">{{ $quotation->date_quotation}}</td>
-                            <td class="text-center">{{ $quotation->date_delivery_note}}</td>
+                            <td class="text-center">{{ $quotation->date_quotation ?? ''}}</td>
+                            <td class="text-center">{{ $quotation->date_delivery_note ?? ''}}</td>
                         </tr>     
                     @endforeach   
                 @endif

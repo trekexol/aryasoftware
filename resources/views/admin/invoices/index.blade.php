@@ -94,11 +94,11 @@
                         <tr>
                             <td class="text-center font-weight-bold">{{$quotation->date_billing}}</td>
                             @if ($quotation->status == "X")
-                                <td class="text-center font-weight-bold">{{ $quotation->id }}
+                                <td class="text-center font-weight-bold">{{ $quotation->number_invoice }}
                                 </td>
                             @else
                                 <td class="text-center font-weight-bold">
-                                    <a href="{{ route('quotations.createfacturado',[$quotation->id,$quotation->coin ?? 'bolivares']) }}" title="Ver Factura" class="font-weight-bold text-dark">{{ $quotation->id }}</a>
+                                    <a href="{{ route('quotations.createfacturado',[$quotation->id,$quotation->coin ?? 'bolivares']) }}" title="Ver Factura" class="font-weight-bold text-dark">{{ $quotation->number_invoice }}</a>
                                 </td>
                             @endif
                             <td class="text-center font-weight-bold">{{ $quotation->clients['name']}}</td>

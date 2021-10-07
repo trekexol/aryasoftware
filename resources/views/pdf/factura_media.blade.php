@@ -28,7 +28,7 @@
 
 
   <br><br><br><br><br><br><br><br><br>
-  <h6 style="color: black">FACTURA NRO: {{ str_pad($quotation->id, 6, "0", STR_PAD_LEFT)}}</h6>
+  <h6 style="color: black">FACTURA NRO: {{ str_pad($quotation->number_invoice ?? $quotation->id, 6, "0", STR_PAD_LEFT)}}</h6>
 
  
    
