@@ -491,7 +491,10 @@
 
 
     function sendProduct(){
-        document.getElementById("formSendProduct").submit();
+        if(validacion()){
+            document.getElementById("formSendProduct").submit();
+        }
+        
     }
     function deliveryNoteSend() {
        
