@@ -397,10 +397,14 @@
                                     <div class="dropdown-menu animated--fade-in" aria-labelledby="dropdownMenuButton">
                                         
                                         <a href="{{ route('export',$expense->id) }}" class="dropdown-item bg-info text-white h5">Descargar Plantilla Excel</a> 
-                                        <a href="{{ route('export',$expense->id) }}" class="dropdown-item bg-info text-white h5">Descargar Guia Excel</a> 
-                                        <form method="POST" action="{{ route('import') }}" enctype="multipart/form-data" >
+                                        <a href="{{ route('export.guideaccount') }}" class="dropdown-item bg-dark text-white h5">Descargar Guia de Cuentas Excel</a> 
+                                        <a href="{{ route('export.guideinventory') }}" class="dropdown-item bg-success text-white h5">Descargar Guia de Inventario Excel</a> 
+                                        <form id="fileForm" method="POST" action="{{ route('import') }}" enctype="multipart/form-data" >
                                         @csrf
-                                            <input id="file" type="file" value="import" accept=".csv" name="file" class="file">
+                                            <input id="file" type="file" value="import" accept=".xlsx" name="file" class="file">
+                                            <input id="id_expense" type="hidden" class="form-control @error('id_expense') is-invalid @enderror" name="id_expense" value="{{ $expense->id ?? -1}}" readonly required autocomplete="id_expense"> 
+                                            <input id="coin_hidde" type="hidden" class="form-control @error('coin_hidde') is-invalid @enderror" name="coin_hidde" value="{{ $coin ?? 'bolivares'}}" readonly required autocomplete="coin_hidde">
+                                            
                                         </form>
                                     </div> 
                                 </div> 
@@ -516,10 +520,10 @@
             }          
             /*-------------------------------*/     
 
-            if(basename.slice(pos + 1) == 'csv'){
-
+            if(basename.slice(pos + 1) == 'xlsx'){
+                document.getElementById("fileForm").submit();
             }else{
-                alert("Solo puede cargar archivos .CSV");
+                alert("Solo puede cargar archivos .xlsx");
             }            
                
         });

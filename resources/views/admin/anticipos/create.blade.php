@@ -43,7 +43,7 @@
                                 <select  id="id_invoice"  name="id_invoice" class="form-control">
                                     <option selected >Seleccione una Factura</option>
                                     @foreach($invoices_to_pay as $invoice)
-                                            <option  value="{{$invoice->id}}">{{ $invoice->clients['name'] ?? ''}} - {{ $invoice->serie }}</option>
+                                            <option  value="{{$invoice->id}}">{{ $invoice->clients['name'] ?? ''}} - {{ $invoice->number_invoice ?? $invoice->number_delivery_note ?? '' }}/{{ $invoice->serie ?? ''}}</option>
                                     @endforeach
                                 </select>
                             </div>

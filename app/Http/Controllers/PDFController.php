@@ -292,6 +292,17 @@ class PDFController extends Controller
                  
 
                  if(!(isset($quotation->date_delivery_note))){
+                     
+                     //Me busco el ultimo numero en notas de entrega
+                    $last_number = Quotation::on(Auth::user()->database_name)->where('number_delivery_note','<>',NULL)->orderBy('number_delivery_note','desc')->first();
+
+                   
+                    //Asigno un numero incrementando en 1
+                    if(isset($last_number)){
+                        $quotation->number_delivery_note = $last_number->number_delivery_note + 1;
+                    }else{
+                        $quotation->number_delivery_note = 1;
+                    }
 
                     $retorno = $this->discount_inventory($id_quotation);
 

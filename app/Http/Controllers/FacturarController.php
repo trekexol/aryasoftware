@@ -301,9 +301,7 @@ class FacturarController extends Controller
                     $total_retiene_iva = ($retiene_iva * $client->percentage_retencion_iva) /100;
                 }*/
 
-            DB::connection(Auth::user()->database_name)->table('quotation_products')
-                ->where('id_quotation', '=', $quotation->id)
-                ->update(['status' => 'C']);
+            
                 
                 if($client->percentage_retencion_islr != 0){
                     $total_retiene_islr = ($retiene_islr * $client->percentage_retencion_islr) /100;
@@ -412,6 +410,10 @@ class FacturarController extends Controller
         $header_voucher->status =  "1";
     
         $header_voucher->save();
+
+        DB::connection(Auth::user()->database_name)->table('quotation_products')
+                ->where('id_quotation', '=', $quotation->id)
+                ->update(['status' => 'C']);
 
         
         /*DB::connection(Auth::user()->database_name)->table('anticipos')->where('id_client', '=', $quotation->id_client)

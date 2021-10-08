@@ -43,7 +43,7 @@
                                 <select  id="id_expense"  name="id_expense" class="form-control">
                                     <option selected value="-1">Seleccione una Gasto o Compra</option>
                                     @foreach($expenses as $expense)
-                                            <option  value="{{$expense->id}}">{{ $expense->providers['razon_social'] ?? ''}} - {{ $expense->serie }}</option>
+                                            <option  value="{{$expense->id}}">{{ $expense->providers['razon_social'] ?? ''}} - {{ $expense->serie ?? '' }}</option>
                                     @endforeach
                                 </select>
                             </div>
