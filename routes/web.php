@@ -781,7 +781,7 @@ Route::group(["prefix"=>'daily_listing'],function(){
 Route::group(["prefix"=>'reports'],function(){
     Route::get('accountsreceivable/{id_client?}','ReportController@index_accounts_receivable')->name('reports.accounts_receivable');
     Route::post('storeaccounts_receivable','ReportController@store_accounts_receivable')->name('reports.store_accounts_receivable');
-    Route::get('accounts_receivablepdf/{date_end}/{typeinvoice}/{id_client?}','ReportController@accounts_receivable_pdf')->name('reports.accounts_receivable_pdf');
+    Route::get('accounts_receivablepdf/{coin}/{date_end}/{typeinvoice}/{id_client?}','ReportController@accounts_receivable_pdf')->name('reports.accounts_receivable_pdf');
    
     Route::get('selectclient','ReportController@select_client')->name('reports.select_client');
 

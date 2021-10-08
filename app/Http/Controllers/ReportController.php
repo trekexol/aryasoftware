@@ -336,7 +336,7 @@ class ReportController extends Controller
         $type = request('type');
         $id_client = request('id_client');
         $typeinvoice = request('typeinvoice');
-
+        $coin = request('coin');
         $client = null;
 
         if($type != 'todo'){
@@ -346,7 +346,7 @@ class ReportController extends Controller
             }
         }
 
-        return view('admin.reports.index_accounts_receivable',compact('typeinvoice','date_end','client'));
+        return view('admin.reports.index_accounts_receivable',compact('coin','typeinvoice','date_end','client'));
     }
 
     public function store_debtstopay(Request $request)
@@ -531,7 +531,7 @@ class ReportController extends Controller
                  
     }
     
-    function accounts_receivable_pdf($date_end,$typeinvoice,$id_client = null)
+    function accounts_receivable_pdf($coin,$date_end,$typeinvoice,$id_client = null)
     {
         
         $pdf = App::make('dompdf.wrapper');
@@ -562,8 +562,8 @@ class ReportController extends Controller
                 ->where('quotations.date_quotation','<=',$date_consult)
                 ->where('quotations.date_delivery_note','<>',null)
                 ->where('quotations.id_client',$id_client)
-                ->select('quotations.date_quotation','quotations.id','quotations.serie','clients.name as name_client','quotations.amount','quotations.amount_with_iva', DB::raw('SUM(anticipos.amount) As amount_anticipo'))
-                ->groupBy('quotations.date_quotation','quotations.id','quotations.serie','clients.name','quotations.amount','quotations.amount_with_iva')
+                ->select('quotations.bcv','quotations.date_quotation','quotations.id','quotations.serie','clients.name as name_client','quotations.amount','quotations.amount_with_iva', DB::raw('SUM(anticipos.amount) As amount_anticipo'))
+                ->groupBy('quotations.bcv','quotations.date_quotation','quotations.id','quotations.serie','clients.name','quotations.amount','quotations.amount_with_iva')
                 ->get();
             }else if(isset($typeinvoice) && ($typeinvoice == 'facturas')){
                 $quotations = DB::connection(Auth::user()->database_name)->table('quotations')
@@ -574,8 +574,8 @@ class ReportController extends Controller
                 ->where('quotations.date_quotation','<=',$date_consult)
                 ->where('quotations.date_billing','<>',null)
                 ->where('quotations.id_client',$id_client)
-                ->select('quotations.date_quotation','quotations.id','quotations.serie','clients.name as name_client','quotations.amount','quotations.amount_with_iva', DB::raw('SUM(anticipos.amount) As amount_anticipo'))
-                ->groupBy('quotations.date_quotation','quotations.id','quotations.serie','clients.name','quotations.amount','quotations.amount_with_iva')
+                ->select('quotations.bcv','quotations.date_quotation','quotations.id','quotations.serie','clients.name as name_client','quotations.amount','quotations.amount_with_iva', DB::raw('SUM(anticipos.amount) As amount_anticipo'))
+                ->groupBy('quotations.bcv','quotations.date_quotation','quotations.id','quotations.serie','clients.name','quotations.amount','quotations.amount_with_iva')
                 ->get();
             }else
             {
@@ -586,8 +586,8 @@ class ReportController extends Controller
                                     ->where('quotations.amount','<>',null)
                                     ->where('quotations.date_quotation','<=',$date_consult)
                                     ->where('quotations.id_client',$id_client)
-                                    ->select('quotations.date_quotation','quotations.id','quotations.serie','clients.name as name_client','quotations.amount','quotations.amount_with_iva', DB::raw('SUM(anticipos.amount) As amount_anticipo'))
-                                    ->groupBy('quotations.date_quotation','quotations.id','quotations.serie','clients.name','quotations.amount','quotations.amount_with_iva')
+                                    ->select('quotations.bcv','quotations.date_quotation','quotations.id','quotations.serie','clients.name as name_client','quotations.amount','quotations.amount_with_iva', DB::raw('SUM(anticipos.amount) As amount_anticipo'))
+                                    ->groupBy('quotations.bcv','quotations.date_quotation','quotations.id','quotations.serie','clients.name','quotations.amount','quotations.amount_with_iva')
                                     ->get();
             }
         }else{
@@ -599,8 +599,8 @@ class ReportController extends Controller
                 ->where('quotations.amount','<>',null)
                 ->where('quotations.date_quotation','<=',$date_consult)
                 ->where('quotations.date_delivery_note','<>',null)
-                ->select('quotations.date_quotation','quotations.id','quotations.serie','clients.name as name_client','quotations.amount','quotations.amount_with_iva', DB::raw('SUM(anticipos.amount) As amount_anticipo'))
-                ->groupBy('quotations.date_quotation','quotations.id','quotations.serie','clients.name','quotations.amount','quotations.amount_with_iva')
+                ->select('quotations.bcv','quotations.date_quotation','quotations.id','quotations.serie','clients.name as name_client','quotations.amount','quotations.amount_with_iva', DB::raw('SUM(anticipos.amount) As amount_anticipo'))
+                ->groupBy('quotations.bcv','quotations.date_quotation','quotations.id','quotations.serie','clients.name','quotations.amount','quotations.amount_with_iva')
                 ->get();
             }else if(isset($typeinvoice) && ($typeinvoice == 'facturas')){
                 $quotations = DB::connection(Auth::user()->database_name)->table('quotations')
@@ -610,8 +610,8 @@ class ReportController extends Controller
                 ->where('quotations.amount','<>',null)
                 ->where('quotations.date_quotation','<=',$date_consult)
                 ->where('quotations.date_billing','<>',null)
-                ->select('quotations.date_quotation','quotations.id','quotations.serie','clients.name as name_client','quotations.amount','quotations.amount_with_iva', DB::raw('SUM(anticipos.amount) As amount_anticipo'))
-                ->groupBy('quotations.date_quotation','quotations.id','quotations.serie','clients.name','quotations.amount','quotations.amount_with_iva')
+                ->select('quotations.bcv','quotations.date_quotation','quotations.id','quotations.serie','clients.name as name_client','quotations.amount','quotations.amount_with_iva', DB::raw('SUM(anticipos.amount) As amount_anticipo'))
+                ->groupBy('quotations.bcv','quotations.date_quotation','quotations.id','quotations.serie','clients.name','quotations.amount','quotations.amount_with_iva')
                 ->get();
             }else
             {
@@ -621,13 +621,13 @@ class ReportController extends Controller
                                     ->whereIn('quotations.status',[1,'P'])
                                     ->where('quotations.amount','<>',null)
                                     ->where('quotations.date_quotation','<=',$date_consult)
-                                    ->select('quotations.date_quotation','quotations.id','quotations.serie','clients.name as name_client','quotations.amount','quotations.amount_with_iva', DB::raw('SUM(anticipos.amount) As amount_anticipo'))
-                                    ->groupBy('quotations.date_quotation','quotations.id','quotations.serie','clients.name','quotations.amount','quotations.amount_with_iva')
+                                    ->select('quotations.bcv','quotations.date_quotation','quotations.id','quotations.serie','clients.name as name_client','quotations.amount','quotations.amount_with_iva', DB::raw('SUM(anticipos.amount) As amount_anticipo'))
+                                    ->groupBy('quotations.bcv','quotations.date_quotation','quotations.id','quotations.serie','clients.name','quotations.amount','quotations.amount_with_iva')
                                     ->get();
             }
         }
         
-        $pdf = $pdf->loadView('admin.reports.accounts_receivable',compact('quotations','datenow','date_end'));
+        $pdf = $pdf->loadView('admin.reports.accounts_receivable',compact('coin','quotations','datenow','date_end'));
         return $pdf->stream();
                  
     }

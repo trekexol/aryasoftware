@@ -804,8 +804,7 @@ class QuotationController extends Controller
             $detail = DetailVoucher::on(Auth::user()->database_name)->where('id_invoice',$id_quotation)
             ->update(['status' => 'X']);
 
-
-            /* DB::connection(Auth::user()->database_name)->table('detail_vouchers')
+             /*DB::connection(Auth::user()->database_name)->table('detail_vouchers')
             ->join('header_vouchers', 'header_vouchers.id','=','detail_vouchers.id_header_voucher')
             ->join('multipayment_expenses', 'multipayment_expenses.id_header','=','header_vouchers.id')
             ->where('multipayment_expenses.id_expense','=',$id_quotation)
@@ -819,6 +818,8 @@ class QuotationController extends Controller
             QuotationPayment::on(Auth::user()->database_name)
                             ->where('id_quotation',$quotation->id)
                             ->update(['status' => 'X']);
+
+            
 
             $quotation->status = 'X';
             $quotation->save();

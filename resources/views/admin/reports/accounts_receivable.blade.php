@@ -40,7 +40,7 @@
 <table style="width: 100%;">
   <tr>
     <th style="text-align: center; ">Fecha</th>
-    <th style="text-align: center; ">N° Factura</th>
+    <th style="text-align: center; ">N°</th>
     <th style="text-align: center; ">Razon Rocial</th>
     <th style="text-align: center; ">N° Serie</th>
     <th style="text-align: center; ">Total</th>
@@ -50,13 +50,24 @@
   @foreach ($quotations as $quotation)
     <?php 
     
-    $por_cobrar = ($quotation->amount_with_iva ?? 0) - ($quotation->amount_anticipo ?? 0);
-    $total_por_cobrar += $por_cobrar;
-    $total_por_facturar += $quotation->amount_with_iva;
+      if(isset($coin) && $coin != 'bolivares'){
+
+        $quotation->amount_with_iva = ($quotation->amount_with_iva ?? 0) / ($quotation->bcv ?? 1);
+        $quotation->amount_anticipo = ($quotation->amount_anticipo ?? 0) / ($quotation->bcv ?? 1);
+
+        $por_cobrar = (($quotation->amount_with_iva ?? 0) - ($quotation->amount_anticipo ?? 0));
+        $total_por_cobrar += $por_cobrar;
+        $total_por_facturar += $quotation->amount_with_iva;
+      }else{
+        $por_cobrar = ($quotation->amount_with_iva ?? 0) - ($quotation->amount_anticipo ?? 0);
+        $total_por_cobrar += $por_cobrar;
+        $total_por_facturar += $quotation->amount_with_iva;
+      }
+    
     ?>
     <tr>
       <th style="text-align: center; font-weight: normal;">{{ $quotation->date_quotation ?? ''}}</th>
-      <th style="text-align: center; font-weight: normal;">{{ $quotation->id ?? ''}}</th>
+      <th style="text-align: center; font-weight: normal;">{{ $quotation->number_invoice ?? $quotation->number_delivery_note ?? $quotation->id ?? ''}}</th>
       <th style="text-align: center; font-weight: normal;">{{ $quotation->name_client ?? ''}}</th>
       <th style="text-align: center; font-weight: normal;">{{ $quotation->serie ?? ''}}</th>
       <th style="text-align: right; font-weight: normal;">{{ number_format(($quotation->amount_with_iva ?? 0), 2, ',', '.') }}</th>

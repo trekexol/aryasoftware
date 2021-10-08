@@ -36,7 +36,19 @@
                             <div id="client_label3" class="form-group col-sm-1">
                                 <a href="{{ route('reports.select_client') }}" title="Seleccionar Cliente"><i class="fa fa-eye"></i></a>  
                             </div>
-                            
+                            <div class="col-sm-2">
+                                <select class="form-control" name="coin" id="coin">
+                                    @if(isset($coin))
+                                        <option disabled selected value="{{ $coin }}">{{ $coin }}</option>
+                                        <option disabled  value="{{ $coin }}">-----------</option>
+                                    @else
+                                        <option disabled selected value="bolivares">Moneda</option>
+                                    @endif
+                                    
+                                    <option  value="bolivares">Bolívares</option>
+                                    <option value="dolares">Dólares</option>
+                                </select>
+                            </div>
                             <div class="col-sm-1">
                             <button type="submit" class="btn btn-primary ">
                                 Buscar
@@ -80,7 +92,7 @@
                         </div>
                     </form>
                         <div class="embed-responsive embed-responsive-16by9">
-                            <iframe class="embed-responsive-item" src="{{ route('reports.accounts_receivable_pdf',[$date_end ?? $datenow,$typeinvoice ?? 'todo',$client->id ?? null]) }}" allowfullscreen></iframe>
+                            <iframe class="embed-responsive-item" src="{{ route('reports.accounts_receivable_pdf',[$coin ?? 'bolivares',$date_end ?? $datenow,$typeinvoice ?? 'todo',$client->id ?? null]) }}" allowfullscreen></iframe>
                           </div>
                         
                         </div>
