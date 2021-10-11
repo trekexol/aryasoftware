@@ -38,17 +38,28 @@
                         </div>
                         @if (isset($invoices_to_pay) && (count($invoices_to_pay)>0))
                         <div class="form-group row">
-                            <label for="clients" class="col-md-3 col-form-label text-md-right">Facturas</label>
+                            <label for="clients" class="col-md-3 col-form-label text-md-right">Factura/Nota de E.</label>
                             <div class="col-md-6">
-                                <select  id="id_invoice"  name="id_invoice" class="form-control">
-                                    <option selected >Seleccione una Factura</option>
+                                <select  id="id_invoice"  name="id_invoice" class="form-control" width="20">
+                                    <option selected value="">Anticipo al Cliente</option>
                                     @foreach($invoices_to_pay as $invoice)
-                                            <option  value="{{$invoice->id}}">{{ $invoice->clients['name'] ?? ''}} - {{ $invoice->number_invoice ?? $invoice->number_delivery_note ?? '' }}/{{ $invoice->serie ?? ''}}</option>
+                                    
+                                    <?php
+                                    if ($invoice->number_invoice > 0){
+                                    $num_fac = 'Factura: '.$invoice->number_invoice;
+                                    }
+                                    if ($invoice->number_delivery_note > 0){
+                                    $num_fac = 'Nota de Entrega: '.$invoice->number_delivery_note;
+                                    }
+                                    ?>
+                                        <option  value="{{$invoice->id}}"> {{$num_fac ?? ''}} - Ctrl/Serie: {{ $invoice->serie ?? ''}} - {{ $invoice->observation ?? ''}}</option>
                                     @endforeach
+
                                 </select>
                             </div>
                         </div>
                         @endif
+                        
                         <div class="form-group row">
                             <label for="clients" class="col-md-3 col-form-label text-md-right">Cuentas</label>
                             <div class="col-md-6">

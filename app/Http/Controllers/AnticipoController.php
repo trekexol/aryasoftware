@@ -213,6 +213,7 @@ class AnticipoController extends Controller
             //si la tasa es fija
             $bcv = $company->rate;
         }
+
         
         return view('admin.anticipos.create',compact('datenow','client','accounts','bcv','invoices_to_pay'));
    }
@@ -250,10 +251,13 @@ class AnticipoController extends Controller
         }
         
         $id_invoice = request('id_invoice');
-        if(isset($id_invoice) &&  $id_invoice != -1){
+
+        if(isset($id_invoice)){
             $var->id_quotation = request('id_invoice');
             $quotation =  Quotation::on(Auth::user()->database_name)->findOrFail($var->id_quotation);
             $var->id_client = $quotation->id_client;
+        } else {
+            $var->id_quotation = null;   
         }
 
         $var->id_account = request('id_account');

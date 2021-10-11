@@ -23,4 +23,8 @@ class Quotation extends Model
     public function anticipos() {
         return $this->hasMany('App\Anticipo');   
     }
+
+    public function datails() {
+        return $this->hasMany('App\DetailVoucher');   
+    }
 }

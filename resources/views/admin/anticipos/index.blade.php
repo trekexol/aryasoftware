@@ -55,7 +55,7 @@
         @if (Auth::user()->role_id  == '1' || Auth::user()->role_id  == '2' )
         <div class="col-md-3">
             <a href="{{ route('anticipos.create')}}" class="btn btn-primary" role="button" aria-pressed="true">Registrar un Anticipo</a>
-         
+
         </div>
         @endif
        
@@ -97,14 +97,30 @@
                         if($anticipo->coin != 'bolivares'){
                             $anticipo->amount = $anticipo->amount / $anticipo->rate;
                         }
+
+
+
+
+                        if (isset($anticipo->quotations['number_invoice'])) {
+                            
+                            $num_fac = 'Factura: '.$anticipo->quotations['number_invoice'].' Ctrl/Serie: '.$anticipo->quotations['serie'];
+
+                        } else {
+
+                            if (isset($anticipo->quotations['number_delivery_note'])) {
+                            
+                            $num_fac = 'Nota de Entrega: '.$anticipo->quotations['number_delivery_note'].' Ctrl/Serie: '.$anticipo->quotations['serie'];
+                            
+                            } else {
+
+                                $num_fac = '';
+                            }
+                        }
+
                     ?>
                     <tr>
-                        @if (isset($anticipo->quotations['serie']))
-                            <td class="text-center">{{$anticipo->clients['name'] ?? ''}} , fact({{$anticipo->quotations['serie'] ?? ''}})</td>
-                        @else
-                            <td class="text-center">{{$anticipo->clients['name'] ?? ''}}</td>
-                        @endif
-                    
+                       
+                    <td class="text-center">{{$anticipo->clients['name'] ?? ''}}<br>{{$num_fac}}</td>
                     <td class="text-center">{{$anticipo->accounts['description'] ?? ''}}</td>
                     <td class="text-center">{{$anticipo->date ?? ''}}</td>
                     <td class="text-center">{{$anticipo->reference ?? ''}}</td>

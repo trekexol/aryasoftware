@@ -544,7 +544,10 @@ Route::group(["prefix"=>'invoices'],function(){
     Route::get('previousexercise/{date_begin}/{date_end}','PDFController@print_previousexercise')->name('pdf.previousexercise');
     
     Route::get('deliverynoteexpense/{id_expense}/{coin}/{iva}/{date}','PDFController@deliverynote_expense')->name('pdf.deliverynote_expense');
- });
+ 
+    Route::get('order/{id_quotation}/{coin}/{iva}/{date}','PDFController@order')->name('pdf.order');
+    
+});
 
 
  Route::group(["prefix"=>'tasas'],function(){
@@ -885,3 +888,11 @@ Route::group(["prefix"=>'export'],function(){
 
     Route::post('expenseimport','ExcelController@import')->name('import');
   });
+
+  Route::group(["prefix"=>'orders'],function(){
+    Route::get('/','OrderController@index')->name('orders.index');
+    Route::get('order/{id_quotation}/{coin}','OrderController@create_order')->name('orders.create_order');
+  });
+
+  
+  

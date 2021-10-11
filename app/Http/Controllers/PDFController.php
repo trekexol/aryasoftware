@@ -172,10 +172,13 @@ class PDFController extends Controller
                         $quotation->number_delivery_note = 1;
                     }
 
-                    $retorno = $this->discount_inventory($id_quotation);
+                    //Si ya se hizo un pedido, ya se desconto del inventario
+                    if(!(isset($quotation->date_order))){
+                        $retorno = $this->discount_inventory($id_quotation);
 
-                    if($retorno != 'exito'){
-                        return redirect('quotations/register/'.$id_quotation.'/'.$coin.'')->withDanger($retorno);                     
+                        if($retorno != 'exito'){
+                            return redirect('quotations/register/'.$id_quotation.'/'.$coin.'')->withDanger($retorno);                     
+                        }
                     }
 
                  }else{
@@ -278,6 +281,139 @@ class PDFController extends Controller
         
     }
 
+    function order($id_quotation,$coin,$iva,$date)
+    {
+      
+
+        $pdf = App::make('dompdf.wrapper');
+    
+             $quotation = null;
+                 
+            if(isset($id_quotation)){
+                 $quotation = Quotation::on(Auth::user()->database_name)->findOrFail($id_quotation);
+                
+                 
+
+                 if(!(isset($quotation->date_order))){
+
+                    //Me busco el ultimo numero en notas de entrega
+                    $last_number = Quotation::on(Auth::user()->database_name)->where('number_delivery_note','<>',NULL)->orderBy('number_delivery_note','desc')->first();
+                   
+                    //Asigno un numero incrementando en 1
+                    if(isset($last_number)){
+                        $quotation->number_delivery_note = $last_number->number_delivery_note + 1;
+                    }else{
+                        $quotation->number_delivery_note = 1;
+                    }
+                    if(!(isset($quotation->date_delivery_note))){
+                        $retorno = $this->discount_inventory($id_quotation);
+
+                        if($retorno != 'exito'){
+                            return redirect('quotations/register/'.$id_quotation.'/'.$coin.'')->withDanger($retorno);                     
+                        }
+                    }
+                        
+
+                 }else{
+                    if(isset($quotation->bcv)){
+                        $bcv = $quotation->bcv;
+                     }
+                 }
+                 
+                                     
+            }else{
+                return redirect('/quotations')->withDanger('No llega el numero de la cotizacion');
+            } 
+     
+             if(isset($quotation)){
+               
+                $inventories_quotations = DB::connection(Auth::user()->database_name)->table('products')->join('inventories', 'products.id', '=', 'inventories.product_id')
+                                                                ->join('quotation_products', 'inventories.id', '=', 'quotation_products.id_inventory')
+                                                                ->where('quotation_products.id_quotation',$quotation->id)
+                                                                ->select('products.*','quotation_products.price as price','quotation_products.rate as rate','quotation_products.discount as discount',
+                                                                'quotation_products.amount as amount_quotation','quotation_products.retiene_iva as retiene_iva_quotation'
+                                                                ,'quotation_products.retiene_islr as retiene_islr_quotation')
+                                                                ->get(); 
+
+                $total= 0;
+                $base_imponible= 0;
+                $price_cost_total= 0;
+
+                //este es el total que se usa para guardar el monto de todos los productos que estan exentos de iva, osea retienen iva
+                $total_retiene_iva = 0;
+                $retiene_iva = 0;
+
+                $total_retiene_islr = 0;
+                $retiene_islr = 0;
+
+                foreach($inventories_quotations as $var){
+                    //Se calcula restandole el porcentaje de descuento (discount)
+                    $percentage = (($var->price * $var->amount_quotation) * $var->discount)/100;
+
+                    $total += ($var->price * $var->amount_quotation) - $percentage;
+                    //----------------------------- 
+
+                    if($var->retiene_iva_quotation == 0){
+
+                        $base_imponible += ($var->price * $var->amount_quotation) - $percentage; 
+
+                    }
+
+                    if($var->retiene_islr_quotation == 1){
+
+                        $retiene_islr += ($var->price * $var->amount_quotation) - $percentage; 
+
+                    }
+
+                
+                }
+                
+                $quotation->amount = $total;
+                $quotation->base_imponible = $base_imponible;
+                $quotation->amount_iva = $base_imponible * $quotation->iva_percentage / 100;
+                $quotation->amount_with_iva = $quotation->amount + $quotation->amount_iva;
+                $quotation->iva_percentage = $iva;
+                $quotation->date_order = $date;
+                $quotation->save();
+
+
+                $quotation->total_factura = $total;
+                //$quotation->base_imponible = $base_imponible;
+
+                
+                $date = Carbon::now();
+                $datenow = $date->format('Y-m-d');    
+                $anticipos_sum = 0;
+                if(isset($coin)){
+                    if($coin == 'bolivares'){
+                        $bcv = null;
+                    }else{
+                        $bcv = $quotation->bcv;
+                    }
+                }else{
+                    $bcv = null;
+                }
+
+
+                /*Aqui revisamos el porcentaje de retencion de iva que tiene el cliente, para aplicarlo a productos que retengan iva */
+                $client = Client::on(Auth::user()->database_name)->find($quotation->id_client);
+
+                
+                $company = Company::on(Auth::user()->database_name)->find(1);
+                
+                $pdf = $pdf->loadView('pdf.order',compact('quotation','inventories_quotations','bcv','company'
+                                                                ,'total_retiene_iva','total_retiene_islr'));
+                return $pdf->stream();
+         
+            }else{
+                return redirect('/invoices')->withDanger('La nota de entrega no existe');
+            } 
+             
+        
+
+        
+    }
+
     function deliverynotemediacarta($id_quotation,$coin,$iva,$date)
     {
       
@@ -304,10 +440,13 @@ class PDFController extends Controller
                         $quotation->number_delivery_note = 1;
                     }
 
-                    $retorno = $this->discount_inventory($id_quotation);
+                     //Si ya se hizo un pedido, ya se desconto del inventario
+                     if(!(isset($quotation->date_order))){
+                        $retorno = $this->discount_inventory($id_quotation);
 
-                    if($retorno != 'exito'){
-                        return redirect('quotations/register/'.$id_quotation.'/'.$coin.'')->withDanger($retorno);                     
+                        if($retorno != 'exito'){
+                            return redirect('quotations/register/'.$id_quotation.'/'.$coin.'')->withDanger($retorno);                     
+                        }
                     }
 
                  }else{

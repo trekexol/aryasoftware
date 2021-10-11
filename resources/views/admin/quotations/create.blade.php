@@ -386,8 +386,10 @@
                                 <div class="col-md-4">
                                     @if($suma == 0)
                                         <a onclick="validate()" id="btnfacturar" name="btnfacturar" class="btn btn-success" title="facturar">Facturar</a>  
+                                        <a onclick="validate()" id="btnorder" name="btnorder" class="btn btn-danger" title="order">Pedido</a>  
                                     @else
                                         <a href="{{ route('quotations.createfacturar',[$quotation->id,$coin]) }}" id="btnfacturar" name="btnfacturar" class="btn btn-success" title="facturar">Facturar</a>  
+                                        <a href="{{ route('orders.create_order',[$quotation->id,$coin]) }}" id="btnorder" name="btnorder" class="btn btn-danger" title="order">Pedido</a>  
                                     @endif
                                 </div>
                                

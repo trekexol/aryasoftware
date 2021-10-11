@@ -27,9 +27,8 @@
 <body>
 
   <br>
-  <h2 style="color: black; text-align: center">CUENTAS POR COBRAR</h2>
-  <br>
-  <h2 style="color: black; text-align: center">Fecha de Emisión: {{ $date_end ?? $datenow ?? '' }}</h2>
+  <h4 style="color: black; text-align: center">CUENTAS POR COBRAR</h4>
+  <h5 style="color: black; text-align: center">Fecha de Emisión: {{ $date_end ?? $datenow ?? '' }}</h5>
    
   <?php 
     
@@ -39,13 +38,15 @@
   ?>
 <table style="width: 100%;">
   <tr>
-    <th style="text-align: center; ">Fecha</th>
-    <th style="text-align: center; ">N°</th>
-    <th style="text-align: center; ">Razon Rocial</th>
-    <th style="text-align: center; ">N° Serie</th>
-    <th style="text-align: center; ">Total</th>
-    <th style="text-align: center; ">Abono</th>
-    <th style="text-align: center; ">Por Cobrar</th>
+    <th style="text-align: center; width:9%;">Fecha</th>
+    <th style="text-align: center; width:12%;">Tipo</th>
+    <th style="text-align: center; width:5%;">N°</th>
+    <th style="text-align: center; width:1%;">Ctrl/Serie</th>
+    <th style="text-align: center; width:22%;">Cliente</th>
+    <th style="text-align: center;">Vendedor</th>
+    <th style="text-align: center;">Total</th>
+    <th style="text-align: center;">Abono</th>
+    <th style="text-align: center;">Por Cobrar</th>
   </tr> 
   @foreach ($quotations as $quotation)
     <?php 
@@ -63,13 +64,23 @@
         $total_por_cobrar += $por_cobrar;
         $total_por_facturar += $quotation->amount_with_iva;
       }
+      $tipo = '';
+    if ($quotation->number_invoice > 0){
+    $tipo = 'Factura';
+    }
+
+    if ($quotation->number_delivery_note > 0) {
+    $tipo = 'Nota de Entrega';
+    }
     
     ?>
     <tr>
       <th style="text-align: center; font-weight: normal;">{{ $quotation->date_quotation ?? ''}}</th>
-      <th style="text-align: center; font-weight: normal;">{{ $quotation->number_invoice ?? $quotation->number_delivery_note ?? $quotation->id ?? ''}}</th>
-      <th style="text-align: center; font-weight: normal;">{{ $quotation->name_client ?? ''}}</th>
+      <th style="text-align: center; font-weight: normal;">{{ $tipo }}</th>
+      <th style="text-align: center; font-weight: normal;">{{ $quotation->number_invoice ?? $quotation->number_delivery_note}}</th>
       <th style="text-align: center; font-weight: normal;">{{ $quotation->serie ?? ''}}</th>
+      <th style="text-align: center; font-weight: normal;">{{ $quotation->name_client ?? ''}}</th>
+      <th style="text-align: center; font-weight: normal;">{{''}}</th>
       <th style="text-align: right; font-weight: normal;">{{ number_format(($quotation->amount_with_iva ?? 0), 2, ',', '.') }}</th>
       <th style="text-align: right; font-weight: normal;">{{ number_format(($quotation->amount_anticipo ?? 0), 2, ',', '.') }}</th>
       <th style="text-align: right; font-weight: normal;">{{ number_format($por_cobrar, 2, ',', '.') }}</th>
@@ -77,6 +88,8 @@
   @endforeach 
 
   <tr>
+    <th style="text-align: center; font-weight: normal; border-color: white;"></th>
+    <th style="text-align: center; font-weight: normal; border-color: white;"></th>
     <th style="text-align: center; font-weight: normal; border-color: white;"></th>
     <th style="text-align: center; font-weight: normal; border-color: white;"></th>
     <th style="text-align: center; font-weight: normal; border-color: white;"></th>

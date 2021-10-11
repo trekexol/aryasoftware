@@ -89,7 +89,7 @@
                             <td class="text-center font-weight-bold">{{$payment_quotation->created_at->format('d-m-Y')}}</td>
                             
                             <td class="text-center font-weight-bold">
-                                <a href="{{ route('payments.movement',$payment_quotation->id_quotation) }}" title="Ver Movimiento" class="font-weight-bold text-dark">{{ $payment_quotation->id }}</a>
+                                <a href="{{ route('payments.movement',$payment_quotation->id_quotation ?? -1) }}" title="Ver Movimiento" class="font-weight-bold text-dark">{{ $payment_quotation->id }}</a>
                             </td>
                             
                             <td class="text-center font-weight-bold">{{ $payment_quotation->reference}}</td>
@@ -97,7 +97,7 @@
                             <td class="text-right font-weight-bold">{{number_format($payment_quotation->amount, 2, ',', '.')}}</td>
                             <td class="text-center">
                                 <a href="#" onclick="pdf({{ $payment_quotation->id }});" title="Mostrar"><i class="fa fa-file-alt"></i></a>
-                                <a href="#"  class="delete" title="Borrar" data-id-quotation={{$payment_quotation->id_quotation}} data-toggle="modal" data-target="#deleteModal"><i class="fa fa-trash text-danger"></i></a>                        
+                                <a href="#"  class="delete" title="Borrar" data-id-quotation={{$payment_quotation->id_quotation ?? -1}} data-toggle="modal" data-target="#deleteModal"><i class="fa fa-trash text-danger"></i></a>                        
                             </td>
                             
                         </tr>     

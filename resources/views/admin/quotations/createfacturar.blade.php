@@ -40,7 +40,29 @@
                         <input type="hidden" id="total_mercancia_credit" name="total_mercancia_credit" value="{{$total_mercancia ?? 0 / ($bcv ?? 1)}}" readonly>
                         <input type="hidden" id="total_servicios_credit" name="total_servicios_credit" value="{{$total_servicios ?? 0 / ($bcv ?? 1)}}" readonly>
 
-                        
+                        <div class="form-group row">
+                            <label for="date-begin" class="col-md-2 col-form-label text-md-right">Fecha:</label>
+                            <div class="col-md-3">
+                                <input id="date-begin" type="date" class="form-control @error('date-begin') is-invalid @enderror" name="date-begin" value="{{ $quotation->date_billing ?? $quotation->date_delivery_note ?? $datenow }}" autocomplete="date-begin">
+    
+                                @error('date')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                            <label for="date-payment" class="col-md-3 col-form-label text-md-right">Fecha del Pago:</label>
+                            <div class="col-md-3">
+                                <input id="date-payment" type="date" class="form-control @error('date-payment') is-invalid @enderror" name="date-payment" value="{{ $datenow }}" autocomplete="date-payment">
+    
+                                @error('date')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
                         <div class="form-group row">
                             <label for="cedula_rif" class="col-md-2 col-form-label text-md-right">CI/Rif Cliente:</label>
                             <div class="col-md-4">
@@ -260,6 +282,10 @@
                 @csrf   
 
                         <input type="hidden" name="id_quotation" value="{{$quotation->id}}" readonly>
+
+                        <input type="hidden" id="date-begin-form" name="date-begin-form" value="{{$quotation->date_billing ?? $quotation->date_delivery_note ?? $datenow}}" readonly>
+
+                        <input type="hidden" id="date-payment-form" name="date-payment-form" value="{{$datenow}}" readonly>
 
                         <input type="hidden" name="coin" value="{{$coin}}" readonly>
 
@@ -867,11 +893,21 @@
             
         });
         $("#coin").on('change',function(){
-                coin = $(this).val();
-                window.location = "{{route('quotations.createfacturar', [$quotation->id,''])}}"+"/"+coin;
-            });
+            coin = $(this).val();
+            window.location = "{{route('quotations.createfacturar', [$quotation->id,''])}}"+"/"+coin;
+        });
 
-            $("body").toggleClass("sidebar-toggled");
+        $("#date-begin").on('change',function(){
+            document.getElementById("date-begin-form").value = $(this).val();
+            
+        });
+
+        $("#date-payment").on('change',function(){
+            document.getElementById("date-payment-form").value = $(this).val();
+            
+        });
+
+        $("body").toggleClass("sidebar-toggled");
         $(".sidebar").toggleClass("toggled");
         if ($(".sidebar").hasClass("toggled")) {
             $('.sidebar .collapse').collapse('hide');

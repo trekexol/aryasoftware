@@ -1008,11 +1008,9 @@ class InvoiceController extends Controller
             $header_voucher->status =  "1";
         
             $header_voucher->save();
-
-                
-
             
             if($validate_boolean1 == true){
+                $var->id_quotation = $id_quotation;
                 $var->save();
 
                 foreach($facturas_a_procesar as $key => $id_factura){
@@ -1028,15 +1026,15 @@ class InvoiceController extends Controller
             }
             
             if($validate_boolean2 == true){
+                $var2->id_quotation = $id_quotation;
                 $var2->save();
 
-                
-               
                 $this->add_pay_movement($bcv,$payment_type2,$header_voucher->id,$var2->id_account,$user_id,$var2->amount,0);
                 
             }
             
             if($validate_boolean3 == true){
+                $var3->id_quotation = $id_quotation;
                 $var3->save();
 
                 
@@ -1046,24 +1044,28 @@ class InvoiceController extends Controller
                 
             }
             if($validate_boolean4 == true){
+                $var4->id_quotation = $id_quotation;
                 $var4->save();
 
                 $this->add_pay_movement($bcv,$payment_type4,$header_voucher->id,$var4->id_account,$user_id,$var4->amount,0);
             
             }
             if($validate_boolean5 == true){
+                $var5->id_quotation = $id_quotation;
                 $var5->save();
 
                 $this->add_pay_movement($bcv,$payment_type5,$header_voucher->id,$var5->id_account,$user_id,$var5->amount,0);
              
             }
             if($validate_boolean6 == true){
+                $var6->id_quotation = $id_quotation;
                 $var6->save();
 
                 $this->add_pay_movement($bcv,$payment_type6,$header_voucher->id,$var6->id_account,$user_id,$var6->amount,0);
             
             }
             if($validate_boolean7 == true){
+                $var7->id_quotation = $id_quotation;
                 $var7->save();
 
                 $this->add_pay_movement($bcv,$payment_type7,$header_voucher->id,$var7->id_account,$user_id,$var7->amount,0);

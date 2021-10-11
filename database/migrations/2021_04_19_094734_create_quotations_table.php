@@ -21,12 +21,14 @@ class CreateQuotationsTable extends Migration
             $table->unsignedBigInteger('id_user');
             $table->bigInteger('number_invoice')->nullable();
             $table->bigInteger('number_delivery_note')->nullable();
+            $table->bigInteger('number_order')->nullable();
 
             $table->string('serie',30)->nullable();
             
             $table->date('date_quotation');
             $table->date('date_billing')->nullable();
             $table->date('date_delivery_note')->nullable();
+            $table->date('date_order')->nullable();
 
             $table->decimal('anticipo',64,2)->nullable();
             $table->integer('iva_percentage')->nullable();

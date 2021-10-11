@@ -365,7 +365,10 @@ class FacturarController extends Controller
         $date = Carbon::now();
         $datenow = $date->format('Y-m-d'); 
 
-        $quotation->date_billing = $datenow;
+       
+        $date_begin = request('date-begin');
+
+        $quotation->date_billing = $date_begin;
 
         $quotation->retencion_iva =  $total_retiene_iva;
         $quotation->retencion_islr =  $total_retiene_islr;
@@ -398,13 +401,14 @@ class FacturarController extends Controller
 
         $quotation->save();
 
+        $date_payment = request('date-payment');
 
         $header_voucher  = new HeaderVoucher();
         $header_voucher->setConnection(Auth::user()->database_name);
 
 
         $header_voucher->description = "Ventas de Bienes o servicios.";
-        $header_voucher->date = $datenow;
+        $header_voucher->date = $date_payment;
         
     
         $header_voucher->status =  "1";
@@ -552,6 +556,8 @@ class FacturarController extends Controller
 
         $total_mercancia = request('total_mercancia');
         $total_servicios = request('total_servicios');
+
+        $date_payment = request('date-payment-form');
 
         $total_iva = 0;
 
@@ -1338,7 +1344,7 @@ class FacturarController extends Controller
         if($total_pay == $sin_formato_total_pay){
 
             /*descontamos el inventario, si existe la fecha de nota de entrega, significa que ya hemos descontado del inventario, por ende no descontamos de nuevo*/
-            if(!isset($quotation->date_delivery_note)){
+            if(!isset($quotation->date_delivery_note) && !isset($quotation->date_order)){
                 $retorno = $this->discount_inventory($quotation->id);
 
                 if($retorno != "exito"){
@@ -1349,12 +1355,14 @@ class FacturarController extends Controller
         
             /*---------------- */
 
+                
+
                 $header_voucher  = new HeaderVoucher();
                 $header_voucher->setConnection(Auth::user()->database_name);
 
 
                 $header_voucher->description = "Cobro de Bienes o servicios.";
-                $header_voucher->date = $datenow;
+                $header_voucher->date = $date_payment;
                 
             
                 $header_voucher->status =  "1";
@@ -1365,6 +1373,7 @@ class FacturarController extends Controller
 
             
             if($validate_boolean1 == true){
+                $var->created_at = $date_payment;
                 $var->save();
 
                     $this->add_pay_movement($bcv,$payment_type,$header_voucher->id,$var->id_account,$quotation->id,$user_id,$var->amount,0);
@@ -1375,6 +1384,7 @@ class FacturarController extends Controller
             }
             
             if($validate_boolean2 == true){
+                $var2->created_at = $date_payment;
                 $var2->save();
 
                 
@@ -1384,6 +1394,7 @@ class FacturarController extends Controller
             }
             
             if($validate_boolean3 == true){
+                $var3->created_at = $date_payment;
                 $var3->save();
 
                 
@@ -1393,24 +1404,28 @@ class FacturarController extends Controller
                 
             }
             if($validate_boolean4 == true){
+                $var4->created_at = $date_payment;
                 $var4->save();
 
                 $this->add_pay_movement($bcv,$payment_type4,$header_voucher->id,$var4->id_account,$quotation->id,$user_id,$var4->amount,0);
             
             }
             if($validate_boolean5 == true){
+                $var5->created_at = $date_payment;
                 $var5->save();
 
                 $this->add_pay_movement($bcv,$payment_type5,$header_voucher->id,$var5->id_account,$quotation->id,$user_id,$var5->amount,0);
              
             }
             if($validate_boolean6 == true){
+                $var6->created_at = $date_payment;
                 $var6->save();
 
                 $this->add_pay_movement($bcv,$payment_type6,$header_voucher->id,$var6->id_account,$quotation->id,$user_id,$var6->amount,0);
             
             }
             if($validate_boolean7 == true){
+                $var7->created_at = $date_payment;
                 $var7->save();
 
                 $this->add_pay_movement($bcv,$payment_type7,$header_voucher->id,$var7->id_account,$quotation->id,$user_id,$var7->amount,0);
@@ -1494,8 +1509,11 @@ class FacturarController extends Controller
                     $quotation->number_invoice = 1;
                 }
             }
+
+            $date_begin = request('date-begin-form');
+            
             /*Modifica la cotizacion */
-            $quotation->date_billing = $datenow;
+            $quotation->date_billing = $date_begin;
                 
             $quotation->base_imponible = $base_imponible;
             $quotation->amount =  $sin_formato_amount;
@@ -1520,7 +1538,7 @@ class FacturarController extends Controller
                 $header_voucher->setConnection(Auth::user()->database_name);
 
                 $header_voucher->description = "Ventas de Bienes o servicios.";
-                $header_voucher->date = $datenow;
+                $header_voucher->date = $date_payment;
                 
             
                 $header_voucher->status =  "1";

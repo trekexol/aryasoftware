@@ -52,36 +52,41 @@ class PaymentController extends Controller
     public function movements($id_invoice)
     {
         
+        if(isset($id_invoice) && $id_invoice != -1){
 
-        $user       =   auth()->user();
-        $users_role =   $user->role_id;
-        
-            $quotation = Quotation::on(Auth::user()->database_name)->find($id_invoice);
-            $detailvouchers = DetailVoucher::on(Auth::user()->database_name)
-                                            ->join('header_vouchers','header_vouchers.id','detail_vouchers.id_header_voucher')
-                                            ->where('id_invoice',$id_invoice)
-                                            ->where('header_vouchers.description','LIKE','Cobro%')
-                                            ->where('detail_vouchers.status','C')
-                                            ->get();
+            $user       =   auth()->user();
+            $users_role =   $user->role_id;
+            
+                $quotation = Quotation::on(Auth::user()->database_name)->find($id_invoice);
+                $detailvouchers = DetailVoucher::on(Auth::user()->database_name)
+                                                ->join('header_vouchers','header_vouchers.id','detail_vouchers.id_header_voucher')
+                                                ->where('id_invoice',$id_invoice)
+                                                ->where('header_vouchers.description','LIKE','Cobro%')
+                                                ->where('detail_vouchers.status','C')
+                                                ->get();
 
-            $multipayments_detail = null;
-            $invoices = null;
-            $coin = $quotation->coin;
-            $return = "payments";
+                $multipayments_detail = null;
+                $invoices = null;
+                $coin = $quotation->coin;
+                $return = "payments";
 
-            //Buscamos a la factura para luego buscar atraves del header a la otras facturas
-            $multipayment = Multipayment::on(Auth::user()->database_name)->where('id_quotation',$id_invoice)->first();
-            if(isset($multipayment)){
-            $invoices = Multipayment::on(Auth::user()->database_name)->where('id_header',$multipayment->id_header)->get();
-            $multipayments_detail = DetailVoucher::on(Auth::user()->database_name)->where('id_header_voucher',$multipayment->id_header)->get();
-            }
+                //Buscamos a la factura para luego buscar atraves del header a la otras facturas
+                $multipayment = Multipayment::on(Auth::user()->database_name)->where('id_quotation',$id_invoice)->first();
+                if(isset($multipayment)){
+                $invoices = Multipayment::on(Auth::user()->database_name)->where('id_header',$multipayment->id_header)->get();
+                $multipayments_detail = DetailVoucher::on(Auth::user()->database_name)->where('id_header_voucher',$multipayment->id_header)->get();
+                }
 
-            if(!isset($coin)){
-                $coin = 'bolivares';
-            }
-         
-        
-        return view('admin.invoices.index_detail_movement',compact('return','detailvouchers','quotation','coin','invoices','multipayments_detail'));
+                if(!isset($coin)){
+                    $coin = 'bolivares';
+                }
+            
+            
+            return view('admin.invoices.index_detail_movement',compact('return','detailvouchers','quotation','coin','invoices','multipayments_detail'));
+        }else{
+            return redirect('payments/index')->withDanger('No se encontro el movimiento de este pago!');
+        }
+    
     }
 
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Anticipo;
 use App\Client;
 use App\Company;
 use App\DetailVoucher;
@@ -788,6 +789,8 @@ class QuotationController extends Controller
         $quotation = Quotation::on(Auth::user()->database_name)->find(request('id_quotation_modal')); 
 
         QuotationProduct::on(Auth::user()->database_name)->where('id_quotation',$quotation->id)->delete();
+
+        Anticipo::on(Auth::user()->database_name)->where('id_quotation',$quotation->id)->delete();
 
         $quotation->delete(); 
 

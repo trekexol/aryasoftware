@@ -18,4 +18,7 @@ class DetailVoucher extends Model
         return $this->belongsTo('App\Permission\Models\BankVoucher','id_bank_voucher');
     }
 
+    public function quotations(){
+        return $this->belongsTo('App\Quotation','id_invoice');
+    }
 }
