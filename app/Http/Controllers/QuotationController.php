@@ -346,7 +346,7 @@ class QuotationController extends Controller
 
     public function selectclient()
     {
-        $clients     = Client::on(Auth::user()->database_name)->get();
+        $clients     = Client::on(Auth::user()->database_name)->orderBy('name','asc')->get();
     
         return view('admin.quotations.selectclient',compact('clients'));
     }

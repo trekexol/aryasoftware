@@ -321,7 +321,7 @@ class FacturarController extends Controller
     }
     public function storefacturacredit(Request $request)
     {
-        //dd($request);
+        
         $id_quotation = request('id_quotation');
 
         $quotation = Quotation::on(Auth::user()->database_name)->findOrFail($id_quotation);
@@ -330,7 +330,7 @@ class FacturarController extends Controller
 
      
         //precio de costo de los productos, vienen en bolivares
-        $price_cost_total = request('price_cost_total');// * $bcv;
+        $price_cost_total = request('price_cost_total');
         
         $total_retiene_iva = str_replace(',', '.', str_replace('.', '', request('iva_retencion')));
         $total_retiene_islr = str_replace(',', '.', str_replace('.', '', request('islr_retencion')));
@@ -420,20 +420,7 @@ class FacturarController extends Controller
                 ->update(['status' => 'C']);
 
         
-        /*DB::connection(Auth::user()->database_name)->table('anticipos')->where('id_client', '=', $quotation->id_client)
-                                                                        ->where('id_quotation',null)
-                                                                        ->orWhere('id_quotation',$quotation->id)
-                                                                        ->where('status', '=', '1')
-                                                                        ->update(['status' => 'C']);
-
-                
-        //los que quedaron en espera, pasan a estar activos
-        DB::connection(Auth::user()->database_name)->table('anticipos')->where('id_client', '=', $quotation->id_client)
-                                                                        ->where('id_quotation',null)
-                                                                        ->orWhere('id_quotation',$quotation->id)
-                                                                        ->where('status', '=', 'M')
-                                                                        ->update(['status' => '1']);
-        */
+       
         /*Busqueda de Cuentas*/
 
         //Cuentas por Cobrar Clientes
@@ -498,6 +485,7 @@ class FacturarController extends Controller
     public function storefactura(Request $request)
     {
         
+        //dd($request);
         $data = request()->validate([
             
         
@@ -512,7 +500,7 @@ class FacturarController extends Controller
             return redirect('quotations/facturar/'.$quotation->id.'/'.$quotation->coin.'')->withDanger('Ya esta factura fue procesada!');
         }else{
             
-        //dd($request);
+        
         $date = Carbon::now();
         $datenow = $date->format('Y-m-d'); 
         
@@ -566,6 +554,8 @@ class FacturarController extends Controller
 
         }
      
+    //si el monto es menor o igual a cero, quiere decir que el anticipo cubre el total de la factura, por tanto no hay pagos
+    if($sin_formato_total_pay > 0){
         $payment_type = request('payment_type');
         if($come_pay >= 1){
 
@@ -1338,10 +1328,11 @@ class FacturarController extends Controller
             /*--------------------------------------------*/
         } 
 
-        
+    }
 
         //VALIDA QUE LA SUMA MONTOS INGRESADOS SEAN IGUALES AL MONTO TOTAL DEL PAGO
-        if($total_pay == $sin_formato_total_pay){
+        if(($total_pay == $sin_formato_total_pay) || ($sin_formato_total_pay <= 0))
+        {
 
             /*descontamos el inventario, si existe la fecha de nota de entrega, significa que ya hemos descontado del inventario, por ende no descontamos de nuevo*/
             if(!isset($quotation->date_delivery_note) && !isset($quotation->date_order)){
@@ -1449,19 +1440,29 @@ class FacturarController extends Controller
     
             }
 
+            $date_begin = request('date-begin-form');
+            $quotation->date_billing = $date_begin;
+
             /*Anticipos*/
             if(isset($anticipo) && ($anticipo != 0)){
-                $quotation->anticipo =  $anticipo;
                 
-                 $account_anticipo_cliente = Account::on(Auth::user()->database_name)->where('code_one',2)
-                                                             ->where('code_two',3)
-                                                             ->where('code_three',1)
-                                                             ->where('code_four',1)
-                                                             ->where('code_five',2)->first(); 
-                 
-                 if(isset($account_anticipo_cliente)){
-                     $this->add_movement($bcv,$header_voucher->id,$account_anticipo_cliente->id,$quotation->id,$user_id,$quotation->anticipo,0);
-                 }
+                //Si el total a pagar es negativo, quiere decir que los anticipos sobrepasan al monto total de la factura
+                if($sin_formato_total_pay < 0){
+                    $this->check_anticipo($quotation,$sin_formato_grandtotal);
+                    $quotation->anticipo =  $sin_formato_grandtotal;
+                }else{
+                    $quotation->anticipo =  $anticipo;
+                }
+                
+                $account_anticipo_cliente = Account::on(Auth::user()->database_name)->where('code_one',2)
+                                                        ->where('code_two',3)
+                                                        ->where('code_three',1)
+                                                        ->where('code_four',1)
+                                                        ->where('code_five',2)->first(); 
+
+                if(isset($account_anticipo_cliente)){
+                    $this->add_movement($bcv,$header_voucher->id,$account_anticipo_cliente->id,$quotation->id,$user_id,$quotation->anticipo,0);
+                }
              }else{
                  $quotation->anticipo = 0;
              }
@@ -1510,7 +1511,7 @@ class FacturarController extends Controller
                 }
             }
 
-            $date_begin = request('date-begin-form');
+            
             
             /*Modifica la cotizacion */
             $quotation->date_billing = $date_begin;
@@ -1518,10 +1519,8 @@ class FacturarController extends Controller
             $quotation->base_imponible = $base_imponible;
             $quotation->amount =  $sin_formato_amount;
             $quotation->amount_iva =  $sin_formato_amount_iva;
-            $quotation->amount_with_iva = $sin_formato_total_pay;
+            $quotation->amount_with_iva = $sin_formato_grandtotal;
             $quotation->iva_percentage = $iva_percentage;
-
-            $quotation->anticipo =  $anticipo;
             $quotation->retencion_iva = $retencion_iva;
             $quotation->retencion_islr = $retencion_islr;
             
@@ -1605,29 +1604,14 @@ class FacturarController extends Controller
                 }
                 /*----------- */
             }
-                DB::connection(Auth::user()->database_name)->table('quotation_products')
+             
+            //Aqui pasa los quotation_products a status C de Cobrado
+            DB::connection(Auth::user()->database_name)->table('quotation_products')
                                                         ->where('id_quotation', '=', $quotation->id)
                                                         ->update(['status' => 'C']);
 
-            /*Verificamos si el cliente tiene anticipos activos */
-                DB::connection(Auth::user()->database_name)->table('anticipos')->where('id_client', '=', $quotation->id_client)
-                                                                                ->where(function ($query) use ($quotation){
-                                                                                    $query->where('id_quotation',null)
-                                                                                        ->orWhere('id_quotation',$quotation->id);
-                                                                                })
-                                                                                ->where('status', '=', 1)
-                                                                                ->update(['status' => 'C']);
-
-                
-                //los que quedaron en espera, pasan a estar activos
-                DB::connection(Auth::user()->database_name)->table('anticipos')->where('id_client', '=', $quotation->id_client)
-                                                                                ->where(function ($query) use ($quotation){
-                                                                                    $query->where('id_quotation',null)
-                                                                                        ->orWhere('id_quotation',$quotation->id);
-                                                                                })
-                                                                                ->where('status', '=', 'M')
-                                                                                ->update(['status' => 1]);
-    
+            $this->procesar_anticipos($quotation,$sin_formato_total_pay);
+            
             /*------------------------------------------------- */
 
             return redirect('quotations/facturado/'.$quotation->id.'/'.$coin.'')->withSuccess('Factura Guardada con Exito!');
@@ -1643,7 +1627,100 @@ class FacturarController extends Controller
     }
 
 
+    public function check_anticipo($quotation,$total_pay)
+    {
+        
+            $anticipos = DB::connection(Auth::user()->database_name)->table('anticipos')->where('id_client', '=', $quotation->id_client)
+                                                                                    ->where(function ($query) use ($quotation){
+                                                                                        $query->where('id_quotation',null)
+                                                                                            ->orWhere('id_quotation',$quotation->id);
+                                                                                    })
+                                                                                    ->where('status', '=', '1')->get();
 
+            foreach($anticipos as $anticipo){
+
+                //si el anticipo esta en dolares, multiplico los dolares por la tasa de la cotizacion, para sacar el monto real en bolivares
+                if($anticipo->coin != "bolivares"){
+                    $anticipo->amount = ($anticipo->amount / $anticipo->rate) * $quotation->bcv;
+                }
+
+                if($total_pay >= $anticipo->amount){
+                    DB::connection(Auth::user()->database_name)->table('anticipos')
+                                                                ->where('id', $anticipo->id)
+                                                                ->update(['status' => 'C']);
+                   
+                    DB::connection(Auth::user()->database_name)->table('anticipo_quotations')->insert(['id_quotation' => $quotation->id,'id_anticipo' => $anticipo->id]);
+                                                         
+                    $total_pay -= $anticipo->amount;
+                }else{
+
+                    DB::connection(Auth::user()->database_name)->table('anticipos')
+                                                                ->where('id', $anticipo->id)
+                                                                ->update(['status' => 'C']);
+                                                    
+                    DB::connection(Auth::user()->database_name)->table('anticipo_quotations')->insert(['id_quotation' => $quotation->id,'id_anticipo' => $anticipo->id]);
+                      
+
+                    $amount_anticipo_new = $anticipo->amount - $total_pay;
+
+                    $var = new Anticipo();
+                    $var->setConnection(Auth::user()->database_name);
+                    
+                    $var->date = $quotation->date_billing;
+                    $var->id_client = $quotation->id_client;
+                    $user       =   auth()->user();
+                    $var->id_user = $user->id;
+                    $var->id_account = $anticipo->id_account;
+                    $var->coin = $anticipo->coin;
+                    $var->amount = $amount_anticipo_new;
+                    $var->rate = $quotation->bcv;
+                    $var->reference = $anticipo->reference;
+                    $var->status = 1;
+                    $var->save();
+                    break;
+                }
+            }
+
+            
+    }
+
+
+    public function procesar_anticipos($quotation,$sin_formato_total_pay){
+        
+        if($sin_formato_total_pay >= 0){
+            $anticipos_old = DB::connection(Auth::user()->database_name)->table('anticipos')
+                                ->where('id_client', '=', $quotation->id_client)
+                                ->where(function ($query) use ($quotation){
+                                    $query->where('id_quotation',null)
+                                        ->orWhere('id_quotation',$quotation->id);
+                                })
+                                ->where('status', '=', '1')->get();
+
+            foreach($anticipos_old as $anticipo){
+                DB::connection(Auth::user()->database_name)->table('anticipo_quotations')->insert(['id_quotation' => $quotation->id,'id_anticipo' => $anticipo->id]);
+            } 
+
+
+            /*Verificamos si el cliente tiene anticipos activos */
+            DB::connection(Auth::user()->database_name)->table('anticipos')
+                    ->where('id_client', '=', $quotation->id_client)
+                    ->where(function ($query) use ($quotation){
+                        $query->where('id_quotation',null)
+                            ->orWhere('id_quotation',$quotation->id);
+                    })
+                    ->where('status', '=', '1')
+                    ->update(['status' => 'C']);
+
+            //los que quedaron en espera, pasan a estar activos
+            DB::connection(Auth::user()->database_name)->table('anticipos')->where('id_client', '=', $quotation->id_client)
+            ->where(function ($query) use ($quotation){
+                $query->where('id_quotation',null)
+                    ->orWhere('id_quotation',$quotation->id);
+            })
+            ->where('status', '=', 'M')
+            ->update(['status' => '1']);
+        }
+    }
 
 
     public function add_movement($bcv,$id_header,$id_account,$id_invoice,$id_user,$debe,$haber){

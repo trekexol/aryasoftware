@@ -327,7 +327,7 @@
 
                         
                         <div class="form-group row" id="formulario1" >
-                            <label for="amount_pays" class="col-md-2 col-form-label text-md-right">Forma de Pago:</label>
+                            <label id="label_amount_pays" for="amount_pays" class="col-md-2 col-form-label text-md-right">Forma de Pago:</label>
                             <div class="col-md-3">
                                 <input id="amount_pay" type="text" class="form-control @error('amount_pay') is-invalid @enderror"  name="amount_pay" placeholder="0,00" required autocomplete="amount_pay"> 
                            
@@ -343,7 +343,7 @@
                                         <option selected value="">Tipo de Pago 1</option>
                                         <option value="1">Cheque</option>
                                         <option value="2">Contado</option>
-                                        <option value="3">Contra Anticipo</option>
+                                        
                                         
                                         <option value="5">Depósito Bancario</option>
                                         <option value="6">Efectivo</option>
@@ -413,7 +413,7 @@
                                         <option selected value="0">Tipo de Pago 2</option>
                                         <option value="1">Cheque</option>
                                         <option value="2">Contado</option>
-                                        <option value="3">Contra Anticipo</option>
+                                        
                                         
                                         <option value="5">Depósito Bancario</option>
                                         <option value="6">Efectivo</option>
@@ -485,7 +485,7 @@
                                     <option selected value="0">Tipo de Pago 3</option>
                                     <option value="1">Cheque</option>
                                     <option value="2">Contado</option>
-                                    <option value="3">Contra Anticipo</option>
+                                    
                                     
                                     <option value="5">Depósito Bancario</option>
                                     <option value="6">Efectivo</option>
@@ -556,7 +556,7 @@
                                     <option selected value="0">Tipo de Pago 4</option>
                                     <option value="1">Cheque</option>
                                     <option value="2">Contado</option>
-                                    <option value="3">Contra Anticipo</option>
+                                    
                                     
                                     <option value="5">Depósito Bancario</option>
                                     <option value="6">Efectivo</option>
@@ -627,7 +627,7 @@
                                     <option selected value="0">Tipo de Pago 5</option>
                                     <option value="1">Cheque</option>
                                     <option value="2">Contado</option>
-                                    <option value="3">Contra Anticipo</option>
+                                    
                                     
                                     <option value="5">Depósito Bancario</option>
                                     <option value="6">Efectivo</option>
@@ -698,7 +698,7 @@
                                     <option selected value="0">Tipo de Pago 6</option>
                                     <option value="1">Cheque</option>
                                     <option value="2">Contado</option>
-                                    <option value="3">Contra Anticipo</option>
+                                    
                                     
                                     <option value="5">Depósito Bancario</option>
                                     <option value="6">Efectivo</option>
@@ -769,7 +769,7 @@
                                     <option selected value="0">Tipo de Pago 7</option>
                                     <option value="1">Cheque</option>
                                     <option value="2">Contado</option>
-                                    <option value="3">Contra Anticipo</option>
+                                    
                                     
                                     <option value="5">Depósito Bancario</option>
                                     <option value="6">Efectivo</option>
@@ -1023,6 +1023,16 @@
                
                 document.getElementById("grandtotal_form").value = grand_totalformat;
                 
+
+                //Quiere decir que el monto total a pagar es negativo o igual a cero
+                if(total_pay.toFixed(2) <= 0){
+                    document.getElementById("amount_pay").required = false;
+                    document.getElementById("payment_type").required = false;
+                    $("#amount_pay").hide();
+                    $("#payment_type").hide();
+                    $("#btn_agregar").hide();
+                    $("#label_amount_pays").hide();
+                }
             }        
                 
               
@@ -1129,6 +1139,16 @@
                 document.getElementById("iva_amount_form").value = document.getElementById("iva_amount").value;
 
                 document.getElementById("grandtotal_form").value = grand_totalformat;
+
+                 //Quiere decir que el monto total a pagar es negativo o igual a cero
+                 if(total_pay.toFixed(2) <= 0){
+                    document.getElementById("amount_pay").required = false;
+                    document.getElementById("payment_type").required = false;
+                    $("#amount_pay").hide();
+                    $("#payment_type").hide();
+                    $("#btn_agregar").hide();
+                    $("#label_amount_pays").hide();
+                }
                
             });
 
@@ -1239,16 +1259,19 @@
                 document.getElementById("iva_amount_form").value = document.getElementById("iva_amount").value;
                
                 document.getElementById("grandtotal_form").value = grand_totalformat;
+
+                 //Quiere decir que el monto total a pagar es negativo o igual a cero
+                 if(total_pay.toFixed(2) <= 0){
+                    document.getElementById("amount_pay").required = false;
+                    document.getElementById("payment_type").required = false;
+                    $("#amount_pay").hide();
+                    $("#payment_type").hide();
+                    $("#btn_agregar").hide();
+                    $("#label_amount_pays").hide();
+                }
                 
             });
 
        
-
-       
-
-   
-
-
-
     </script>
 @endsection

@@ -142,7 +142,7 @@
                         <div class="form-group row">
                             <label for="total_pays" class="col-md-2 col-form-label text-md-right">Total a Pagar:</label>
                             <div class="col-md-4">
-                                <input id="total_pay" type="text" class="form-control @error('total_pay') is-invalid @enderror" name="total_pay" readonly value="{{ number_format($quotation->amount_with_iva / ($bcv ?? 1), 2, ',', '.') ?? '0,00' }}"  required autocomplete="total_pay"> 
+                                <input id="total_pay" type="text" class="form-control @error('total_pay') is-invalid @enderror" name="total_pay" readonly value="{{ number_format(($quotation->amount_with_iva / ($bcv ?? 1)) - ($quotation->anticipo / ($bcv ?? 1)) - ($quotation->retencion_iva / ($bcv ?? 1)) - ($quotation->retencion_islr / ($bcv ?? 1)), 2, ',', '.') ?? '0,00' }}"  required autocomplete="total_pay"> 
                            
                                 @error('total_pay')
                                     <span class="invalid-feedback" role="alert">

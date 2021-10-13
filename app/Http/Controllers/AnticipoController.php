@@ -89,14 +89,14 @@ class AnticipoController extends Controller
     */
     public function selectclient($id_anticipo = null)
     {
-        $clients = Client::on(Auth::user()->database_name)->orderBy('id' ,'DESC')->get();
+        $clients = Client::on(Auth::user()->database_name)->orderBy('name' ,'asc')->get();
 
         return view('admin.anticipos.selectclient',compact('clients','id_anticipo'));
     }
 
     public function selectprovider($id_anticipo = null)
     {
-        $providers = Provider::on(Auth::user()->database_name)->orderBy('id' ,'DESC')->get();
+        $providers = Provider::on(Auth::user()->database_name)->orderBy('name' ,'asc')->get();
 
         return view('admin.anticipos.selectprovider',compact('providers','id_anticipo'));
     }
@@ -104,9 +104,11 @@ class AnticipoController extends Controller
     public function selectanticipo($id_client,$coin,$id_quotation)
     {
         $anticipos = Anticipo::on(Auth::user()->database_name)->where('id_client',$id_client)
-                                                                ->where('id_quotation',null)
-                                                                ->orWhere('id_quotation',$id_quotation)
-                                                                ->where('coin','like','bolivares')
+                                                                ->where(function ($query) use ($id_quotation){
+                                                                    $query->where('id_quotation',null)
+                                                                        ->orWhere('id_quotation',$id_quotation);
+                                                                })
+                                                                
                                                                 ->whereIn('status',[1,'M'])->get();
                                                                 
         $client = Client::on(Auth::user()->database_name)->find($id_client);
@@ -118,8 +120,10 @@ class AnticipoController extends Controller
     {
         $anticipos = Anticipo::on(Auth::user()->database_name)
         ->where('id_provider',$id_provider)
-        ->where('id_expense',null)
-        ->orWhere('id_expense',$id_expense)
+        ->where(function ($query) use ($id_expense){
+            $query->where('id_expense',null)
+                ->orWhere('id_expense',$id_expense);
+        })
         ->whereIn('status',[1,'M'])->orderBy('id' ,'DESC')->get();
         
 
