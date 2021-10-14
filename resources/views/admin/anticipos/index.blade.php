@@ -81,6 +81,7 @@
                 <th class="text-center">Caja/Banco</th>
                 <th class="text-center">Fecha del Anticipo</th>
                 <th class="text-center">Referencia</th>
+                <th class="text-center">REF</th>
                 <th class="text-center">Monto</th>
                 <th class="text-center">Moneda</th>
                 @if (isset($control) && ($control == 'index'))
@@ -94,11 +95,15 @@
                 @else
                     @foreach ($anticipos as $key => $anticipo)
                     <?php 
+
+                        $amount_bcv = 0;
+                        
+                        $amount_bcv = $anticipo->amount / $anticipo->rate;
+
+
                         if($anticipo->coin != 'bolivares'){
                             $anticipo->amount = $anticipo->amount / $anticipo->rate;
                         }
-
-
 
 
                         if (isset($anticipo->quotations['number_invoice'])) {
@@ -124,6 +129,7 @@
                     <td class="text-center">{{$anticipo->accounts['description'] ?? ''}}</td>
                     <td class="text-center">{{$anticipo->date ?? ''}}</td>
                     <td class="text-center">{{$anticipo->reference ?? ''}}</td>
+                    <td class="text-right">${{number_format($amount_bcv ?? 0, 2, ',', '.')}}</td>
                     <td class="text-right">{{number_format($anticipo->amount ?? 0, 2, ',', '.')}}</td>
                     <td class="text-center">{{$anticipo->coin ?? ''}}</td>
                    

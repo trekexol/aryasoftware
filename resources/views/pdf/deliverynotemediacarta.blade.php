@@ -104,9 +104,11 @@
   </tr> 
   @foreach ($inventories_quotations as $var)
       <?php
+
+
       $percentage = (($var->price * $var->amount_quotation) * $var->discount)/100;
 
-      $total_less_percentage = ($var->price * $var->amount_quotation) - $percentage;
+      $total_less_percentage = (number_format($var->price,2,'.','') * $var->amount_quotation) - $percentage;
 
       $total_less_percentage = $total_less_percentage / ($bcv ?? 1);
       ?>
@@ -241,7 +243,7 @@
       <?php
       $percentage = (($var->price * $var->amount_quotation) * $var->discount)/100;
 
-      $total_less_percentage = ($var->price * $var->amount_quotation) - $percentage;
+      $total_less_percentage = (number_format($var->price,2,'.','') * $var->amount_quotation) - $percentage;
 
       $total_less_percentage = $total_less_percentage / ($bcv ?? 1);
       ?>
@@ -376,7 +378,7 @@
       <?php
       $percentage = (($var->price * $var->amount_quotation) * $var->discount)/100;
 
-      $total_less_percentage = ($var->price * $var->amount_quotation) - $percentage;
+      $total_less_percentage = (number_format($var->price,2,'.','') * $var->amount_quotation) - $percentage;
 
       $total_less_percentage = $total_less_percentage / ($bcv ?? 1);
       ?>
