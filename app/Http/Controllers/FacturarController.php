@@ -377,7 +377,7 @@ class FacturarController extends Controller
         $quotation->base_imponible = $sin_formato_base_imponible;
         $quotation->amount =  $sin_formato_amount;
         $quotation->amount_iva =  $sin_formato_amount_iva;
-        $quotation->amount_with_iva =  $sin_formato_amount_with_iva;
+        $quotation->amount_with_iva = $sin_formato_grand_total;
         
         $credit = request('credit');
         
@@ -1450,6 +1450,7 @@ class FacturarController extends Controller
                 if($sin_formato_total_pay < 0){
                     $this->check_anticipo($quotation,$sin_formato_grandtotal);
                     $quotation->anticipo =  $sin_formato_grandtotal;
+                    $quotation->status = "C";
                 }else{
                     $quotation->anticipo =  $anticipo;
                 }
@@ -1685,7 +1686,8 @@ class FacturarController extends Controller
     }
 
 
-    public function procesar_anticipos($quotation,$sin_formato_total_pay){
+    public function procesar_anticipos($quotation,$sin_formato_total_pay)
+    {
         
         if($sin_formato_total_pay >= 0){
             $anticipos_old = DB::connection(Auth::user()->database_name)->table('anticipos')

@@ -54,7 +54,7 @@
       if(isset($coin) && $coin != 'bolivares'){
 
         $quotation->amount_with_iva = ($quotation->amount_with_iva ?? 0) / ($quotation->bcv ?? 1);
-        $quotation->amount_anticipo = ($quotation->amount_anticipo ?? 0) / ($quotation->bcv ?? 1);
+        //$quotation->amount_anticipo = ($quotation->amount_anticipo ?? 0) / ($quotation->bcv ?? 1);
 
         $por_cobrar = (($quotation->amount_with_iva ?? 0) - ($quotation->amount_anticipo ?? 0));
         $total_por_cobrar += $por_cobrar;
