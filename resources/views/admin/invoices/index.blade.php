@@ -78,10 +78,12 @@
             <tr> 
                 <th class="text-center">Fecha</th>
                 <th class="text-center">Nº</th>
+                <th class="text-center">Nota de Entrega</th>
                 <th class="text-center">Cliente</th>
+                <th class="text-center">Vendedor</th>
+                <th class="text-center">REF</th>
                 <th class="text-center">Monto</th>
-                <th class="text-center">Iva</th>
-                <th class="text-center">Monto Con Iva</th>
+                <th class="text-center">Moneda</th>
                 <th class="text-center"></th>
                 <th class="text-center"></th>
             </tr>
@@ -91,6 +93,11 @@
                 @if (empty($quotations))
                 @else  
                     @foreach ($quotations as $quotation)
+                    <?php 
+                        $amount_bcv = 0;
+                        $amount_bcv = $quotation->amount_with_iva / $quotation->bcv;
+                    ?>
+
                         <tr>
                             <td class="text-center font-weight-bold">{{$quotation->date_billing}}</td>
                             @if ($quotation->status == "X")
@@ -101,10 +108,12 @@
                                     <a href="{{ route('quotations.createfacturado',[$quotation->id,$quotation->coin ?? 'bolivares']) }}" title="Ver Factura" class="font-weight-bold text-dark">{{ $quotation->number_invoice }}</a>
                                 </td>
                             @endif
-                            <td class="text-center font-weight-bold">{{ $quotation->clients['name']}}</td>
-                            <td class="text-right font-weight-bold">{{number_format($quotation->amount, 2, ',', '.')}}</td>
-                            <td class="text-right font-weight-bold">{{number_format($quotation->amount_iva, 2, ',', '.')}}</td>
+                            <td class="text-center font-weight-bold">{{$quotation->number_delivery_note ?? ''}}</td>
+                            <td class="text-center font-weight-bold">{{$quotation->clients['name'] ?? ''}}</td>
+                            <td class="text-center font-weight-bold">{{$quotation->vendors['name'] ?? ''}} {{$quotation->vendors['surname'] ?? ''}}</td>
+                            <td class="text-right font-weight-bold">${{number_format($amount_bcv, 2, ',', '.')}}</td>
                             <td class="text-right font-weight-bold">{{number_format($quotation->amount_with_iva, 2, ',', '.')}}</td>
+                            <td class="text-right font-weight-bold">{{$quotation->coin}}</td>
                             @if ($quotation->status == "C")
                                 <td class="text-center font-weight-bold">
                                     <a href="{{ route('quotations.createfacturado',[$quotation->id,$quotation->coin ?? 'bolivares']) }}" title="Ver Factura" class="text-center text-success font-weight-bold">Cobrado</a>
