@@ -65,13 +65,17 @@
         <table class="table table-light2 table-bordered" id="dataTable" width="100%" cellspacing="0" >
             <thead>
             <tr> 
-                <th class="text-center"></th>
+                
+                <th class="text-center">F. Nota de Entrega</th>
                 <th class="text-center">N°</th>
                 <th class="text-center">Cliente</th>
                 <th class="text-center">Vendedor</th>
-                <th class="text-center">Transporte</th>
-                <th class="text-center">Fecha de Cotización</th>
-                <th class="text-center">Fecha de la Nota de Entrega</th>
+                <th class="text-center">REF</th>
+                <th class="text-center">Monto</th>
+                <th class="text-center">F. Cotización</th>
+                <th class="text-center"></th>
+                
+                
                
             </tr>
             </thead>
@@ -80,18 +84,25 @@
                 @if (empty($quotations))
                 @else  
                     @foreach ($quotations as $quotation)
-                        <tr>
+                    <?php 
+                    $amount_bcv = 0;
+                    $amount_bcv = $quotation->amount_with_iva / $quotation->bcv;
+                    ?>
+                    
+                      <tr>
+                            <td class="text-center">{{ $quotation->date_delivery_note ?? ''}}</td>
+                            <td class="text-center">{{ $quotation->number_delivery_note ?? $quotation->id ?? ''}}</td>
+                            <td class="text-center">{{ $quotation->clients['name'] ?? ''}}</td>
+                            <td class="text-center">{{ $quotation->vendors['name'] ?? ''}} {{ $quotation->vendors['surname'] ?? ''}}</td>
+                            <td class="text-center">${{number_format($amount_bcv, 2, ',', '.') ?? 0}}</td>
+                            <td class="text-center">{{number_format($quotation->amount_with_iva, 2, ',', '.') ?? 0}}</td>
+                            <td class="text-center">{{ $quotation->date_quotation ?? ''}}</td>
                             <td class="text-center">
                                 <a href="{{ route('quotations.createfacturar',[$quotation->id,$quotation->coin])}}" title="Seleccionar"><i class="fa fa-check"></i></a>
                                 <a href="{{ route('quotations.createdeliverynote',[$quotation->id,$quotation->coin])}}" title="Mostrar"><i class="fa fa-file-alt"></i></a>
                                 <a href="{{ route('quotations.reversarQuotation',$quotation->id)}}" title="Borrar"><i class="fa fa-trash text-danger"></i></a>
-                           </td>
-                            <td class="text-center">{{ $quotation->number_delivery_note ?? $quotation->id ?? ''}}</td>
-                            <td class="text-center">{{ $quotation->clients['name'] ?? ''}}</td>
-                            <td class="text-center">{{ $quotation->vendors['name'] ?? ''}} {{ $quotation->vendors['surname'] ?? ''}}</td>
-                            <td class="text-center">{{ $quotation->transports['placa'] ?? ''}}</td>
-                            <td class="text-center">{{ $quotation->date_quotation ?? ''}}</td>
-                            <td class="text-center">{{ $quotation->date_delivery_note ?? ''}}</td>
+                            </td>                        
+                        
                         </tr>     
                     @endforeach   
                 @endif
