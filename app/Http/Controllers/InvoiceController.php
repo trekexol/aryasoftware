@@ -236,8 +236,6 @@ class InvoiceController extends Controller
         $grand_total = str_replace(',', '.', str_replace('.', '', request('grand_total')));
 
 
-        $total_pay = 0;
-
         $date = Carbon::now();
         $datenow = $date->format('Y-m-d'); 
       
@@ -271,780 +269,783 @@ class InvoiceController extends Controller
             $bcv = $company->rate;
         }
 
+        //si el monto es menor o igual a cero, quiere decir que el anticipo cubre el total de la factura, por tanto no hay pagos
+        if($amount_with_iva > 0){
+            if($come_pay >= 1){
 
-        if($come_pay >= 1){
+                /*-------------PAGO NUMERO 1----------------------*/
 
-            /*-------------PAGO NUMERO 1----------------------*/
+                $var = new QuotationPayment();
+                $var->setConnection(Auth::user()->database_name);
 
-            $var = new QuotationPayment();
-            $var->setConnection(Auth::user()->database_name);
-
-            $amount_pay = request('amount_pay');
-    
-            if(isset($amount_pay)){
-                
-                $valor_sin_formato_amount_pay = str_replace(',', '.', str_replace('.', '', $amount_pay));
-            }else{
-                return redirect('invoices')->withDanger('Debe ingresar un monto de pago 1!');
-            }
-                
-    
-            $account_bank = request('account_bank');
-            $account_efectivo = request('account_efectivo');
-            $account_punto_de_venta = request('account_punto_de_venta');
-    
-            $credit_days = request('credit_days');
-    
-            $reference = request('reference');
-    
-            if($valor_sin_formato_amount_pay != 0){
-    
-                if($payment_type != 0){
-    
-                    $var->id_quotation = request('id_quotation');
-    
-                    //SELECCIONA LA CUENTA QUE SE REGISTRA EN EL TIPO DE PAGO
-                    if($payment_type == 1 || $payment_type == 11 || $payment_type == 5 ){
-                        //CUENTAS BANCARIAS
-                        if(($account_bank != 0)){
-                            if(isset($reference)){
-    
-                                $var->id_account = $account_bank;
-    
-                                $var->reference = $reference;
-    
-                            }else{
-                                return redirect('invoices')->withDanger('Debe ingresar una Referencia Bancaria!');
-                            }
-                        }else{
-                            return redirect('invoices')->withDanger('Debe seleccionar una Cuenta Bancaria!');
-                        }
-                    }
-                    if($payment_type == 4){
-                        //DIAS DE CREDITO
-                        if(isset($credit_days)){
-    
-                            $var->credit_days = $credit_days;
-    
-                        }else{
-                            return redirect('invoices')->withDanger('Debe ingresar los Dias de Credito!');
-                        }
-                    }
-    
-                    if($payment_type == 6){
-                        //DIAS DE CREDITO
-                        if(($account_efectivo != 0)){
-    
-                            $var->id_account = $account_efectivo;
-    
-                        }else{
-                            return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Efectivo!');
-                        }
-                    }
-    
-                    if($payment_type == 9 || $payment_type == 10){
-                        //CUENTAS PUNTO DE VENTA
-                        if(($account_punto_de_venta != 0)){
-                            $var->id_account = $account_punto_de_venta;
-                        }else{
-                            return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Punto de Venta!');
-                        }
-                    }
-    
-                        
-                
-    
-                        $var->payment_type = request('payment_type');
-                        $var->amount = $valor_sin_formato_amount_pay;
-                        
-                        if($coin == 'dolares'){
-                            $var->amount = $var->amount * $bcv;
-                        }
-
-                        $var->rate = $bcv;
-                        
-                        $var->status =  1;
+                $amount_pay = request('amount_pay');
+        
+                if(isset($amount_pay)){
                     
-                        $total_pay += $valor_sin_formato_amount_pay;
-    
-                        $validate_boolean1 = true;
-    
-                    
+                    $valor_sin_formato_amount_pay = str_replace(',', '.', str_replace('.', '', $amount_pay));
                 }else{
-                    return redirect('invoices')->withDanger('Debe seleccionar un Tipo de Pago 1!');
-                }
-    
-                
-            }else{
-                    return redirect('invoices')->withDanger('El pago debe ser distinto de Cero!');
-                }
-            /*--------------------------------------------*/
-        }   
-        $payment_type2 = request('payment_type2');
-        if($come_pay >= 2){
-
-            /*-------------PAGO NUMERO 2----------------------*/
-
-            $var2 = new QuotationPayment();
-            $var2->setConnection(Auth::user()->database_name);
-
-            $amount_pay2 = request('amount_pay2');
-
-            if(isset($amount_pay2)){
-                
-                $valor_sin_formato_amount_pay2 = str_replace(',', '.', str_replace('.', '', $amount_pay2));
-            }else{
-                return redirect('invoices')->withDanger('Debe ingresar un monto de pago 2!');
-            }
-                
-
-            $account_bank2 = request('account_bank2');
-            $account_efectivo2 = request('account_efectivo2');
-            $account_punto_de_venta2 = request('account_punto_de_venta2');
-
-            $credit_days2 = request('credit_days2');
-
-            
-
-            $reference2 = request('reference2');
-
-            if($valor_sin_formato_amount_pay2 != 0){
-
-            if($payment_type2 != 0){
-
-                $var2->id_quotation = request('id_quotation');
-
-                //SELECCIONA LA CUENTA QUE SE REGISTRA EN EL TIPO DE PAGO
-                if($payment_type2 == 1 || $payment_type2 == 11 || $payment_type2 == 5 ){
-                    //CUENTAS BANCARIAS
-                    if(($account_bank2 != 0)){
-                        if(isset($reference2)){
-
-                            $var2->id_account = $account_bank2;
-
-                            $var2->reference = $reference2;
-
-                        }else{
-                            return redirect('invoices')->withDanger('Debe ingresar una Referencia Bancaria en pago numero 2!');
-                        }
-                    }else{
-                        return redirect('invoices')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 2!');
-                    }
-                }
-                if($payment_type2 == 4){
-                    //DIAS DE CREDITO
-                    if(isset($credit_days2)){
-
-                        $var2->credit_days = $credit_days2;
-
-                    }else{
-                        return redirect('invoices')->withDanger('Debe ingresar los Dias de Credito en pago numero 2!');
-                    }
-                }
-
-                if($payment_type2 == 6){
-                    //DIAS DE CREDITO
-                    if(($account_efectivo2 != 0)){
-
-                        $var2->id_account = $account_efectivo2;
-
-                    }else{
-                        return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Efectivo en pago numero 2!');
-                    }
-                }
-
-                if($payment_type2 == 9 || $payment_type2 == 10){
-                        //CUENTAS PUNTO DE VENTA
-                    if(($account_punto_de_venta2 != 0)){
-                        $var2->id_account = $account_punto_de_venta2;
-                    }else{
-                        return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Punto de Venta en pago numero 2!');
-                    }
-                }
-
-                    
-            
-
-                    $var2->payment_type = request('payment_type2');
-                    $var2->amount = $valor_sin_formato_amount_pay2;
-                    
-                    if($coin == 'dolares'){
-                        $var2->amount = $var2->amount * $bcv;
-                    }
-                    $var2->rate = $bcv;
-                    
-                    $var2->status =  1;
-                
-                    $total_pay += $valor_sin_formato_amount_pay2;
-
-                    $validate_boolean2 = true;
-
-                
-            }else{
-                return redirect('invoices')->withDanger('Debe seleccionar un Tipo de Pago 2!');
-            }
-
-            
-            }else{
-                return redirect('invoices')->withDanger('El pago 2 debe ser distinto de Cero!');
-            }
-            /*--------------------------------------------*/
-        } 
-        $payment_type3 = request('payment_type3');   
-        if($come_pay >= 3){
-
-                /*-------------PAGO NUMERO 3----------------------*/
-
-                $var3 = new QuotationPayment();
-                $var3->setConnection(Auth::user()->database_name);
-
-                $amount_pay3 = request('amount_pay3');
-
-                if(isset($amount_pay3)){
-                    
-                    $valor_sin_formato_amount_pay3 = str_replace(',', '.', str_replace('.', '', $amount_pay3));
-                }else{
-                    return redirect('invoices')->withDanger('Debe ingresar un monto de pago 3!');
+                    return redirect('invoices')->withDanger('Debe ingresar un monto de pago 1!');
                 }
                     
-
-                $account_bank3 = request('account_bank3');
-                $account_efectivo3 = request('account_efectivo3');
-                $account_punto_de_venta3 = request('account_punto_de_venta3');
-
-                $credit_days3 = request('credit_days3');
-
-               
-
-                $reference3 = request('reference3');
-
-                if($valor_sin_formato_amount_pay3 != 0){
-
-                    if($payment_type3 != 0){
-
-                        $var3->id_quotation = request('id_quotation');
-
+        
+                $account_bank = request('account_bank');
+                $account_efectivo = request('account_efectivo');
+                $account_punto_de_venta = request('account_punto_de_venta');
+        
+                $credit_days = request('credit_days');
+        
+                $reference = request('reference');
+        
+                if($valor_sin_formato_amount_pay != 0){
+        
+                    if($payment_type != 0){
+        
+                        $var->id_quotation = request('id_quotation');
+        
                         //SELECCIONA LA CUENTA QUE SE REGISTRA EN EL TIPO DE PAGO
-                        if($payment_type3 == 1 || $payment_type3 == 11 || $payment_type3 == 5 ){
+                        if($payment_type == 1 || $payment_type == 11 || $payment_type == 5 ){
                             //CUENTAS BANCARIAS
-                            if(($account_bank3 != 0)){
-                                if(isset($reference3)){
-
-                                    $var3->id_account = $account_bank3;
-
-                                    $var3->reference = $reference3;
-
+                            if(($account_bank != 0)){
+                                if(isset($reference)){
+        
+                                    $var->id_account = $account_bank;
+        
+                                    $var->reference = $reference;
+        
                                 }else{
-                                    return redirect('invoices')->withDanger('Debe ingresar una Referencia Bancaria en pago numero 3!');
+                                    return redirect('invoices')->withDanger('Debe ingresar una Referencia Bancaria!');
                                 }
                             }else{
-                                return redirect('invoices')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 3!');
+                                return redirect('invoices')->withDanger('Debe seleccionar una Cuenta Bancaria!');
                             }
                         }
-                        if($payment_type3 == 4){
+                        if($payment_type == 4){
                             //DIAS DE CREDITO
-                            if(isset($credit_days3)){
-
-                                $var3->credit_days = $credit_days3;
-
+                            if(isset($credit_days)){
+        
+                                $var->credit_days = $credit_days;
+        
                             }else{
-                                return redirect('invoices')->withDanger('Debe ingresar los Dias de Credito en pago numero 3!');
+                                return redirect('invoices')->withDanger('Debe ingresar los Dias de Credito!');
                             }
                         }
-
-                        if($payment_type3 == 6){
+        
+                        if($payment_type == 6){
                             //DIAS DE CREDITO
-                            if(($account_efectivo3 != 0)){
-
-                                $var3->id_account = $account_efectivo3;
-
+                            if(($account_efectivo != 0)){
+        
+                                $var->id_account = $account_efectivo;
+        
                             }else{
-                                return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Efectivo en pago numero 3!');
+                                return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Efectivo!');
                             }
                         }
-
-                        if($payment_type3 == 9 || $payment_type3 == 10){
+        
+                        if($payment_type == 9 || $payment_type == 10){
                             //CUENTAS PUNTO DE VENTA
-                            if(($account_punto_de_venta3 != 0)){
-                                $var3->id_account = $account_punto_de_venta3;
+                            if(($account_punto_de_venta != 0)){
+                                $var->id_account = $account_punto_de_venta;
                             }else{
-                                return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Punto de Venta en pago numero 3!');
+                                return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Punto de Venta!');
                             }
                         }
-
+        
+                            
                     
-                    
-
-                            $var3->payment_type = request('payment_type3');
-                            $var3->amount = $valor_sin_formato_amount_pay3;
+        
+                            $var->payment_type = request('payment_type');
+                            $var->amount = $valor_sin_formato_amount_pay;
                             
                             if($coin == 'dolares'){
-                                $var3->amount = $var3->amount * $bcv;
+                                $var->amount = $var->amount * $bcv;
                             }
-                            $var3->rate = $bcv;
-                            
-                            $var3->status =  1;
-                        
-                            $total_pay += $valor_sin_formato_amount_pay3;
 
-                            $validate_boolean3 = true;
+                            $var->rate = $bcv;
+                            
+                            $var->status =  1;
+                        
+                            $total_pay += $valor_sin_formato_amount_pay;
+        
+                            $validate_boolean1 = true;
+        
+                        
+                    }else{
+                        return redirect('invoices')->withDanger('Debe seleccionar un Tipo de Pago 1!');
+                    }
+        
+                    
+                }else{
+                        return redirect('invoices')->withDanger('El pago debe ser distinto de Cero!');
+                    }
+                /*--------------------------------------------*/
+            }   
+            $payment_type2 = request('payment_type2');
+            if($come_pay >= 2){
+
+                /*-------------PAGO NUMERO 2----------------------*/
+
+                $var2 = new QuotationPayment();
+                $var2->setConnection(Auth::user()->database_name);
+
+                $amount_pay2 = request('amount_pay2');
+
+                if(isset($amount_pay2)){
+                    
+                    $valor_sin_formato_amount_pay2 = str_replace(',', '.', str_replace('.', '', $amount_pay2));
+                }else{
+                    return redirect('invoices')->withDanger('Debe ingresar un monto de pago 2!');
+                }
+                    
+
+                $account_bank2 = request('account_bank2');
+                $account_efectivo2 = request('account_efectivo2');
+                $account_punto_de_venta2 = request('account_punto_de_venta2');
+
+                $credit_days2 = request('credit_days2');
+
+                
+
+                $reference2 = request('reference2');
+
+                if($valor_sin_formato_amount_pay2 != 0){
+
+                if($payment_type2 != 0){
+
+                    $var2->id_quotation = request('id_quotation');
+
+                    //SELECCIONA LA CUENTA QUE SE REGISTRA EN EL TIPO DE PAGO
+                    if($payment_type2 == 1 || $payment_type2 == 11 || $payment_type2 == 5 ){
+                        //CUENTAS BANCARIAS
+                        if(($account_bank2 != 0)){
+                            if(isset($reference2)){
+
+                                $var2->id_account = $account_bank2;
+
+                                $var2->reference = $reference2;
+
+                            }else{
+                                return redirect('invoices')->withDanger('Debe ingresar una Referencia Bancaria en pago numero 2!');
+                            }
+                        }else{
+                            return redirect('invoices')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 2!');
+                        }
+                    }
+                    if($payment_type2 == 4){
+                        //DIAS DE CREDITO
+                        if(isset($credit_days2)){
+
+                            $var2->credit_days = $credit_days2;
+
+                        }else{
+                            return redirect('invoices')->withDanger('Debe ingresar los Dias de Credito en pago numero 2!');
+                        }
+                    }
+
+                    if($payment_type2 == 6){
+                        //DIAS DE CREDITO
+                        if(($account_efectivo2 != 0)){
+
+                            $var2->id_account = $account_efectivo2;
+
+                        }else{
+                            return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Efectivo en pago numero 2!');
+                        }
+                    }
+
+                    if($payment_type2 == 9 || $payment_type2 == 10){
+                            //CUENTAS PUNTO DE VENTA
+                        if(($account_punto_de_venta2 != 0)){
+                            $var2->id_account = $account_punto_de_venta2;
+                        }else{
+                            return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Punto de Venta en pago numero 2!');
+                        }
+                    }
+
+                        
+                
+
+                        $var2->payment_type = request('payment_type2');
+                        $var2->amount = $valor_sin_formato_amount_pay2;
+                        
+                        if($coin == 'dolares'){
+                            $var2->amount = $var2->amount * $bcv;
+                        }
+                        $var2->rate = $bcv;
+                        
+                        $var2->status =  1;
+                    
+                        $total_pay += $valor_sin_formato_amount_pay2;
+
+                        $validate_boolean2 = true;
+
+                    
+                }else{
+                    return redirect('invoices')->withDanger('Debe seleccionar un Tipo de Pago 2!');
+                }
+
+                
+                }else{
+                    return redirect('invoices')->withDanger('El pago 2 debe ser distinto de Cero!');
+                }
+                /*--------------------------------------------*/
+            } 
+            $payment_type3 = request('payment_type3');   
+            if($come_pay >= 3){
+
+                    /*-------------PAGO NUMERO 3----------------------*/
+
+                    $var3 = new QuotationPayment();
+                    $var3->setConnection(Auth::user()->database_name);
+
+                    $amount_pay3 = request('amount_pay3');
+
+                    if(isset($amount_pay3)){
+                        
+                        $valor_sin_formato_amount_pay3 = str_replace(',', '.', str_replace('.', '', $amount_pay3));
+                    }else{
+                        return redirect('invoices')->withDanger('Debe ingresar un monto de pago 3!');
+                    }
+                        
+
+                    $account_bank3 = request('account_bank3');
+                    $account_efectivo3 = request('account_efectivo3');
+                    $account_punto_de_venta3 = request('account_punto_de_venta3');
+
+                    $credit_days3 = request('credit_days3');
+
+                
+
+                    $reference3 = request('reference3');
+
+                    if($valor_sin_formato_amount_pay3 != 0){
+
+                        if($payment_type3 != 0){
+
+                            $var3->id_quotation = request('id_quotation');
+
+                            //SELECCIONA LA CUENTA QUE SE REGISTRA EN EL TIPO DE PAGO
+                            if($payment_type3 == 1 || $payment_type3 == 11 || $payment_type3 == 5 ){
+                                //CUENTAS BANCARIAS
+                                if(($account_bank3 != 0)){
+                                    if(isset($reference3)){
+
+                                        $var3->id_account = $account_bank3;
+
+                                        $var3->reference = $reference3;
+
+                                    }else{
+                                        return redirect('invoices')->withDanger('Debe ingresar una Referencia Bancaria en pago numero 3!');
+                                    }
+                                }else{
+                                    return redirect('invoices')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 3!');
+                                }
+                            }
+                            if($payment_type3 == 4){
+                                //DIAS DE CREDITO
+                                if(isset($credit_days3)){
+
+                                    $var3->credit_days = $credit_days3;
+
+                                }else{
+                                    return redirect('invoices')->withDanger('Debe ingresar los Dias de Credito en pago numero 3!');
+                                }
+                            }
+
+                            if($payment_type3 == 6){
+                                //DIAS DE CREDITO
+                                if(($account_efectivo3 != 0)){
+
+                                    $var3->id_account = $account_efectivo3;
+
+                                }else{
+                                    return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Efectivo en pago numero 3!');
+                                }
+                            }
+
+                            if($payment_type3 == 9 || $payment_type3 == 10){
+                                //CUENTAS PUNTO DE VENTA
+                                if(($account_punto_de_venta3 != 0)){
+                                    $var3->id_account = $account_punto_de_venta3;
+                                }else{
+                                    return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Punto de Venta en pago numero 3!');
+                                }
+                            }
+
+                        
+                        
+
+                                $var3->payment_type = request('payment_type3');
+                                $var3->amount = $valor_sin_formato_amount_pay3;
+                                
+                                if($coin == 'dolares'){
+                                    $var3->amount = $var3->amount * $bcv;
+                                }
+                                $var3->rate = $bcv;
+                                
+                                $var3->status =  1;
+                            
+                                $total_pay += $valor_sin_formato_amount_pay3;
+
+                                $validate_boolean3 = true;
+
+                            
+                        }else{
+                            return redirect('invoices')->withDanger('Debe seleccionar un Tipo de Pago 3!');
+                        }
 
                         
                     }else{
-                        return redirect('invoices')->withDanger('Debe seleccionar un Tipo de Pago 3!');
+                            return redirect('invoices')->withDanger('El pago 3 debe ser distinto de Cero!');
+                        }
+                    /*--------------------------------------------*/
+            }
+            $payment_type4 = request('payment_type4');
+            if($come_pay >= 4){
+
+                    /*-------------PAGO NUMERO 4----------------------*/
+
+                    $var4 = new QuotationPayment();
+                    $var4->setConnection(Auth::user()->database_name);
+
+                    $amount_pay4 = request('amount_pay4');
+
+                    if(isset($amount_pay4)){
+                        
+                        $valor_sin_formato_amount_pay4 = str_replace(',', '.', str_replace('.', '', $amount_pay4));
+                    }else{
+                        return redirect('invoices')->withDanger('Debe ingresar un monto de pago 4!');
+                    }
+                        
+
+                    $account_bank4 = request('account_bank4');
+                    $account_efectivo4 = request('account_efectivo4');
+                    $account_punto_de_venta4 = request('account_punto_de_venta4');
+
+                    $credit_days4 = request('credit_days4');
+
+                
+
+                    $reference4 = request('reference4');
+
+                    if($valor_sin_formato_amount_pay4 != 0){
+
+                        if($payment_type4 != 0){
+
+                            $var4->id_quotation = request('id_quotation');
+
+                            //SELECCIONA LA CUENTA QUE SE REGISTRA EN EL TIPO DE PAGO
+                            if($payment_type4 == 1 || $payment_type4 == 11 || $payment_type4 == 5 ){
+                                //CUENTAS BANCARIAS
+                                if(($account_bank4 != 0)){
+                                    if(isset($reference4)){
+
+                                        $var4->id_account = $account_bank4;
+
+                                        $var4->reference = $reference4;
+
+                                    }else{
+                                        return redirect('invoices')->withDanger('Debe ingresar una Referencia Bancaria en pago numero 4!');
+                                    }
+                                }else{
+                                    return redirect('invoices')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 4!');
+                                }
+                            }
+                            if($payment_type4 == 4){
+                                //DIAS DE CREDITO
+                                if(isset($credit_days4)){
+
+                                    $var4->credit_days = $credit_days4;
+
+                                }else{
+                                    return redirect('invoices')->withDanger('Debe ingresar los Dias de Credito en pago numero 4!');
+                                }
+                            }
+
+                            if($payment_type4 == 6){
+                                //DIAS DE CREDITO
+                                if(($account_efectivo4 != 0)){
+
+                                    $var4->id_account = $account_efectivo4;
+
+                                }else{
+                                    return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Efectivo en pago numero 4!');
+                                }
+                            }
+
+                            if($payment_type4 == 9 || $payment_type4 == 10){
+                                //CUENTAS PUNTO DE VENTA
+                                if(($account_punto_de_venta4 != 0)){
+                                    $var4->id_account = $account_punto_de_venta4;
+                                }else{
+                                    return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Punto de Venta en pago numero 4!');
+                                }
+                            }
+
+                        
+                        
+
+                                $var4->payment_type = request('payment_type4');
+                                $var4->amount = $valor_sin_formato_amount_pay4;
+                                
+                                if($coin == 'dolares'){
+                                    $var4->amount = $var4->amount * $bcv;
+                                }
+                                $var4->rate = $bcv;
+                                
+                                $var4->status =  1;
+                            
+                                $total_pay += $valor_sin_formato_amount_pay4;
+
+                                $validate_boolean4 = true;
+
+                            
+                        }else{
+                            return redirect('invoices')->withDanger('Debe seleccionar un Tipo de Pago 4!');
+                        }
+
+                        
+                    }else{
+                            return redirect('invoices')->withDanger('El pago 4 debe ser distinto de Cero!');
+                        }
+                    /*--------------------------------------------*/
+            } 
+            $payment_type5 = request('payment_type5');
+            if($come_pay >= 5){
+
+                /*-------------PAGO NUMERO 5----------------------*/
+
+                $var5 = new QuotationPayment();
+                $var5->setConnection(Auth::user()->database_name);
+
+                $amount_pay5 = request('amount_pay5');
+
+                if(isset($amount_pay5)){
+                    
+                    $valor_sin_formato_amount_pay5 = str_replace(',', '.', str_replace('.', '', $amount_pay5));
+                }else{
+                    return redirect('invoices')->withDanger('Debe ingresar un monto de pago 5!');
+                }
+                    
+
+                $account_bank5 = request('account_bank5');
+                $account_efectivo5 = request('account_efectivo5');
+                $account_punto_de_venta5 = request('account_punto_de_venta5');
+
+                $credit_days5 = request('credit_days5');
+
+            
+
+                $reference5 = request('reference5');
+
+                if($valor_sin_formato_amount_pay5 != 0){
+
+                    if($payment_type5 != 0){
+
+                        $var5->id_quotation = request('id_quotation');
+
+                        //SELECCIONA LA CUENTA QUE SE REGISTRA EN EL TIPO DE PAGO
+                        if($payment_type5 == 1 || $payment_type5 == 11 || $payment_type5 == 5 ){
+                            //CUENTAS BANCARIAS
+                            if(($account_bank5 != 0)){
+                                if(isset($reference5)){
+
+                                    $var5->id_account = $account_bank5;
+
+                                    $var5->reference = $reference5;
+
+                                }else{
+                                    return redirect('invoices')->withDanger('Debe ingresar una Referencia Bancaria en pago numero 5!');
+                                }
+                            }else{
+                                return redirect('invoices')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 5!');
+                            }
+                        }
+                        if($payment_type5 == 4){
+                            //DIAS DE CREDITO
+                            if(isset($credit_days5)){
+
+                                $var5->credit_days = $credit_days5;
+
+                            }else{
+                                return redirect('invoices')->withDanger('Debe ingresar los Dias de Credito en pago numero 5!');
+                            }
+                        }
+
+                        if($payment_type5 == 6){
+                            //DIAS DE CREDITO
+                            if(($account_efectivo5 != 0)){
+
+                                $var5->id_account = $account_efectivo5;
+
+                            }else{
+                                return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Efectivo en pago numero 5!');
+                            }
+                        }
+
+                        if($payment_type5 == 9 || $payment_type5 == 10){
+                            //CUENTAS PUNTO DE VENTA
+                            if(($account_punto_de_venta5 != 0)){
+                                $var5->id_account = $account_punto_de_venta5;
+                            }else{
+                                return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Punto de Venta en pago numero 5!');
+                            }
+                        }
+
+                    
+                    
+
+                            $var5->payment_type = request('payment_type5');
+                            $var5->amount = $valor_sin_formato_amount_pay5;
+                            
+                            if($coin == 'dolares'){
+                                $var5->amount = $var5->amount * $bcv;
+                            }
+
+                            $var5->rate = $bcv;
+                            
+                            $var5->status =  1;
+                        
+                            $total_pay += $valor_sin_formato_amount_pay5;
+
+                            $validate_boolean5 = true;
+
+                        
+                    }else{
+                        return redirect('invoices')->withDanger('Debe seleccionar un Tipo de Pago 5!');
                     }
 
                     
                 }else{
-                        return redirect('invoices')->withDanger('El pago 3 debe ser distinto de Cero!');
+                        return redirect('invoices')->withDanger('El pago 5 debe ser distinto de Cero!');
                     }
                 /*--------------------------------------------*/
+            } 
+            $payment_type6 = request('payment_type6');
+            if($come_pay >= 6){
+
+                /*-------------PAGO NUMERO 6----------------------*/
+
+                $var6 = new QuotationPayment();
+                $var6->setConnection(Auth::user()->database_name);
+
+                $amount_pay6 = request('amount_pay6');
+
+                if(isset($amount_pay6)){
+                    
+                    $valor_sin_formato_amount_pay6 = str_replace(',', '.', str_replace('.', '', $amount_pay6));
+                }else{
+                    return redirect('invoices')->withDanger('Debe ingresar un monto de pago 6!');
+                }
+                    
+
+                $account_bank6 = request('account_bank6');
+                $account_efectivo6 = request('account_efectivo6');
+                $account_punto_de_venta6 = request('account_punto_de_venta6');
+
+                $credit_days6 = request('credit_days6');
+
+                
+
+                $reference6 = request('reference6');
+
+                if($valor_sin_formato_amount_pay6 != 0){
+
+                    if($payment_type6 != 0){
+
+                        $var6->id_quotation = request('id_quotation');
+
+                        //SELECCIONA LA CUENTA QUE SE REGISTRA EN EL TIPO DE PAGO
+                        if($payment_type6 == 1 || $payment_type6 == 11 || $payment_type6 == 5 ){
+                            //CUENTAS BANCARIAS
+                            if(($account_bank6 != 0)){
+                                if(isset($reference6)){
+
+                                    $var6->id_account = $account_bank6;
+
+                                    $var6->reference = $reference6;
+
+                                }else{
+                                    return redirect('invoices')->withDanger('Debe ingresar una Referencia Bancaria en pago numero 6!');
+                                }
+                            }else{
+                                return redirect('invoices')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 6!');
+                            }
+                        }
+                        if($payment_type6 == 4){
+                            //DIAS DE CREDITO
+                            if(isset($credit_days6)){
+
+                                $var6->credit_days = $credit_days6;
+
+                            }else{
+                                return redirect('invoices')->withDanger('Debe ingresar los Dias de Credito en pago numero 6!');
+                            }
+                        }
+
+                        if($payment_type6 == 6){
+                            //DIAS DE CREDITO
+                            if(($account_efectivo6 != 0)){
+
+                                $var6->id_account = $account_efectivo6;
+
+                            }else{
+                                return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Efectivo en pago numero 6!');
+                            }
+                        }
+
+                        if($payment_type6 == 9 || $payment_type6 == 10){
+                            //CUENTAS PUNTO DE VENTA
+                            if(($account_punto_de_venta6 != 0)){
+                                $var6->id_account = $account_punto_de_venta6;
+                            }else{
+                                return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Punto de Venta en pago numero 6!');
+                            }
+                        }
+
+                    
+                    
+
+                            $var6->payment_type = request('payment_type6');
+                            $var6->amount = $valor_sin_formato_amount_pay6;
+                            
+                            if($coin == 'dolares'){
+                                $var6->amount = $var6->amount * $bcv;
+                            }
+
+                            $var6->rate = $bcv;
+
+                            $var6->status =  1;
+                        
+                            $total_pay += $valor_sin_formato_amount_pay6;
+
+                            $validate_boolean6 = true;
+
+                        
+                    }else{
+                        return redirect('invoices')->withDanger('Debe seleccionar un Tipo de Pago 6!');
+                    }
+
+                    
+                }else{
+                        return redirect('invoices')->withDanger('El pago 6 debe ser distinto de Cero!');
+                    }
+                /*--------------------------------------------*/
+            } 
+            $payment_type7 = request('payment_type7');
+            if($come_pay >= 7){
+
+                /*-------------PAGO NUMERO 7----------------------*/
+
+                $var7 = new QuotationPayment();
+                $var7->setConnection(Auth::user()->database_name);
+
+                $amount_pay7 = request('amount_pay7');
+
+                if(isset($amount_pay7)){
+                    
+                    $valor_sin_formato_amount_pay7 = str_replace(',', '.', str_replace('.', '', $amount_pay7));
+                }else{
+                    return redirect('invoices')->withDanger('Debe ingresar un monto de pago 7!');
+                }
+                    
+
+                $account_bank7 = request('account_bank7');
+                $account_efectivo7 = request('account_efectivo7');
+                $account_punto_de_venta7 = request('account_punto_de_venta7');
+
+                $credit_days7 = request('credit_days7');
+
+                
+
+                $reference7 = request('reference7');
+
+                if($valor_sin_formato_amount_pay7 != 0){
+
+                    if($payment_type7 != 0){
+
+                        $var7->id_quotation = request('id_quotation');
+
+                        //SELECCIONA LA CUENTA QUE SE REGISTRA EN EL TIPO DE PAGO
+                        if($payment_type7 == 1 || $payment_type7 == 11 || $payment_type7 == 5 ){
+                            //CUENTAS BANCARIAS
+                            if(($account_bank7 != 0)){
+                                if(isset($reference7)){
+
+                                    $var7->id_account = $account_bank7;
+
+                                    $var7->reference = $reference7;
+
+                                }else{
+                                    return redirect('invoices')->withDanger('Debe ingresar una Referencia Bancaria en pago numero 7!');
+                                }
+                            }else{
+                                return redirect('invoices')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 7!');
+                            }
+                        }
+                        if($payment_type7 == 4){
+                            //DIAS DE CREDITO
+                            if(isset($credit_days7)){
+
+                                $var7->credit_days = $credit_days7;
+
+                            }else{
+                                return redirect('invoices')->withDanger('Debe ingresar los Dias de Credito en pago numero 7!');
+                            }
+                        }
+
+                        if($payment_type7 == 6){
+                            //DIAS DE CREDITO
+                            if(($account_efectivo7 != 0)){
+
+                                $var7->id_account = $account_efectivo7;
+
+                            }else{
+                                return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Efectivo en pago numero 7!');
+                            }
+                        }
+
+                        if($payment_type7 == 9 || $payment_type7 == 10){
+                            //CUENTAS PUNTO DE VENTA
+                            if(($account_punto_de_venta7 != 0)){
+                                $var7->id_account = $account_punto_de_venta7;
+                            }else{
+                                return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Punto de Venta en pago numero 7!');
+                            }
+                        }
+
+                    
+                    
+
+                            $var7->payment_type = request('payment_type7');
+                            $var7->amount = $valor_sin_formato_amount_pay7;
+                            
+                            if($coin == 'dolares'){
+                                $var7->amount = $var7->amount * $bcv;
+                            }
+                            $var7->rate = $bcv;
+                            
+                            $var7->status =  1;
+                        
+                            $total_pay += $valor_sin_formato_amount_pay7;
+
+                            $validate_boolean7 = true;
+
+                        
+                    }else{
+                        return redirect('invoices')->withDanger('Debe seleccionar un Tipo de Pago 7!');
+                    }
+
+                    
+                }else{
+                        return redirect('invoices')->withDanger('El pago 7 debe ser distinto de Cero!');
+                    }
+                /*--------------------------------------------*/
+            } 
         }
-        $payment_type4 = request('payment_type4');
-        if($come_pay >= 4){
 
-                /*-------------PAGO NUMERO 4----------------------*/
 
-                $var4 = new QuotationPayment();
-                $var4->setConnection(Auth::user()->database_name);
-
-                $amount_pay4 = request('amount_pay4');
-
-                if(isset($amount_pay4)){
-                    
-                    $valor_sin_formato_amount_pay4 = str_replace(',', '.', str_replace('.', '', $amount_pay4));
-                }else{
-                    return redirect('invoices')->withDanger('Debe ingresar un monto de pago 4!');
-                }
-                    
-
-                $account_bank4 = request('account_bank4');
-                $account_efectivo4 = request('account_efectivo4');
-                $account_punto_de_venta4 = request('account_punto_de_venta4');
-
-                $credit_days4 = request('credit_days4');
-
-               
-
-                $reference4 = request('reference4');
-
-                if($valor_sin_formato_amount_pay4 != 0){
-
-                    if($payment_type4 != 0){
-
-                        $var4->id_quotation = request('id_quotation');
-
-                        //SELECCIONA LA CUENTA QUE SE REGISTRA EN EL TIPO DE PAGO
-                        if($payment_type4 == 1 || $payment_type4 == 11 || $payment_type4 == 5 ){
-                            //CUENTAS BANCARIAS
-                            if(($account_bank4 != 0)){
-                                if(isset($reference4)){
-
-                                    $var4->id_account = $account_bank4;
-
-                                    $var4->reference = $reference4;
-
-                                }else{
-                                    return redirect('invoices')->withDanger('Debe ingresar una Referencia Bancaria en pago numero 4!');
-                                }
-                            }else{
-                                return redirect('invoices')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 4!');
-                            }
-                        }
-                        if($payment_type4 == 4){
-                            //DIAS DE CREDITO
-                            if(isset($credit_days4)){
-
-                                $var4->credit_days = $credit_days4;
-
-                            }else{
-                                return redirect('invoices')->withDanger('Debe ingresar los Dias de Credito en pago numero 4!');
-                            }
-                        }
-
-                        if($payment_type4 == 6){
-                            //DIAS DE CREDITO
-                            if(($account_efectivo4 != 0)){
-
-                                $var4->id_account = $account_efectivo4;
-
-                            }else{
-                                return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Efectivo en pago numero 4!');
-                            }
-                        }
-
-                        if($payment_type4 == 9 || $payment_type4 == 10){
-                            //CUENTAS PUNTO DE VENTA
-                            if(($account_punto_de_venta4 != 0)){
-                                $var4->id_account = $account_punto_de_venta4;
-                            }else{
-                                return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Punto de Venta en pago numero 4!');
-                            }
-                        }
-
-                    
-                    
-
-                            $var4->payment_type = request('payment_type4');
-                            $var4->amount = $valor_sin_formato_amount_pay4;
-                            
-                            if($coin == 'dolares'){
-                                $var4->amount = $var4->amount * $bcv;
-                            }
-                            $var4->rate = $bcv;
-                            
-                            $var4->status =  1;
-                        
-                            $total_pay += $valor_sin_formato_amount_pay4;
-
-                            $validate_boolean4 = true;
-
-                        
-                    }else{
-                        return redirect('invoices')->withDanger('Debe seleccionar un Tipo de Pago 4!');
-                    }
-
-                    
-                }else{
-                        return redirect('invoices')->withDanger('El pago 4 debe ser distinto de Cero!');
-                    }
-                /*--------------------------------------------*/
-        } 
-        $payment_type5 = request('payment_type5');
-        if($come_pay >= 5){
-
-            /*-------------PAGO NUMERO 5----------------------*/
-
-            $var5 = new QuotationPayment();
-            $var5->setConnection(Auth::user()->database_name);
-
-            $amount_pay5 = request('amount_pay5');
-
-            if(isset($amount_pay5)){
-                
-                $valor_sin_formato_amount_pay5 = str_replace(',', '.', str_replace('.', '', $amount_pay5));
-            }else{
-                return redirect('invoices')->withDanger('Debe ingresar un monto de pago 5!');
-            }
-                
-
-            $account_bank5 = request('account_bank5');
-            $account_efectivo5 = request('account_efectivo5');
-            $account_punto_de_venta5 = request('account_punto_de_venta5');
-
-            $credit_days5 = request('credit_days5');
-
-           
-
-            $reference5 = request('reference5');
-
-            if($valor_sin_formato_amount_pay5 != 0){
-
-                if($payment_type5 != 0){
-
-                    $var5->id_quotation = request('id_quotation');
-
-                    //SELECCIONA LA CUENTA QUE SE REGISTRA EN EL TIPO DE PAGO
-                    if($payment_type5 == 1 || $payment_type5 == 11 || $payment_type5 == 5 ){
-                        //CUENTAS BANCARIAS
-                        if(($account_bank5 != 0)){
-                            if(isset($reference5)){
-
-                                $var5->id_account = $account_bank5;
-
-                                $var5->reference = $reference5;
-
-                            }else{
-                                return redirect('invoices')->withDanger('Debe ingresar una Referencia Bancaria en pago numero 5!');
-                            }
-                        }else{
-                            return redirect('invoices')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 5!');
-                        }
-                    }
-                    if($payment_type5 == 4){
-                        //DIAS DE CREDITO
-                        if(isset($credit_days5)){
-
-                            $var5->credit_days = $credit_days5;
-
-                        }else{
-                            return redirect('invoices')->withDanger('Debe ingresar los Dias de Credito en pago numero 5!');
-                        }
-                    }
-
-                    if($payment_type5 == 6){
-                        //DIAS DE CREDITO
-                        if(($account_efectivo5 != 0)){
-
-                            $var5->id_account = $account_efectivo5;
-
-                        }else{
-                            return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Efectivo en pago numero 5!');
-                        }
-                    }
-
-                    if($payment_type5 == 9 || $payment_type5 == 10){
-                        //CUENTAS PUNTO DE VENTA
-                        if(($account_punto_de_venta5 != 0)){
-                            $var5->id_account = $account_punto_de_venta5;
-                        }else{
-                            return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Punto de Venta en pago numero 5!');
-                        }
-                    }
-
-                
-                
-
-                        $var5->payment_type = request('payment_type5');
-                        $var5->amount = $valor_sin_formato_amount_pay5;
-                        
-                        if($coin == 'dolares'){
-                            $var5->amount = $var5->amount * $bcv;
-                        }
-
-                        $var5->rate = $bcv;
-                        
-                        $var5->status =  1;
-                    
-                        $total_pay += $valor_sin_formato_amount_pay5;
-
-                        $validate_boolean5 = true;
-
-                    
-                }else{
-                    return redirect('invoices')->withDanger('Debe seleccionar un Tipo de Pago 5!');
-                }
-
-                
-            }else{
-                    return redirect('invoices')->withDanger('El pago 5 debe ser distinto de Cero!');
-                }
-            /*--------------------------------------------*/
-        } 
-        $payment_type6 = request('payment_type6');
-        if($come_pay >= 6){
-
-            /*-------------PAGO NUMERO 6----------------------*/
-
-            $var6 = new QuotationPayment();
-            $var6->setConnection(Auth::user()->database_name);
-
-            $amount_pay6 = request('amount_pay6');
-
-            if(isset($amount_pay6)){
-                
-                $valor_sin_formato_amount_pay6 = str_replace(',', '.', str_replace('.', '', $amount_pay6));
-            }else{
-                return redirect('invoices')->withDanger('Debe ingresar un monto de pago 6!');
-            }
-                
-
-            $account_bank6 = request('account_bank6');
-            $account_efectivo6 = request('account_efectivo6');
-            $account_punto_de_venta6 = request('account_punto_de_venta6');
-
-            $credit_days6 = request('credit_days6');
-
-            
-
-            $reference6 = request('reference6');
-
-            if($valor_sin_formato_amount_pay6 != 0){
-
-                if($payment_type6 != 0){
-
-                    $var6->id_quotation = request('id_quotation');
-
-                    //SELECCIONA LA CUENTA QUE SE REGISTRA EN EL TIPO DE PAGO
-                    if($payment_type6 == 1 || $payment_type6 == 11 || $payment_type6 == 5 ){
-                        //CUENTAS BANCARIAS
-                        if(($account_bank6 != 0)){
-                            if(isset($reference6)){
-
-                                $var6->id_account = $account_bank6;
-
-                                $var6->reference = $reference6;
-
-                            }else{
-                                return redirect('invoices')->withDanger('Debe ingresar una Referencia Bancaria en pago numero 6!');
-                            }
-                        }else{
-                            return redirect('invoices')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 6!');
-                        }
-                    }
-                    if($payment_type6 == 4){
-                        //DIAS DE CREDITO
-                        if(isset($credit_days6)){
-
-                            $var6->credit_days = $credit_days6;
-
-                        }else{
-                            return redirect('invoices')->withDanger('Debe ingresar los Dias de Credito en pago numero 6!');
-                        }
-                    }
-
-                    if($payment_type6 == 6){
-                        //DIAS DE CREDITO
-                        if(($account_efectivo6 != 0)){
-
-                            $var6->id_account = $account_efectivo6;
-
-                        }else{
-                            return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Efectivo en pago numero 6!');
-                        }
-                    }
-
-                    if($payment_type6 == 9 || $payment_type6 == 10){
-                        //CUENTAS PUNTO DE VENTA
-                        if(($account_punto_de_venta6 != 0)){
-                            $var6->id_account = $account_punto_de_venta6;
-                        }else{
-                            return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Punto de Venta en pago numero 6!');
-                        }
-                    }
-
-                
-                
-
-                        $var6->payment_type = request('payment_type6');
-                        $var6->amount = $valor_sin_formato_amount_pay6;
-                        
-                        if($coin == 'dolares'){
-                            $var6->amount = $var6->amount * $bcv;
-                        }
-
-                        $var6->rate = $bcv;
-
-                        $var6->status =  1;
-                    
-                        $total_pay += $valor_sin_formato_amount_pay6;
-
-                        $validate_boolean6 = true;
-
-                    
-                }else{
-                    return redirect('invoices')->withDanger('Debe seleccionar un Tipo de Pago 6!');
-                }
-
-                
-            }else{
-                    return redirect('invoices')->withDanger('El pago 6 debe ser distinto de Cero!');
-                }
-            /*--------------------------------------------*/
-        } 
-        $payment_type7 = request('payment_type7');
-        if($come_pay >= 7){
-
-            /*-------------PAGO NUMERO 7----------------------*/
-
-            $var7 = new QuotationPayment();
-            $var7->setConnection(Auth::user()->database_name);
-
-            $amount_pay7 = request('amount_pay7');
-
-            if(isset($amount_pay7)){
-                
-                $valor_sin_formato_amount_pay7 = str_replace(',', '.', str_replace('.', '', $amount_pay7));
-            }else{
-                return redirect('invoices')->withDanger('Debe ingresar un monto de pago 7!');
-            }
-                
-
-            $account_bank7 = request('account_bank7');
-            $account_efectivo7 = request('account_efectivo7');
-            $account_punto_de_venta7 = request('account_punto_de_venta7');
-
-            $credit_days7 = request('credit_days7');
-
-            
-
-            $reference7 = request('reference7');
-
-            if($valor_sin_formato_amount_pay7 != 0){
-
-                if($payment_type7 != 0){
-
-                    $var7->id_quotation = request('id_quotation');
-
-                    //SELECCIONA LA CUENTA QUE SE REGISTRA EN EL TIPO DE PAGO
-                    if($payment_type7 == 1 || $payment_type7 == 11 || $payment_type7 == 5 ){
-                        //CUENTAS BANCARIAS
-                        if(($account_bank7 != 0)){
-                            if(isset($reference7)){
-
-                                $var7->id_account = $account_bank7;
-
-                                $var7->reference = $reference7;
-
-                            }else{
-                                return redirect('invoices')->withDanger('Debe ingresar una Referencia Bancaria en pago numero 7!');
-                            }
-                        }else{
-                            return redirect('invoices')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 7!');
-                        }
-                    }
-                    if($payment_type7 == 4){
-                        //DIAS DE CREDITO
-                        if(isset($credit_days7)){
-
-                            $var7->credit_days = $credit_days7;
-
-                        }else{
-                            return redirect('invoices')->withDanger('Debe ingresar los Dias de Credito en pago numero 7!');
-                        }
-                    }
-
-                    if($payment_type7 == 6){
-                        //DIAS DE CREDITO
-                        if(($account_efectivo7 != 0)){
-
-                            $var7->id_account = $account_efectivo7;
-
-                        }else{
-                            return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Efectivo en pago numero 7!');
-                        }
-                    }
-
-                    if($payment_type7 == 9 || $payment_type7 == 10){
-                        //CUENTAS PUNTO DE VENTA
-                        if(($account_punto_de_venta7 != 0)){
-                            $var7->id_account = $account_punto_de_venta7;
-                        }else{
-                            return redirect('invoices')->withDanger('Debe seleccionar una Cuenta de Punto de Venta en pago numero 7!');
-                        }
-                    }
-
-                
-                
-
-                        $var7->payment_type = request('payment_type7');
-                        $var7->amount = $valor_sin_formato_amount_pay7;
-                        
-                        if($coin == 'dolares'){
-                            $var7->amount = $var7->amount * $bcv;
-                        }
-                        $var7->rate = $bcv;
-                        
-                        $var7->status =  1;
-                    
-                        $total_pay += $valor_sin_formato_amount_pay7;
-
-                        $validate_boolean7 = true;
-
-                    
-                }else{
-                    return redirect('invoices')->withDanger('Debe seleccionar un Tipo de Pago 7!');
-                }
-
-                
-            }else{
-                    return redirect('invoices')->withDanger('El pago 7 debe ser distinto de Cero!');
-                }
-            /*--------------------------------------------*/
-        } 
-       
         //VALIDA QUE LA SUMA MONTOS INGRESADOS SEAN IGUALES AL MONTO TOTAL DEL PAGO
-        if($total_pay == $amount_with_iva){
+        if($total_pay == $amount_with_iva  || ($amount_with_iva <= 0)){
 
             $array = $request->all();
             $id_quotation = 0;
@@ -1054,7 +1055,7 @@ class InvoiceController extends Controller
                 
                 if(substr($key,0, 12) == 'id_quotation'){
                     array_push($facturas_a_procesar, $item);
-                    $this->procesar_quotation($item);
+                    $this->procesar_quotation($item,$total_pay);
                     $id_quotation = $item;
                 }
                 
@@ -1156,18 +1157,31 @@ class InvoiceController extends Controller
     
             }
             
-            /*Anticipos*/
-            if(isset($anticipo) && ($anticipo != 0)){
+            
+             /*Anticipos*/
+             if(isset($anticipo) && ($anticipo != 0)){
                 
-                 $account_anticipo_cliente = Account::on(Auth::user()->database_name)->where('code_one',2)
-                                                             ->where('code_two',3)
-                                                             ->where('code_three',1)
-                                                             ->where('code_four',1)
-                                                             ->where('code_five',2)->first(); 
-                 
-                 if(isset($account_anticipo_cliente)){
-                     $this->add_movement($bcv,$header_voucher->id,$account_anticipo_cliente->id,$user_id,$anticipo,0);
-                 }
+                //Si el total a pagar es negativo, quiere decir que los anticipos sobrepasan al monto total de la factura
+                if($amount_with_iva  < 0){
+                    $global = new GlobalController;     
+                    $global->check_anticipo($quotation,$grand_total);
+                    $quotation->anticipo =  $grand_total;
+                    $quotation->status = "C";
+                }else{
+                    $quotation->anticipo =  $anticipo;
+                }
+                
+                $account_anticipo_cliente = Account::on(Auth::user()->database_name)->where('code_one',2)
+                                                        ->where('code_two',3)
+                                                        ->where('code_three',1)
+                                                        ->where('code_four',1)
+                                                        ->where('code_five',2)->first(); 
+
+                if(isset($account_anticipo_cliente)){
+                    $this->add_movement($bcv,$header_voucher->id,$account_anticipo_cliente->id,$quotation->id,$user_id,$quotation->anticipo,0);
+                }
+             }else{
+                 $quotation->anticipo = 0;
              }
             /*---------- */
 
@@ -1200,7 +1214,8 @@ class InvoiceController extends Controller
                 $this->add_movement($bcv,$header_voucher->id,$account_cuentas_por_cobrar->id,$user_id,0,$grand_total);
             }
             
-            
+            $global = new GlobalController;                                                
+            $global->procesar_anticipos($quotation,$total_pay);
             
             return redirect('invoices')->withSuccess('Facturas Guardadas con Exito!');
    
@@ -1214,7 +1229,7 @@ class InvoiceController extends Controller
     
     
     
-    public function procesar_quotation($id_quotation)
+    public function procesar_quotation($id_quotation,$total_pay)
     {
         $quotation = Quotation::on(Auth::user()->database_name)->findOrFail($id_quotation);
         
@@ -1227,28 +1242,22 @@ class InvoiceController extends Controller
             }
         }
 
-        /*Verificamos si el cliente tiene anticipos activos */
-        DB::connection(Auth::user()->database_name)->table('anticipos')
-                                                    ->where('id_client',$quotation->id_client)
-                                                    ->where('id_quotation',null)
-                                                    ->orWhere('id_quotation',$quotation->id)
-                                                    ->where('status', '=', '1')
-                                                    ->update(['status' => 'C']);
+        //Aqui pasa los quotation_products a status C de Cobrado
+        DB::connection(Auth::user()->database_name)->table('quotation_products')
+        ->where('id_quotation', '=', $quotation->id)
+        ->update(['status' => 'C']);
 
-        //los que quedaron en espera, pasan a estar activos
-        DB::connection(Auth::user()->database_name)->table('anticipos')
-                                                    ->where('id_client',$quotation->id_client)
-                                                    ->where('id_quotation',null)
-                                                    ->orWhere('id_quotation',$quotation->id)
-                                                    ->where('status', '=', 'M')
-                                                    ->update(['status' => '1']);
-        /*------------------------------------------------- */
+        $global = new GlobalController;                                                
+        $global->procesar_anticipos($quotation,$total_pay);
         
         $quotation->status = 'C';
         $quotation->save();
 
         return true;
     }
+
+
+   
 
     public function register_multipayment($id_quotation,$id_header,$id_payment,$id_user)
     {
@@ -1262,7 +1271,8 @@ class InvoiceController extends Controller
         $multipayment->save();
     }
 
-    public function add_movement($bcv,$id_header,$id_account,$id_user,$debe,$haber){
+    public function add_movement($bcv,$id_header,$id_account,$id_user,$debe,$haber)
+    {
 
         $detail = new DetailVoucher();
         $detail->setConnection(Auth::user()->database_name);
@@ -1282,12 +1292,12 @@ class InvoiceController extends Controller
 
          /*Le cambiamos el status a la cuenta a M, para saber que tiene Movimientos en detailVoucher */
          
-            $account = Account::on(Auth::user()->database_name)->findOrFail($detail->id_account);
+        $account = Account::on(Auth::user()->database_name)->findOrFail($detail->id_account);
 
-            if($account->status != "M"){
-                $account->status = "M";
-                $account->save();
-            }
+        if($account->status != "M"){
+            $account->status = "M";
+            $account->save();
+        }
          
     
         $detail->save();
@@ -1355,7 +1365,8 @@ class InvoiceController extends Controller
 }
 
     
-    public function add_pay_movement($bcv,$payment_type,$header_voucher,$id_account,$user_id,$amount_debe,$amount_haber){
+    public function add_pay_movement($bcv,$payment_type,$header_voucher,$id_account,$user_id,$amount_debe,$amount_haber)
+    {
 
 
         //Cuentas por Cobrar Clientes
@@ -1391,9 +1402,10 @@ class InvoiceController extends Controller
             } 
            
 
-}
+    }
 
-    public function calcularfactura($id_quotation){
+    public function calcularfactura($id_quotation)
+    {
 
         $coin = 'bolivares';
         if(isset($id_quotation)){
@@ -1402,29 +1414,10 @@ class InvoiceController extends Controller
 
         if(isset($quotation)){
                                                            
-           $payment_quotations = QuotationPayment::on(Auth::user()->database_name)->where('id_quotation',$quotation->id)->get();
+            $payment_quotations = QuotationPayment::on(Auth::user()->database_name)->where('id_quotation',$quotation->id)->get();
 
-            $anticipos_sum_bolivares = Anticipo::on(Auth::user()->database_name)->where('status',1)
-                                                ->where('id_client',$quotation->id_client)
-                                                ->where('id_quotation',null)
-                                                ->orWhere('id_quotation',$quotation->id)
-                                                ->where('coin','like','bolivares')
-                                                ->sum('amount');
+            
 
-            $total_dolar_anticipo =    DB::connection(Auth::user()->database_name)->select('SELECT SUM(amount/rate) AS dolar
-                                        FROM anticipos
-                                        WHERE id_client = ? AND
-                                        id_quotation = null OR
-                                        id_quotation = ? AND
-                                        coin not like ? AND
-                                        status = ?
-                                        '
-                                        , [$quotation->id_client,$quotation->id,'bolivares',1]);
-
-           $anticipos_sum_dolares = 0;
-           if(isset($total_dolar_anticipo[0]->dolar)){
-               $anticipos_sum_dolares = $total_dolar_anticipo[0]->dolar;
-           }
 
             $accounts_bank = DB::connection(Auth::user()->database_name)->table('accounts')->where('code_one', 1)
                                            ->where('code_two', 1)
@@ -1442,7 +1435,7 @@ class InvoiceController extends Controller
             $accounts_punto_de_venta = DB::connection(Auth::user()->database_name)->table('accounts')->where('description','LIKE', 'Punto de Venta%')
                                            ->get();
 
-           $inventories_quotations = DB::connection(Auth::user()->database_name)->table('products')->join('inventories', 'products.id', '=', 'inventories.product_id')
+            $inventories_quotations = DB::connection(Auth::user()->database_name)->table('products')->join('inventories', 'products.id', '=', 'inventories.product_id')
                                                            ->join('quotation_products', 'inventories.id', '=', 'quotation_products.id_inventory')
                                                            ->where('quotation_products.id_quotation',$quotation->id)
                                                            ->select('products.*','quotation_products.price as price','quotation_products.rate as rate','quotation_products.discount as discount',
@@ -1501,25 +1494,6 @@ class InvoiceController extends Controller
             $quotation->total_factura = $total;
             $quotation->base_imponible = $base_imponible;
            
-              
-            $anticipos_sum = 0;
-            if(isset($coin)){
-                if($coin == 'bolivares'){
-                   $bcv = null;
-                   //Si la factura es en BS, y tengo anticipos en dolares, los multiplico los dolares por la tasa a la que estoy facturando
-                   $anticipos_sum_dolares =  $anticipos_sum_dolares * $quotation->bcv;
-                   $anticipos_sum = $anticipos_sum_bolivares + $anticipos_sum_dolares; 
-                }else{
-                   $bcv = $quotation->bcv;
-                    //Si la factura es en Dolares, y tengo anticipos en bolivares, divido los bolivares por la tasa a la que estoy facturando
-                   $anticipos_sum_bolivares =  $anticipos_sum_bolivares / $quotation->bcv;
-                   $anticipos_sum = $anticipos_sum_bolivares + $anticipos_sum_dolares; 
-                }
-            }else{
-               $bcv = null;
-            }
-            
-
            /*Aqui revisamos el porcentaje de retencion de iva que tiene el cliente, para aplicarlo a productos que retengan iva */
             $client = Client::on(Auth::user()->database_name)->find($quotation->id_client);
 
@@ -1532,12 +1506,9 @@ class InvoiceController extends Controller
     
            
            $quotation->price_cost_total = $price_cost_total;
-           $quotation->anticipos_sum = $anticipos_sum;
            $quotation->total_retiene_islr = $total_retiene_islr;
            $quotation->total_mercancia = $total_mercancia;
            $quotation->total_servicios = $total_servicios;
-
-           $quotation->anticipo = $anticipos_sum;
 
            return $quotation;
          

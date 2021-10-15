@@ -155,7 +155,7 @@
                         
                         
                         <div class="form-group row" id="formulario1" >
-                            <label for="amount_pays" class="col-md-2 col-form-label text-md-right">Forma de Pago:</label>
+                            <label id="label_amount_pays" for="amount_pays" class="col-md-2 col-form-label text-md-right">Forma de Pago:</label>
                             <div class="col-md-3">
                                 <input id="amount_pay" type="text" class="form-control @error('amount_pay') is-invalid @enderror"  name="amount_pay" placeholder="0,00" required autocomplete="amount_pay"> 
                            
@@ -713,6 +713,26 @@
             
         });
         
+        var input_total_pay = document.getElementById("total_pay").value;
+
+        var montoFormat = input_total_pay.replace(/[$.]/g,'');
+
+        var total_pay = montoFormat.replace(/[,]/g,'.');
+
+        
+        //Quiere decir que el monto total a pagar es negativo o igual a cero
+        if(total_pay <= 0){
+            
+            document.getElementById("amount_pay").required = false;
+            document.getElementById("payment_type").required = false;
+            $("#amount_pay").hide();
+            $("#payment_type").hide();
+            $("#btn_agregar").hide();
+            $("#label_amount_pays").hide();
+        }
+
+
+
     </script>
   
 @endsection
