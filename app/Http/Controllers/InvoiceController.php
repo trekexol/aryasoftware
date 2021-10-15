@@ -78,34 +78,103 @@ class InvoiceController extends Controller
         $count = 0;
         $facturas_a_procesar = [];
 
+        
+
         $total_facturas = new Quotation;
         $total_facturas->setConnection(Auth::user()->database_name);
 
-        foreach ($array as $key => $item) {
-
+        foreach ($array as $key => $item) 
+        {
             if($count >= 2){
                 array_push($facturas_a_procesar, $item);
                 $quotation = $this->calcularfactura($item);
 
-                $total = $quotation->amount + $quotation->amount_iva - $quotation->anticipo - $quotation->retencion_islr - $quotation->retencion_iva;
-                
-                $total_facturas->anticipo += $quotation->anticipo;
-                $total_facturas->retencion_iva += $quotation->retencion_iva;
-                $total_facturas->retencion_islr += $quotation->retencion_islr;
-                $total_facturas->base_imponible += $quotation->base_imponible;
-                $total_facturas->amount += $quotation->amount;
-                $total_facturas->amount_iva += $quotation->amount_iva;
-                $total_facturas->amount_with_iva += $total;
-                $total_facturas->total_factura += $quotation->total_factura;
-                $total_facturas->price_cost_total += $quotation->price_cost_total;
-                $total_facturas->total_mercancia += $quotation->total_mercancia;
-                $total_facturas->total_servicios += $quotation->total_servicios;
-            
+                if((empty($id_client_old)) || ($id_client_old == $quotation->id_client))
+                {
+                    //El id del cliente se guarda una sola vez, al igual que la suma de los anticipos de ese mismo cliente
+                    if(empty($id_client_old)){
+                        $id_client_old = $quotation->id_client;
+
+                        //Aqui sacamos los totales de los anticipos del cliente
+                        $anticipos_sum_bolivares = Anticipo::on(Auth::user()->database_name)->where('status',1)
+                                                ->where('id_client',$quotation->id_client)
+                                                ->where('id_quotation',null)
+                                                ->where('coin','like','bolivares')
+                                                ->sum('amount');
+
+                        $total_dolar_anticipo = Anticipo::on(Auth::user()->database_name)->where('status',1)
+                                                ->where('id_client',$quotation->id_client)
+                                                ->where('id_quotation',null)
+                                                ->where('coin','not like','bolivares')
+                                                ->select( DB::raw('SUM(anticipos.amount/anticipos.rate) As dolar'))
+                                                ->get();
+    
+                        
+                        $anticipos_sum_dolares = 0;
+                        if(isset($total_dolar_anticipo[0]->dolar)){
+                            $anticipos_sum_dolares += $total_dolar_anticipo[0]->dolar;
+                        }
+
+                        
+                    }
+
+                        //aqui sacamos los totales de los anticipos por factura
+                        $anticipos_sum_bolivares += Anticipo::on(Auth::user()->database_name)->where('status',1)
+                                                    ->where('id_client',$quotation->id_client)
+                                                    ->where('id_quotation',$quotation->id)
+                                                    ->where('coin','like','bolivares')
+                                                    ->sum('amount');
+
+                        $total_dolar_anticipo = Anticipo::on(Auth::user()->database_name)->where('status',1)
+                                                    ->where('id_client',$quotation->id_client)
+                                                    ->where('id_quotation',$quotation->id)
+                                                    ->where('coin','not like','bolivares')
+                                                    ->select( DB::raw('SUM(anticipos.amount/anticipos.rate) As dolar'))
+                                                    ->get();
+    
+                        
+                        
+                        if(isset($total_dolar_anticipo[0]->dolar)){
+                            $anticipos_sum_dolares += $total_dolar_anticipo[0]->dolar;
+                        }
+                        
+
+                    $total = $quotation->amount + $quotation->amount_iva - $quotation->retencion_islr - $quotation->retencion_iva;
+                    
+                    
+                    $total_facturas->retencion_iva += $quotation->retencion_iva;
+                    $total_facturas->retencion_islr += $quotation->retencion_islr;
+                    $total_facturas->base_imponible += $quotation->base_imponible;
+                    $total_facturas->amount += $quotation->amount;
+                    $total_facturas->amount_iva += $quotation->amount_iva;
+                    $total_facturas->amount_with_iva += $total;
+                    $total_facturas->total_factura += $quotation->total_factura;
+                    $total_facturas->price_cost_total += $quotation->price_cost_total;
+                    $total_facturas->total_mercancia += $quotation->total_mercancia;
+                    $total_facturas->total_servicios += $quotation->total_servicios;
+                }else{
+                    return redirect('invoices')->withDanger('Solo se pueden Pagar Facturas de un mismo Cliente!');
+                }
             
             }
             
             $count ++;
         }
+
+        $company = Company::on(Auth::user()->database_name)->find(1);
+        //Si la taza es automatica
+        if($company->tiporate_id == 1){
+            //esto es para que siempre se pueda guardar la tasa en la base de datos
+            $bcv = $this->search_bcv();
+        }else{
+            //si la tasa es fija
+            $bcv = $company->rate;
+        }
+
+        
+        $total_facturas->anticipo = $anticipos_sum_bolivares + ($anticipos_sum_dolares * $bcv);
+
+        $total_facturas->amount_with_iva -= $total_facturas->anticipo;
          
         if(empty($facturas_a_procesar)){
             return redirect('invoices')->withDanger('Debe seleccionar facturar para Pagar!');
