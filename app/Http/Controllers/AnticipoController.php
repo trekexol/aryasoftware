@@ -108,7 +108,6 @@ class AnticipoController extends Controller
                                                                     $query->where('id_quotation',null)
                                                                         ->orWhere('id_quotation',$id_quotation);
                                                                 })
-                                                                
                                                                 ->whereIn('status',[1,'M'])->get();
                                                                 
         $client = Client::on(Auth::user()->database_name)->find($id_client);
@@ -119,12 +118,12 @@ class AnticipoController extends Controller
     public function selectanticipo_provider($id_provider,$coin,$id_expense)
     {
         $anticipos = Anticipo::on(Auth::user()->database_name)
-        ->where('id_provider',$id_provider)
-        ->where(function ($query) use ($id_expense){
-            $query->where('id_expense',null)
-                ->orWhere('id_expense',$id_expense);
-        })
-        ->whereIn('status',[1,'M'])->orderBy('id' ,'DESC')->get();
+                                                            ->where('id_provider',$id_provider)
+                                                            ->where(function ($query) use ($id_expense){
+                                                                $query->where('id_expense',null)
+                                                                    ->orWhere('id_expense',$id_expense);
+                                                            })
+                                                            ->whereIn('status',[1,'M'])->orderBy('id' ,'DESC')->get();
         
 
         $provider = Provider::on(Auth::user()->database_name)->find($id_provider);

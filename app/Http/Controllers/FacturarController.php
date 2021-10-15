@@ -40,13 +40,17 @@ class FacturarController extends Controller
                                         })
                                         ->where('coin','like','bolivares')
                                         ->sum('amount');
-
-            $total_dolar_anticipo =    DB::connection(Auth::user()->database_name)->select('SELECT SUM(amount/rate) AS dolar
-                                        FROM anticipos
-                                        WHERE id_client = ? AND coin not like ? AND status = ? 
-                                        '
-                                        , [$quotation->id_client,'bolivares',1,]);
-
+            $total_dolar_anticipo = Anticipo::on(Auth::user()->database_name)->where('status',1)
+                                                ->where('id_client',$quotation->id_client)
+                                                ->where(function ($query) use ($quotation){
+                                                    $query->where('id_quotation',null)
+                                                        ->orWhere('id_quotation',$quotation->id);
+                                                })
+                                                ->where('coin','not like','bolivares')
+                                                ->select( DB::raw('SUM(anticipos.amount/anticipos.rate) As dolar'))
+                                                ->get();
+             
+           
             
             $anticipos_sum_dolares = 0;
             if(isset($total_dolar_anticipo[0]->dolar)){
@@ -194,13 +198,15 @@ class FacturarController extends Controller
                                         ->where('coin','like','bolivares')
                                         ->sum('amount');
 
-            $total_dolar_anticipo =    DB::connection(Auth::user()->database_name)->select('SELECT SUM(amount/rate) AS dolar
-                                        FROM anticipos
-                                        WHERE id_client = ? AND
-                                        coin not like ? AND
-                                        status = ?
-                                        '
-                                        , [$quotation->id_client,'bolivares',1]);
+            $total_dolar_anticipo = Anticipo::on(Auth::user()->database_name)->where('status',1)
+                                        ->where('id_client',$quotation->id_client)
+                                        ->where(function ($query) use ($quotation){
+                                            $query->where('id_quotation',null)
+                                                ->orWhere('id_quotation',$quotation->id);
+                                        })
+                                        ->where('coin','not like','bolivares')
+                                        ->select( DB::raw('SUM(anticipos.amount/anticipos.rate) As dolar'))
+                                        ->get();
 
             $anticipos_sum_dolares = 0;
             if(isset($total_dolar_anticipo[0]->dolar)){
@@ -554,8 +560,8 @@ class FacturarController extends Controller
 
         }
      
-    //si el monto es menor o igual a cero, quiere decir que el anticipo cubre el total de la factura, por tanto no hay pagos
-    if($sin_formato_total_pay > 0){
+        //si el monto es menor o igual a cero, quiere decir que el anticipo cubre el total de la factura, por tanto no hay pagos
+        if($sin_formato_total_pay > 0){
         $payment_type = request('payment_type');
         if($come_pay >= 1){
 
@@ -1328,7 +1334,7 @@ class FacturarController extends Controller
             /*--------------------------------------------*/
         } 
 
-    }
+        }
 
         //VALIDA QUE LA SUMA MONTOS INGRESADOS SEAN IGUALES AL MONTO TOTAL DEL PAGO
         if(($total_pay == $sin_formato_total_pay) || ($sin_formato_total_pay <= 0))
