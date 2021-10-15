@@ -66,13 +66,13 @@
             <thead>
             <tr> 
                 
-                <th class="text-center">F. Nota de Entrega</th>
+                <th class="text-center">F.Nota de Entrega</th>
                 <th class="text-center">N°</th>
                 <th class="text-center">Cliente</th>
                 <th class="text-center">Vendedor</th>
                 <th class="text-center">REF</th>
                 <th class="text-center">Monto</th>
-                <th class="text-center">F. Cotización</th>
+                <th class="text-center">F.Cotización</th>
                 <th class="text-center"></th>
                 
                 
