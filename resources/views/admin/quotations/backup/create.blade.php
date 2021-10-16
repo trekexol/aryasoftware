@@ -78,7 +78,7 @@
                         
                         
                         <div class="form-group row">
-                            <label for="transports" class="col-md-2 col-form-label text-md-right">Transporte/ Tipo de Entrega:</label>
+                            <label for="transports" class="col-md-2 col-form-label text-md-right">Transporte:</label>
                             <div class="col-md-4">
                                 <input id="transport" type="text" class="form-control @error('transport') is-invalid @enderror" name="transport" value="{{ $quotation->transports['placa'] ?? old('transport') }}" readonly required autocomplete="transport"> 
                            
@@ -129,13 +129,6 @@
                        
                         
                         <div class="form-group row" id="formcoin">
-
-                            <div class="custom-control custom-switch">
-                                <input type="checkbox" class="custom-control-input" id="customSwitches">
-                                <label class="custom-control-label" for="customSwitches">Auto</label>
-                                
-                            </div>
-
                             <label id="coinlabel" for="coin" class="col-md-2 col-form-label text-md-right">Moneda:</label>
 
                             <div class="col-md-2">
@@ -169,7 +162,7 @@
                                 <div class="form-row col-md-12">
                                     <div class="form-group col-md-2">
                                         <label for="description" >Código</label>
-                                        <input id="code" type="text" class="form-control @error('code') is-invalid @enderror" name="code" value="{{ $inventory->code ?? old('code') ?? '' }}" required autocomplete="code" onblur="searchCode()">
+                                        <input id="code" type="text" class="form-control @error('code') is-invalid @enderror" name="code" value="{{ $inventory->code ?? old('code') ?? '' }}" required autocomplete="code" autofocus>
                                     </div>
                                    
                                     <div class="form-group col-md-1">
@@ -182,7 +175,7 @@
                                     
                                     <div class="form-group col-md-2">
                                         <label for="description" >Descripción</label>
-                                        <input id="description" type="text" class="form-control @error('description') is-invalid @enderror" name="description" value="{{ $inventory->products['description'] ?? old('description') ?? '' }}" required autocomplete="description">
+                                        <input id="description" type="text" class="form-control @error('description') is-invalid @enderror" name="description" value="{{ $inventory->products['description'] ?? old('description') ?? '' }}" readonly required autocomplete="description">
         
                                         @error('description')
                                             <span class="invalid-feedback" role="alert">
@@ -192,7 +185,7 @@
                                     </div>
                                     <div class="form-group col-md-1">
                                         <label for="amount" >Cantidad</label>
-                                        <input id="amount_product"  type="text" class="form-control @error('amount') is-invalid @enderror" name="amount" value="1" required autocomplete="amount">
+                                        <input id="amount_product"  type="text" class="form-control @error('amount') is-invalid @enderror" name="amount" value="0" required autocomplete="amount">
         
                                         @error('amount')
                                             <span class="invalid-feedback" role="alert">
@@ -469,37 +462,6 @@
             $("#cost").mask('000.000.000.000.000,00', { reverse: true });
             
         });
-        $("#code").keydown(function(event){ 
-            if(event.which == 13){   // teclear enter
-                /*sendProduct(callback);
-                //Una funcion anonima para retornar el resultado despues de 1 segundo
-                searchCode();*/
-                    //alert(12); 
-                 searchCode(); 
-                //alert(13);             
-            }
-       });
-      
-        /*$("#description").on('change',function(){
-          alert('change');
-        });*/
-
-        checkbox = document.getElementById('customSwitches'); // retoma el valor anterior
-        checkbox.checked = eval(window.localStorage.getItem(checkbox.id));
-        checkbox.addEventListener('change', function(){
-            window.localStorage.setItem(checkbox.id, checkbox.checked);
-        })
-
-        if( $('#customSwitches').prop('checked')) { // validar seleccionado
-            var value=$.trim($("#description").val()); // valida el campo si esta lleno
-            if(value.length>0 ){
-                //alert('enviando');
-                sendProduct();
-                $("#description").val('');
-            }
-
-          document.getElementById("code").focus();   
-        }
 
         $(document).on('click','.delete',function(){
          let id = $(this).attr('data-id');
@@ -566,19 +528,28 @@
         }
         else {
             return true;
-        }  
+        }
+    
+    
+        
     }
+    
+    </script> 
 
+@endsection    
 
-    function alertad() {
-       
-       alert('envia');
-        //console.log("enviar");          
-   }
+@section('consulta')
+    <script>
+       /* $("#formcoin").hide();
+        $("#btnSendNote").hide();
 
+        function deliveryNote(){
+            $("#formcoin").show();
+            $("#btnSendNote").show();
+            $("#btnNote").hide();
+        }*/
 
-
-    function searchCode2(callback){
+        function searchCode(){
             
             let reference_id = document.getElementById("code").value; 
             
@@ -600,49 +571,6 @@
                            
                         });
                     }else{
-                        window.location = "{{route('quotations.create', [$quotation->id,$coin,''])}}";
-                       //alert('No se Encontro este numero de Referencia');
-                    }
-                   
-                },
-                error:(xhr)=>{
-                   //alert('Presentamos Inconvenientes');
-                }
-            })
-            }
-           //alert('busca');
-            //console.log("buscar");
-
-           callback();
-        }  
-    
-    </script> 
-
-@endsection    
-
-@section('consulta')
-    <script>
-
-        function searchCode(){ 
-            let reference_id = document.getElementById("code").value; 
-            if(reference_id != ""){
-                $.ajax({
-                url:"{{ route('quotations.listinventory') }}" + '/' + reference_id,
-                beforSend:()=>{
-                    alert('consultando datos');
-                },
-                success:(response)=>{
-                
-                    if(response.length > 0){
-                        response.forEach((item, index, object)=>{
-                            let {id,description,date} = item;
-                          
-                           window.location = "{{route('quotations.createproduct', [$quotation->id,$coin,''])}}"+"/"+id;
-                           
-                        });
-                    }else{
-
-                          window.location = "{{route('quotations.create', [$quotation->id,$coin,''])}}";
                        //alert('No se Encontro este numero de Referencia');
                     }
                    

@@ -250,8 +250,9 @@ class QuotationController extends Controller
                         }
                         $bcv = null;
                     }
+                    $llego ='llego';
 
-                    return view('admin.quotations.create',compact('bcv_quotation_product','quotation','inventories_quotations','inventory','bcv','datenow','coin'));
+                    return view('admin.quotations.create',compact('llego','bcv_quotation_product','quotation','inventories_quotations','inventory','bcv','datenow','coin'));
 
                 }else{
                     return redirect('/quotations')->withDanger('El Producto no existe');
@@ -467,6 +468,8 @@ class QuotationController extends Controller
 
         if($var->id_inventory == -1){
             return redirect('quotations/register/'.$var->id_quotation.'')->withDanger('No se encontro el producto!');
+            /*echo '<script type="text/javascript">alert("no encontrado sin cantidad");</script>';
+            return;*/
         }
 
         $amount = request('amount');

@@ -66,7 +66,7 @@
     <th style="text-align: center;">RIF/CI</th>
     <th style="text-align: center;">N° Control / Serie</th>
     <th style="text-align: center;">Condición de Pago</th>
-    <th style="text-align: center;">Transporte</th>
+    <th style="text-align: center;">Transporte/Tipo de Entrega</th>
    
   </tr>
   <tr>
