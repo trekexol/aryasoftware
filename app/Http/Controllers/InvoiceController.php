@@ -1234,7 +1234,7 @@ class InvoiceController extends Controller
         $quotation = Quotation::on(Auth::user()->database_name)->findOrFail($id_quotation);
         
         /*descontamos el inventario, si existe la fecha de nota de entrega, significa que ya hemos descontado del inventario, por ende no descontamos de nuevo*/
-        if(!isset($quotation->date_delivery_note)){
+        if(!isset($quotation->date_delivery_note) && !isset($quotation->date_order)){
             $retorno = $this->discount_inventory($quotation->id);
 
             if($retorno != "exito"){
