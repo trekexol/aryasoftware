@@ -130,13 +130,9 @@
                         
                         <div class="form-group row" id="formcoin">
 
-                            <div class="custom-control custom-switch">
-                                <input type="checkbox" class="custom-control-input" id="customSwitches">
-                                <label class="custom-control-label" for="customSwitches">Auto</label>
-                                
-                            </div>
+                            
 
-                            <label id="coinlabel" for="coin" class="col-md-2 col-form-label text-md-right">Moneda:</label>
+                            <label id="coinlabel" for="coin" class="col-md-1 col-form-label text-md-right">Moneda:</label>
 
                             <div class="col-md-2">
                                 <select class="form-control" name="coin" id="coin">
@@ -161,6 +157,11 @@
                             <label  class="col-md-2 col-form-label text-md-right h6">Tasa actual:</label>
                             <div class="col-md-2 col-form-label text-md-left">
                                 <label for="tasaactual" id="tasaacutal">{{ number_format($bcv, 2, ',', '.')}}</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="customSwitches">
+                                <label class="custom-control-label" for="customSwitches">Auto</label>
+                                
                             </div>
                         </div>
                         <br>
