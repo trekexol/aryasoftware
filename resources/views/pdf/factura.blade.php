@@ -78,14 +78,14 @@
     <th style="text-align: center;">RIF/CI</th>
     <th style="text-align: center;">N° Control / Serie</th>
     <th style="text-align: center;">Nota de Entrega</th>
-    <th style="text-align: center;">Transporte</th>
+    <th style="text-align: center;">Transp./Tipo Entrega</th>
    
   </tr>
   <tr>
     <td style="text-align: center;">{{ $quotation->clients['phone1'] ?? '' }}</td>
     <td style="text-align: center;">{{ $quotation->clients['cedula_rif'] ?? '' }}</td>
     <td style="text-align: center;">{{ $quotation->serie ?? '' }}</td>
-    <td style="text-align: center;">{{ $quotation->date_delivery_note ?? '' }}</td>
+    <td style="text-align: center;">{{ $quotation->number_delivery_note ?? '' }}</td>
     <td style="text-align: center;">{{ $quotation->transports['placa'] ?? '' }}</td>
     
     

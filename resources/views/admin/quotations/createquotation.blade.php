@@ -76,7 +76,7 @@
                             <div class="form-group col-md-1">
                                 <a href="{{ route('quotations.selectclient') }}" title="Seleccionar Cliente"><i class="fa fa-eye"></i></a>  
                             </div>
-                            <label for="transports" class="col-md-2 col-form-label text-md-right">Transporte</label>
+                            <label for="transports" class="col-md-2 col-form-label text-md-right">Transporte / Tipo de Entrega</label>
 
                             <div class="col-md-3">
                             <select class="form-control" id="id_transport" name="id_transport">
