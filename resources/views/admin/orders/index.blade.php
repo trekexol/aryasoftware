@@ -10,7 +10,10 @@
       <a class="nav-link  font-weight-bold" style="color: black;" id="profile-tab"  href="{{ route('invoices') }}" role="tab" aria-controls="profile" aria-selected="false">Facturas</a>
     </li>
     <li class="nav-item" role="presentation">
-      <a class="nav-link active font-weight-bold" style="color: black;" id="contact-tab"  href="{{ route('quotations.indexdeliverynote') }}" role="tab" aria-controls="contact" aria-selected="false">Notas De Entrega</a>
+        <a class="nav-link font-weight-bold" style="color: black;" id="contact-tab"  href="{{ route('quotations.indexdeliverynote') }}" role="tab" aria-controls="contact" aria-selected="false">Notas De Entrega</a>
+      </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link active font-weight-bold" style="color: black;" id="contact-tab"  href="{{ route('orders.index') }}" role="tab" aria-controls="contact" aria-selected="false">Pedidos</a>
     </li>
     <li class="nav-item" role="presentation">
         <a class="nav-link font-weight-bold" style="color: black;" id="profile-tab"  href="{{ route('sales') }}" role="tab" aria-controls="profile" aria-selected="false">Ventas</a>
@@ -34,7 +37,7 @@
     <!-- Page Heading -->
     <div class="row py-lg-2">
       <div class="col-md-6">
-          <h2>Notas de Entrega</h2>
+          <h2>Pedidos</h2>
       </div>
       <div class="col-md-6">
         <a href="{{ route('quotations.createquotation')}}" class="btn btn-primary float-md-right" role="button" aria-pressed="true">Registrar una Cotización</a>
@@ -65,13 +68,13 @@
         <table class="table table-light2 table-bordered" id="dataTable" width="100%" cellspacing="0" >
             <thead>
             <tr> 
-                <th class="text-center"></th>
+                
+                <th class="text-center">Fecha</th>
                 <th class="text-center">N°</th>
                 <th class="text-center">Cliente</th>
                 <th class="text-center">Vendedor</th>
                 <th class="text-center">Transporte</th>
-                <th class="text-center">Fecha de Cotización</th>
-                <th class="text-center">Fecha de la Nota de Entrega</th>
+                <th class="text-center" width="8%"></th>
                
             </tr>
             </thead>
@@ -81,17 +84,16 @@
                 @else  
                     @foreach ($quotations as $quotation)
                         <tr>
-                            <td class="text-center">
-                                <a href="{{ route('quotations.createfacturar',[$quotation->id,$quotation->coin])}}" title="Seleccionar"><i class="fa fa-check"></i></a>
-                                <a href="{{ route('quotations.createdeliverynote',[$quotation->id,$quotation->coin])}}" title="Mostrar"><i class="fa fa-file-alt"></i></a>
-                                <a href="{{ route('quotations.reversarQuotation',$quotation->id)}}" title="Borrar"><i class="fa fa-trash text-danger"></i></a>
-                           </td>
+                           <td class="text-center">{{ $quotation->date_order ?? ''}}</td>
                             <td class="text-center">{{ $quotation->number_delivery_note ?? $quotation->id ?? ''}}</td>
                             <td class="text-center">{{ $quotation->clients['name'] ?? ''}}</td>
                             <td class="text-center">{{ $quotation->vendors['name'] ?? ''}} {{ $quotation->vendors['surname'] ?? ''}}</td>
                             <td class="text-center">{{ $quotation->transports['placa'] ?? ''}}</td>
-                            <td class="text-center">{{ $quotation->date_quotation ?? ''}}</td>
-                            <td class="text-center">{{ $quotation->date_delivery_note ?? ''}}</td>
+                            <td class="text-center">
+                                <a href="{{ route('quotations.create',[$quotation->id,$quotation->coin])}}" title="Seleccionar"><i class="fa fa-check"></i></a>
+                                <a href="{{ route('orders.create_order',[$quotation->id,$quotation->coin])}}" title="Mostrar"><i class="fa fa-file-alt"></i></a>
+                                <a href="{{ route('orders.reversar_order',$quotation->id)}}" title="Borrar"><i class="fa fa-trash text-danger"></i></a>
+                           </td>
                         </tr>     
                     @endforeach   
                 @endif

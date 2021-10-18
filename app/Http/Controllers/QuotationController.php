@@ -39,6 +39,7 @@ class QuotationController extends Controller
         $quotations = Quotation::on(Auth::user()->database_name)->orderBy('id' ,'DESC')
                                 ->where('date_billing','=',null)
                                 ->where('date_delivery_note','=',null)
+                                ->where('date_order','=',null)
                                 ->get();
         
        return view('admin.quotations.index',compact('quotations'));
@@ -780,8 +781,18 @@ class QuotationController extends Controller
     public function deleteProduct(Request $request)
     {
         
-        $product = QuotationProduct::on(Auth::user()->database_name)->find(request('id_quotation_product_modal')); 
-        $product->delete(); 
+        $quotation_product = QuotationProduct::on(Auth::user()->database_name)->find(request('id_quotation_product_modal')); 
+        
+        if(isset($quotation_product) && $quotation_product->status == "C"){
+            QuotationProduct::on(Auth::user()->database_name)
+                ->join('inventories','inventories.id','quotation_products.id_inventory')
+                ->join('products','products.id','inventories.product_id')
+                ->where('products.type','MERCANCIA')
+                ->where('inventories.id',$quotation_product->id_inventory)
+                ->update(['inventories.amount' => DB::raw('inventories.amount+quotation_products.amount')]);
+        }
+
+        $quotation_product->delete(); 
 
         return redirect('/quotations/register/'.request('id_quotation_modal').'/'.request('coin_modal').'')->withDanger('Eliminacion exitosa!!');
         
@@ -816,8 +827,6 @@ class QuotationController extends Controller
                 $detail = DetailVoucher::on(Auth::user()->database_name)->where('id_invoice',$id_quotation)
                 ->update(['status' => 'X']);
     
-                 
-    
                 QuotationProduct::on(Auth::user()->database_name)
                                 ->join('inventories','inventories.id','quotation_products.id_inventory')
                                 ->join('products','products.id','inventories.product_id')
@@ -838,9 +847,6 @@ class QuotationController extends Controller
             return redirect('/quotations/facturado/'.$quotation->id.'/bolivares/'.$exist_multipayment->id_header.'');
         }
 
-        
-        
-        
         return redirect('invoices')->withSuccess('Reverso de Factura Exitosa!');
 
     }

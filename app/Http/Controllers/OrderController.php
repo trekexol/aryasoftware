@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Client;
+use App\DetailVoucher;
 use Illuminate\Http\Request;
 
 use Carbon\Carbon;
@@ -10,7 +11,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 use App\Inventory;
+use App\Multipayment;
 use App\Quotation;
+use App\QuotationPayment;
+use App\QuotationProduct;
 
 class OrderController extends Controller
 {
@@ -19,14 +23,15 @@ class OrderController extends Controller
         $user       =   auth()->user();
         $users_role =   $user->role_id;
         
-         $quotations = Quotation::on(Auth::user()->database_name)->orderBy('number_delivery_note' ,'DESC')
-                                 ->where('date_delivery_note','<>',null)
+         $quotations = Quotation::on(Auth::user()->database_name)->orderBy('number_order' ,'DESC')
+                                 ->where('date_order','<>',null)
                                  ->where('date_billing',null)
+                                 ->where('date_delivery_note',null)
                                  ->whereIn('status',[1,'M'])
                                  ->get();
        
  
-        return view('admin.quotations.indexdeliverynote',compact('quotations'));
+        return view('admin.orders.index',compact('quotations'));
     }
  
 
@@ -126,6 +131,24 @@ class OrderController extends Controller
          
     }
 
+    public function reversar_order($id_quotation)
+    { 
+        
+        $quotation = Quotation::on(Auth::user()->database_name)->findOrFail($id_quotation);
+
+        QuotationProduct::on(Auth::user()->database_name)
+                        ->join('inventories','inventories.id','quotation_products.id_inventory')
+                        ->join('products','products.id','inventories.product_id')
+                        ->where('products.type','MERCANCIA')
+                        ->where('id_quotation',$quotation->id)
+                        ->update(['inventories.amount' => DB::raw('inventories.amount+quotation_products.amount') , 'quotation_products.status' => 'X']);
+    
+        $quotation->status = 'X';
+        $quotation->save();
+       
+        return redirect('orders')->withSuccess('Reverso de Pedido Exitoso!');
+
+    }
 
 
     public function search_bcv()

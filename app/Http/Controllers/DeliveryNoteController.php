@@ -125,6 +125,24 @@ class DeliveryNoteController extends Controller
          
     }
 
+    public function reversar_delivery_note($id_quotation)
+    { 
+        
+        $quotation = Quotation::on(Auth::user()->database_name)->findOrFail($id_quotation);
+
+        QuotationProduct::on(Auth::user()->database_name)
+                        ->join('inventories','inventories.id','quotation_products.id_inventory')
+                        ->join('products','products.id','inventories.product_id')
+                        ->where('products.type','MERCANCIA')
+                        ->where('id_quotation',$quotation->id)
+                        ->update(['inventories.amount' => DB::raw('inventories.amount+quotation_products.amount') , 'quotation_products.status' => 'X']);
+    
+        $quotation->status = 'X';
+        $quotation->save();
+       
+        return redirect('quotations/indexnotasdeentrega')->withSuccess('Reverso de Nota de Entrega Exitoso!');
+
+    }
 
 
     public function search_bcv()

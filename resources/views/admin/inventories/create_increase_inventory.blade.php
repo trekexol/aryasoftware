@@ -35,9 +35,9 @@
                     <form method="POST" action="{{ route('inventories.store_increase_inventory') }}" enctype="multipart/form-data">
                         @csrf
 
-                        <input id="id_inventory" type="hidden" class="form-control @error('id_inventory') is-invalid @enderror" name="id_inventory" value="{{ $inventory->id }}" readonly required autocomplete="id_inventory">
+                        <input id="id_inventory" type="hidden" class="form-control @error('id_inventory') is-invalid @enderror" name="id_inventory" value="{{ $inventory->id ?? null}}" readonly required autocomplete="id_inventory">
                        
-                        <input id="amount_old" type="hidden" class="form-control @error('amount_old') is-invalid @enderror" name="amount_old" value="{{ $inventory->amount }}" readonly required autocomplete="amount_old">
+                        <input id="amount_old" type="hidden" class="form-control @error('amount_old') is-invalid @enderror" name="amount_old" value="{{ $inventory->amount ?? null}}" readonly required autocomplete="amount_old">
                         <input id="id_user" type="hidden" class="form-control @error('id_user') is-invalid @enderror" name="id_user" value="{{ Auth::user()->id }}" readonly required autocomplete="id_user">
                        
 
@@ -45,7 +45,7 @@
                             <label for="name_product" class="col-md-2 col-form-label text-md-right">Nombre del Producto</label>
 
                             <div class="col-md-4">
-                                <input id="name_product" type="text" class="form-control @error('name_product') is-invalid @enderror" name="name_product" value="{{ $inventory->products['description'] }}" readonly required autocomplete="name_product">
+                                <input id="name_product" type="text" class="form-control @error('name_product') is-invalid @enderror" name="name_product" value="{{ $inventory->products['description'] ?? ''}}" readonly required autocomplete="name_product">
 
                                 @error('name_product')
                                     <span class="invalid-feedback" role="alert">
@@ -56,7 +56,7 @@
                             <label for="code" class="col-md-2 col-form-label text-md-right">Código</label>
 
                             <div class="col-md-4">
-                                <input id="code" type="text" class="form-control @error('code') is-invalid @enderror" name="code" value="{{ $inventory->code }}" required readonly autocomplete="code">
+                                <input id="code" type="text" class="form-control @error('code') is-invalid @enderror" name="code" value="{{ $inventory->code ?? '' }}" required readonly autocomplete="code">
 
                                 @error('code')
                                     <span class="invalid-feedback" role="alert">
@@ -68,7 +68,7 @@
                         <div class="form-group row">
                             <label for="cantidad" class="col-md-2 col-form-label text-md-right">Cantidad Actual</label>
                             <div class="col-md-4">
-                                <input id="amount" type="text" class="form-control @error('amount') is-invalid @enderror" name="amount" value="{{ $inventory->amount }}" readonly required autocomplete="amount">
+                                <input id="amount" type="text" class="form-control @error('amount') is-invalid @enderror" name="amount" value="{{ $inventory->amount ?? '' }}" readonly required autocomplete="amount">
 
                                 @error('amount')
                                     <span class="invalid-feedback" role="alert">
@@ -95,7 +95,7 @@
                             <label for="price" class="col-md-2 col-form-label text-md-right">Precio de Venta</label>
 
                             <div class="col-md-4">
-                                <input id="price" type="text" readonly class="form-control @error('price') is-invalid @enderror" value="{{ number_format($inventory->products['price'], 2, ',', '.')}}" name="price" required autocomplete="price">
+                                <input id="price" type="text" readonly class="form-control @error('price') is-invalid @enderror" value="{{ number_format($inventory->products['price'] ?? 0, 2, ',', '.')}}" name="price" required autocomplete="price">
 
                                 @error('price')
                                     <span class="invalid-feedback" role="alert">
@@ -124,7 +124,7 @@
                             <label for="price_buy" class="col-md-2 col-form-label text-md-right">Precio de Compra</label>
 
                             <div class="col-md-4">
-                                <input id="price_buy" type="text" readonly class="form-control @error('price_buy') is-invalid @enderror" value="{{ number_format($inventory->products['price_buy'], 2, ',', '.')}}" name="price_buy" required autocomplete="price_buy">
+                                <input id="price_buy" type="text" readonly class="form-control @error('price_buy') is-invalid @enderror" value="{{ number_format($inventory->products['price_buy'] ?? 0, 2, ',', '.')}}" name="price_buy" required autocomplete="price_buy">
 
                                 @error('price_buy')
                                     <span class="invalid-feedback" role="alert">
@@ -150,7 +150,7 @@
                             <label for="contrapartida" class="col-md-2 col-form-label text-md-right">Contrapartida:</label>
                         
                             <div class="col-md-4">
-                            <select id="contrapartida"  name="contrapartida" class="form-control" required>
+                            <select id="contrapartida"  name="contrapartida" class="form-control">
                                 <option value="">Seleccione una Contrapartida</option>
                                 @foreach($contrapartidas as $index => $value)
                                     <option value="{{ $index }}" {{ old('Contrapartida') == $index ? 'selected' : '' }}>
@@ -167,7 +167,7 @@
                             </div>
                             @endif
                             <div class="col-md-4">
-                                    <select  id="subcontrapartida"  name="Subcontrapartida" class="form-control" required>
+                                    <select  id="subcontrapartida"  name="Subcontrapartida" class="form-control">
                                         <option value="">Seleccionar</option>
                                     </select>
 

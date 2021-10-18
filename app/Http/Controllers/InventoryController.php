@@ -30,7 +30,10 @@ class InventoryController extends Controller
         $inventories = Inventory::on(Auth::user()->database_name)
         ->join('products','products.id','inventories.product_id')
         ->where('products.type','MERCANCIA')
-        ->orderBy('products.description' ,'ASC')->where('products.status',1)->get();
+        ->orderBy('products.description' ,'ASC')
+        ->where('products.status',1)
+        ->select('inventories.id as id_inventory','inventories.*','products.*')
+        ->get();
         
        return view('admin.inventories.index',compact('inventories'));
    }
@@ -206,37 +209,44 @@ class InventoryController extends Controller
             $date = Carbon::now();
             $datenow = $date->format('Y-m-d');   
 
-            $header_voucher  = new HeaderVoucher();
-            $header_voucher->setConnection(Auth::user()->database_name);
-
-            $header_voucher->description = "Incremento de Inventario";
-            $header_voucher->date = $datenow;
+            $counterpart = request('Subcontrapartida');
             
-        
-            $header_voucher->status =  "1";
-        
-            $header_voucher->save();
+            if(isset($counterpart) && $counterpart != 'Seleccionar'){
+                
+                $header_voucher  = new HeaderVoucher();
+                $header_voucher->setConnection(Auth::user()->database_name);
+    
+                $header_voucher->description = "Incremento de Inventario";
+                $header_voucher->date = $datenow;
+                
+            
+                $header_voucher->status =  "1";
+            
+                $header_voucher->save();
+    
+                if($var->products['money'] == 'Bs'){
+                    $total = $valor_sin_formato_amount_new * $valor_sin_formato_price_buy;
+                }else{
+                    $total = $valor_sin_formato_amount_new * $valor_sin_formato_price_buy * $valor_sin_formato_rate;
+                }
+    
+                
+    
+               //$account = request('account');
+                $account_mecancia_para_venta = Account::on(Auth::user()->database_name)->where('code_one',1)->where('code_two',1)->where('code_three',3)->where('code_four',1)->where('code_five',1)->first();  
+    
+                $this->add_movement($valor_sin_formato_rate,$header_voucher->id,$account_mecancia_para_venta->id,
+                                    $id_user,$total,0);
+    
+                
+                $account_counterpart = Account::on(Auth::user()->database_name)->find(request('Subcontrapartida'));            
+                //$account_gastos_ajuste_inventario = Account::on(Auth::user()->database_name)->where('code_one',6)->where('code_two',1)->where('code_three',3)->where('code_four',2)->where('code_five',1)->first();  
+    
+                $this->add_movement($valor_sin_formato_rate,$header_voucher->id,$account_counterpart->id,
+                                    $id_user,0,$total);
 
-            if($var->products['money'] == 'Bs'){
-                $total = $valor_sin_formato_amount_new * $valor_sin_formato_price_buy;
-            }else{
-                $total = $valor_sin_formato_amount_new * $valor_sin_formato_price_buy * $valor_sin_formato_rate;
             }
-
             
-
-           //$account = request('account');
-            $account_mecancia_para_venta = Account::on(Auth::user()->database_name)->where('code_one',1)->where('code_two',1)->where('code_three',3)->where('code_four',1)->where('code_five',1)->first();  
-
-            $this->add_movement($valor_sin_formato_rate,$header_voucher->id,$account_mecancia_para_venta->id,
-                                $id_user,$total,0);
-
-            
-            $account_counterpart = Account::on(Auth::user()->database_name)->find(request('Subcontrapartida'));            
-            //$account_gastos_ajuste_inventario = Account::on(Auth::user()->database_name)->where('code_one',6)->where('code_two',1)->where('code_three',3)->where('code_four',2)->where('code_five',1)->first();  
-
-            $this->add_movement($valor_sin_formato_rate,$header_voucher->id,$account_counterpart->id,
-                                $id_user,0,$total);
         
             return redirect('/inventories')->withSuccess('Actualizado el inventario del producto: '.$var->products['description'].' Exitosamente!');
     

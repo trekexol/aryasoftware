@@ -455,7 +455,9 @@ Route::group(["prefix"=>'quotations'],function(){
     Route::get('reversarquotation{id}','QuotationController@reversar_quotation')->name('quotations.reversarQuotation');
 
     Route::get('reversarquotationmultipayment/{id}/{id_header?}','QuotationController@reversar_quotation_multipayment')->name('quotations.reversar_quotation_multipayment');
-   
+    
+    Route::get('reversardeliverynote/{id_quotation}','DeliveryNoteController@reversar_delivery_note')->name('quotations.reversar_delivery_note');
+
 });
 
 Route::group(["prefix"=>'bankmovements'],function(){
@@ -663,7 +665,8 @@ Route::group(["prefix"=>'expensesandpurchases'],function(){
 
     Route::get('notadeentrega/{id_expense}/{coin}','ExpensesAndPurchaseController@createdeliverynote')->name('expensesandpurchases.createdeliverynote');
     Route::get('indexnotasdeentrega/','ExpensesAndPurchaseController@index_delivery_note')->name('expensesandpurchases.indexdeliverynote');
-});
+
+   });
 
 Route::group(["prefix"=>'directpaymentorders'],function(){
     Route::get('/','DirectPaymentOrderController@createretirement')->name('directpaymentorders.create');
@@ -894,6 +897,7 @@ Route::group(["prefix"=>'export'],function(){
   Route::group(["prefix"=>'orders'],function(){
     Route::get('/','OrderController@index')->name('orders.index');
     Route::get('order/{id_quotation}/{coin}','OrderController@create_order')->name('orders.create_order');
+    Route::get('reversarorder/{id_quotation}','OrderController@reversar_order')->name('orders.reversar_order');
   });
 
   

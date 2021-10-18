@@ -1367,14 +1367,13 @@ class FacturarController extends Controller
         if(($total_pay == $sin_formato_total_pay) || ($sin_formato_total_pay <= 0))
         {
 
-            /*descontamos el inventario, si existe la fecha de nota de entrega, significa que ya hemos descontado del inventario, por ende no descontamos de nuevo*/
-            if(!isset($quotation->date_delivery_note) && !isset($quotation->date_order)){
-                $retorno = $this->discount_inventory($quotation->id);
-
-                if($retorno != "exito"){
-                    return redirect('quotations/facturar/'.$quotation->id.'/'.$quotation->coin.'');
-                }
+            $global = new GlobalController();
+            $retorno = $global->discount_inventory($quotation->id);
+            
+            if($retorno != "exito"){
+                return redirect('quotations/facturar/'.$quotation->id.'/'.$quotation->coin.'');
             }
+            
             
         
             /*---------------- */
@@ -1795,8 +1794,8 @@ class FacturarController extends Controller
 
 
 
-    public function discount_inventory($id_quotation){
-            /*Primero Revisa que todos los productos tengan inventario suficiente*/
+   /* public function discount_inventory($id_quotation){
+            //Primero Revisa que todos los productos tengan inventario suficiente
             $no_hay_cantidad_suficiente = DB::connection(Auth::user()->database_name)->table('inventories')
                                     ->join('quotation_products', 'quotation_products.id_inventory','=','inventories.id')
                                     ->join('products', 'products.id','=','inventories.product_id')
@@ -1811,7 +1810,7 @@ class FacturarController extends Controller
                 return redirect('quotations/facturar/'.$id_quotation.'/bolivares')->withDanger('En el Inventario de Codigo: '.$no_hay_cantidad_suficiente->code.' no hay Cantidad suficiente!');
             }
 
-        /*Luego, descuenta del Inventario*/
+        //Luego, descuenta del Inventario
             $inventories_quotations = DB::connection(Auth::user()->database_name)->table('products')->join('inventories', 'products.id', '=', 'inventories.product_id')
             ->join('quotation_products', 'inventories.id', '=', 'quotation_products.id_inventory')
             ->where('quotation_products.id_quotation',$id_quotation)
@@ -1853,7 +1852,7 @@ class FacturarController extends Controller
                 return "exito";
 
     }
-
+*/
 
 
 

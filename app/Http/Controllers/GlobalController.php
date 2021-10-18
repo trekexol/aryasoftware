@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Anticipo;
+use App\Inventory;
+use App\QuotationProduct;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
@@ -103,5 +105,65 @@ class GlobalController extends Controller
             }
 
             
+    }
+
+    public function discount_inventory($id_quotation)
+    {
+            /*Primero Revisa que todos los productos tengan inventario suficiente*/
+            $no_hay_cantidad_suficiente = DB::connection(Auth::user()->database_name)->table('inventories')
+                                    ->join('quotation_products', 'quotation_products.id_inventory','=','inventories.id')
+                                    ->join('products', 'products.id','=','inventories.product_id')
+                                    ->where('quotation_products.id_quotation','=',$id_quotation)
+                                    ->where('quotation_products.amount','<','inventories.amount')
+                                    ->where('quotation_products.status','1')
+                                    ->where('products.type','LIKE','MERCANCIA')
+                                    ->select('inventories.code as code','quotation_products.id_quotation as id_quotation','quotation_products.discount as discount',
+                                    'quotation_products.amount as amount_quotation')
+                                    ->first(); 
+        
+            if(isset($no_hay_cantidad_suficiente)){
+                return "no_hay_cantidad_suficiente";
+            }
+
+            /*Luego, descuenta del Inventario*/
+            $inventories_quotations = DB::connection(Auth::user()->database_name)->table('products')->join('inventories', 'products.id', '=', 'inventories.product_id')
+            ->join('quotation_products', 'inventories.id', '=', 'quotation_products.id_inventory')
+            ->where('quotation_products.id_quotation',$id_quotation)
+            ->where('quotation_products.status','1')
+            ->select('products.*','quotation_products.id as id_quotation','quotation_products.discount as discount',
+            'quotation_products.amount as amount_quotation')
+            ->get(); 
+
+            foreach($inventories_quotations as $inventories_quotation){
+
+                $quotation_product = QuotationProduct::on(Auth::user()->database_name)->findOrFail($inventories_quotation->id_quotation);
+
+                if(isset($quotation_product)){
+                    if($inventories_quotation->type == 'MERCANCIA'){
+                        $inventory = Inventory::on(Auth::user()->database_name)->findOrFail($quotation_product->id_inventory);
+
+                        if(isset($inventory)){
+                            //REVISO QUE SEA MAYOR EL MONTO DEL INVENTARIO Y LUEGO DESCUENTO
+                            if($inventory->amount >= $quotation_product->amount){
+                                $inventory->amount -= $quotation_product->amount;
+                                $inventory->save();
+                            }else{
+                                return 'El Inventario de Codigo: '.$inventory->code.' no tiene Cantidad suficiente!';
+                            }
+                        }else{
+                            return 'El Inventario no existe!';
+                        }
+                    }
+                    //CAMBIAMOS EL ESTADO PARA SABER QUE ESE PRODUCTO YA SE COBRO Y SE RESTO DEL INVENTARIO
+                    $quotation_product->status = 'C';  
+                    $quotation_product->save();
+                }else{
+                return 'El Inventario de la cotizacion no existe!';
+                }
+
+            }
+
+            return "exito";
+
     }
 }

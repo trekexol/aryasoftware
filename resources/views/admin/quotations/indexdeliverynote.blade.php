@@ -13,6 +13,9 @@
       <a class="nav-link active font-weight-bold" style="color: black;" id="contact-tab"  href="{{ route('quotations.indexdeliverynote') }}" role="tab" aria-controls="contact" aria-selected="false">Notas De Entrega</a>
     </li>
     <li class="nav-item" role="presentation">
+        <a class="nav-link font-weight-bold" style="color: black;" id="contact-tab"  href="{{ route('orders.index') }}" role="tab" aria-controls="contact" aria-selected="false">Pedidos</a>
+    </li>
+    <li class="nav-item" role="presentation">
         <a class="nav-link font-weight-bold" style="color: black;" id="profile-tab"  href="{{ route('sales') }}" role="tab" aria-controls="profile" aria-selected="false">Ventas</a>
       </li>
     <li class="nav-item" role="presentation">
@@ -66,7 +69,7 @@
             <thead>
             <tr> 
                 
-                <th class="text-center">F.Nota de Entrega</th>
+                <th class="text-center">Fecha</th>
                 <th class="text-center">N°</th>
                 <th class="text-center">Cliente</th>
                 <th class="text-center">Vendedor</th>
@@ -100,7 +103,7 @@
                             <td class="text-center">
                                 <a href="{{ route('quotations.createfacturar',[$quotation->id,$quotation->coin])}}" title="Seleccionar"><i class="fa fa-check"></i></a>
                                 <a href="{{ route('quotations.createdeliverynote',[$quotation->id,$quotation->coin])}}" title="Mostrar"><i class="fa fa-file-alt"></i></a>
-                                <a href="{{ route('quotations.reversarQuotation',$quotation->id)}}" title="Borrar"><i class="fa fa-trash text-danger"></i></a>
+                                <a href="{{ route('quotations.reversar_delivery_note',$quotation->id)}}" title="Borrar"><i class="fa fa-trash text-danger"></i></a>
                             </td>                        
                         
                         </tr>     

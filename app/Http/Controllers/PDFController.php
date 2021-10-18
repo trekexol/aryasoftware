@@ -172,14 +172,14 @@ class PDFController extends Controller
                         $quotation->number_delivery_note = 1;
                     }
 
-                    //Si ya se hizo un pedido, ya se desconto del inventario
-                    if(!(isset($quotation->date_order))){
-                        $retorno = $this->discount_inventory($id_quotation);
+                    
+                    $global = new GlobalController();
+                    $retorno = $global->discount_inventory($id_quotation);
 
-                        if($retorno != 'exito'){
-                            return redirect('quotations/register/'.$id_quotation.'/'.$coin.'')->withDanger($retorno);                     
-                        }
+                    if($retorno != 'exito'){
+                        return redirect('quotations/register/'.$id_quotation.'/'.$coin.'')->withDanger($retorno);                     
                     }
+                   
 
                  }else{
                     if(isset($quotation->bcv)){
@@ -292,26 +292,26 @@ class PDFController extends Controller
             if(isset($id_quotation)){
                  $quotation = Quotation::on(Auth::user()->database_name)->findOrFail($id_quotation);
                 
-                 
-
                  if(!(isset($quotation->date_order))){
 
                     //Me busco el ultimo numero en notas de entrega
-                    $last_number = Quotation::on(Auth::user()->database_name)->where('number_delivery_note','<>',NULL)->orderBy('number_delivery_note','desc')->first();
+                    $last_number = Quotation::on(Auth::user()->database_name)->where('number_order','<>',NULL)->orderBy('number_order','desc')->first();
                    
                     //Asigno un numero incrementando en 1
                     if(isset($last_number)){
-                        $quotation->number_delivery_note = $last_number->number_delivery_note + 1;
+                        $quotation->number_order = $last_number->number_order + 1;
                     }else{
-                        $quotation->number_delivery_note = 1;
+                        $quotation->number_order = 1;
                     }
-                    if(!(isset($quotation->date_delivery_note))){
-                        $retorno = $this->discount_inventory($id_quotation);
 
-                        if($retorno != 'exito'){
-                            return redirect('quotations/register/'.$id_quotation.'/'.$coin.'')->withDanger($retorno);                     
-                        }
+                    //if(!(isset($quotation->date_delivery_note)) && !(isset($quotation->date_order))){
+                    $global = new GlobalController();
+                    $retorno = $global->discount_inventory($id_quotation);
+
+                    if($retorno != 'exito'){
+                        return redirect('quotations/register/'.$id_quotation.'/'.$coin.'')->withDanger($retorno);                     
                     }
+                    //}
                         
 
                  }else{
@@ -440,14 +440,14 @@ class PDFController extends Controller
                         $quotation->number_delivery_note = 1;
                     }
 
-                     //Si ya se hizo un pedido, ya se desconto del inventario
-                     if(!(isset($quotation->date_order))){
-                        $retorno = $this->discount_inventory($id_quotation);
+                    
+                    $global = new GlobalController();
+                    $retorno = $global->discount_inventory($id_quotation);
 
-                        if($retorno != 'exito'){
-                            return redirect('quotations/register/'.$id_quotation.'/'.$coin.'')->withDanger($retorno);                     
-                        }
+                    if($retorno != 'exito'){
+                        return redirect('quotations/register/'.$id_quotation.'/'.$coin.'')->withDanger($retorno);                     
                     }
+                    
 
                  }else{
                     if(isset($quotation->bcv)){
@@ -902,65 +902,7 @@ class PDFController extends Controller
 
 
 
-    public function discount_inventory($id_quotation)
-    {
-            /*Primero Revisa que todos los productos tengan inventario suficiente*/
-            $no_hay_cantidad_suficiente = DB::connection(Auth::user()->database_name)->table('inventories')
-                                    ->join('quotation_products', 'quotation_products.id_inventory','=','inventories.id')
-                                    ->join('products', 'products.id','=','inventories.product_id')
-                                    ->where('quotation_products.id_quotation','=',$id_quotation)
-                                    ->where('quotation_products.amount','<','inventories.amount')
-                                    ->where('products.type','LIKE','MERCANCIA')
-                                    ->select('inventories.code as code','quotation_products.id_quotation as id_quotation','quotation_products.discount as discount',
-                                    'quotation_products.amount as amount_quotation')
-                                    ->first(); 
-        
-            if(isset($no_hay_cantidad_suficiente)){
-                return "no_hay_cantidad_suficiente";
-            }
-
-            /*Luego, descuenta del Inventario*/
-                $inventories_quotations = DB::connection(Auth::user()->database_name)->table('products')->join('inventories', 'products.id', '=', 'inventories.product_id')
-                ->join('quotation_products', 'inventories.id', '=', 'quotation_products.id_inventory')
-                ->where('quotation_products.id_quotation',$id_quotation)
-                ->where('products.type','LIKE','MERCANCIA')
-                ->select('products.*','quotation_products.id as id_quotation','quotation_products.discount as discount',
-                'quotation_products.amount as amount_quotation')
-                ->get(); 
-
-            foreach($inventories_quotations as $inventories_quotation){
-
-                $quotation_product = QuotationProduct::on(Auth::user()->database_name)->findOrFail($inventories_quotation->id_quotation);
-
-                if(isset($quotation_product)){
-                    $inventory = Inventory::on(Auth::user()->database_name)->findOrFail($quotation_product->id_inventory);
-
-                    if(isset($inventory)){
-                        //REVISO QUE SEA MAYOR EL MONTO DEL INVENTARIO Y LUEGO DESCUENTO
-                        if($inventory->amount >= $quotation_product->amount){
-                            $inventory->amount -= $quotation_product->amount;
-                            $inventory->save();
-
-                            //CAMBIAMOS EL ESTADO PARA SABER QUE ESE PRODUCTO YA SE COBRO Y SE RESTO DEL INVENTARIO
-                            $quotation_product->status = 'C';  
-                            $quotation_product->save();
-
-                        }else{
-                            return 'El Inventario de Codigo: '.$inventory->code.' no tiene Cantidad suficiente!';
-                        }
-                        
-                    }else{
-                        return 'El Inventario no existe!';
-                    }
-                }else{
-                return 'El Inventario de la cotizacion no existe!';
-                }
-
-            }
-
-            return "exito";
-
-    }
+    
 
 
     public function calculation($coin)

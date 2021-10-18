@@ -165,7 +165,7 @@
     <th style="text-align: right; font-weight: normal; width: 21%;">{{ number_format($total_petro, 6, ',', '.') }}</th>
   </tr> 
   <tr>
-    <th style="text-align: left; font-weight: normal; width: 79%; border-top-color: rgb(17, 9, 9); border-right-color: white; font-size: small;"><pre>NOTA DE ENTREGA        </pre></th>
+    <th style="text-align: left; font-weight: normal; width: 79%; border-top-color: rgb(17, 9, 9); border-right-color: white; font-size: small;"><pre>Pedido</pre></th>
     <th style="text-align: right; font-weight: normal; width: 21%; "></th>
   </tr> 
   
