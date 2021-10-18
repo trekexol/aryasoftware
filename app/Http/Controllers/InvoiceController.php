@@ -1167,8 +1167,6 @@ class InvoiceController extends Controller
                     $global->check_anticipo($quotation,$grand_total);
                     $quotation->anticipo =  $grand_total;
                     $quotation->status = "C";
-                }else{
-                    $quotation->anticipo =  $anticipo;
                 }
                 
                 $account_anticipo_cliente = Account::on(Auth::user()->database_name)->where('code_one',2)
@@ -1177,11 +1175,10 @@ class InvoiceController extends Controller
                                                         ->where('code_four',1)
                                                         ->where('code_five',2)->first(); 
 
+                                                        
                 if(isset($account_anticipo_cliente)){
-                    $this->add_movement($bcv,$header_voucher->id,$account_anticipo_cliente->id,$quotation->id,$user_id,$quotation->anticipo,0);
+                    $this->add_movement($bcv,$header_voucher->id,$account_anticipo_cliente->id,$user_id,$anticipo,0);
                 }
-             }else{
-                 $quotation->anticipo = 0;
              }
             /*---------- */
 

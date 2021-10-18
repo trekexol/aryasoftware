@@ -8,6 +8,7 @@ use App\Company;
 use App\DetailVoucher;
 use App\Exports\ProductsExport;
 use App\Inventory;
+use App\Multipayment;
 use App\Product;
 use App\Quotation;
 use App\QuotationPayment;
@@ -803,36 +804,85 @@ class QuotationController extends Controller
         
         $quotation = Quotation::on(Auth::user()->database_name)->findOrFail($id_quotation);
 
-        if($quotation != 'X'){
-            $detail = DetailVoucher::on(Auth::user()->database_name)->where('id_invoice',$id_quotation)
-            ->update(['status' => 'X']);
-
-             DB::connection(Auth::user()->database_name)->table('detail_vouchers')
-            ->join('header_vouchers', 'header_vouchers.id','=','detail_vouchers.id_header_voucher')
-            ->join('multipayment', 'multipayment.id_header','=','header_vouchers.id')
-            ->where('multipayment.id_quotation','=',$id_quotation)
-            ->update(['detail_vouchers.status' => 'X']);
-
-            QuotationProduct::on(Auth::user()->database_name)
-                            ->join('inventories','inventories.id','quotation_products.id_inventory')
+        $exist_multipayment = Multipayment::on(Auth::user()->database_name)
                             ->where('id_quotation',$quotation->id)
-                            ->update(['inventories.amount' => DB::raw('inventories.amount+quotation_products.amount') , 'quotation_products.status' => 'X']);
+                            ->first();
 
-            QuotationPayment::on(Auth::user()->database_name)
-                            ->where('id_quotation',$quotation->id)
-                            ->update(['status' => 'X']);
-
-            
-
-            $quotation->status = 'X';
-            $quotation->save();
+        if(empty($exist_multipayment)){
+            if($quotation != 'X'){
+                $detail = DetailVoucher::on(Auth::user()->database_name)->where('id_invoice',$id_quotation)
+                ->update(['status' => 'X']);
+    
+                 
+    
+                QuotationProduct::on(Auth::user()->database_name)
+                                ->join('inventories','inventories.id','quotation_products.id_inventory')
+                                ->join('products','products.id','inventories.product_id')
+                                ->where('products.type','MERCANCIA')
+                                ->where('id_quotation',$quotation->id)
+                                ->update(['inventories.amount' => DB::raw('inventories.amount+quotation_products.amount') , 'quotation_products.status' => 'X']);
+    
+                QuotationPayment::on(Auth::user()->database_name)
+                                ->where('id_quotation',$quotation->id)
+                                ->update(['status' => 'X']);
+    
+                
+    
+                $quotation->status = 'X';
+                $quotation->save();
+            }
+        }else{
+            return redirect('/quotations/facturado/'.$quotation->id.'/bolivares/'.$exist_multipayment->id_header.'');
         }
+
+        
         
         
         return redirect('invoices')->withSuccess('Reverso de Factura Exitosa!');
 
     }
 
+    public function reversar_quotation_multipayment($id_quotation,$id_header){
+
+        
+        if(isset($id_header)){
+            //aqui reversamos todo el movimiento del multipago
+            DB::connection(Auth::user()->database_name)->table('detail_vouchers')
+            ->join('header_vouchers', 'header_vouchers.id','=','detail_vouchers.id_header_voucher')
+            ->where('header_vouchers.id','=',$id_header)
+            ->update(['detail_vouchers.status' => 'X' , 'header_vouchers.status' => 'X']);
+
+            //aqui se cambia el status de los pagos
+            DB::connection(Auth::user()->database_name)->table('multipayments')
+            ->join('quotation_payments', 'quotation_payments.id_quotation','=','multipayments.id_quotation')
+            ->where('multipayments.id_header','=',$id_header)
+            ->update(['quotation_payments.status' => 'X']);
+
+            //aqui aumentamos el inventario y cambiamos el status de los productos que se reversaron
+            DB::connection(Auth::user()->database_name)->table('multipayments')
+                ->join('quotation_products', 'quotation_products.id_quotation','=','multipayments.id_quotation')
+                ->join('inventories','inventories.id','quotation_products.id_inventory')
+                ->join('products','products.id','inventories.product_id')
+                ->where('products.type','MERCANCIA')
+                ->where('multipayments.id_header','=',$id_header)
+                ->update(['inventories.amount' => DB::raw('inventories.amount+quotation_products.amount') ,
+                        'quotation_products.status' => 'X']);
+    
+
+            //aqui le cambiamos el status a todas las facturas a X de reversado
+            Multipayment::on(Auth::user()->database_name)
+            ->join('quotations', 'quotations.id','=','multipayments.id_quotation')
+            ->where('id_header',$id_header)->update(['quotations.status' => 'X']);
+
+            Multipayment::on(Auth::user()->database_name)->where('id_header',$id_header)->delete();
+
+            return redirect('invoices')->withSuccess('Reverso de Facturas Multipago Exitosa!');
+        }else{
+            return redirect('invoices')->withDanger('No se pudo reversar las facturas');
+        }
+        
+    }
+    
 
     public function listinventory(Request $request, $var = null){
         //validar si la peticion es asincrona

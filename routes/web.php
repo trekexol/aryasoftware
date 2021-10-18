@@ -430,7 +430,7 @@ Route::group(["prefix"=>'quotations'],function(){
     Route::get('facturar/{id_quotation}/{coin}','FacturarController@createfacturar')->name('quotations.createfacturar');
 
     Route::post('storefactura','FacturarController@storefactura')->name('quotations.storefactura');
-    Route::get('facturado/{id_quotation}/{coin}','FacturarController@createfacturado')->name('quotations.createfacturado');
+    Route::get('facturado/{id_quotation}/{coin}/{reverso?}','FacturarController@createfacturado')->name('quotations.createfacturado');
 
     Route::get('listinventory/{var?}','QuotationController@listinventory')->name('quotations.listinventory');
 
@@ -453,6 +453,8 @@ Route::group(["prefix"=>'quotations'],function(){
     Route::delete('deletequotation','QuotationController@deleteQuotation')->name('quotations.deleteQuotation');
 
     Route::get('reversarquotation{id}','QuotationController@reversar_quotation')->name('quotations.reversarQuotation');
+
+    Route::get('reversarquotationmultipayment/{id}/{id_header?}','QuotationController@reversar_quotation_multipayment')->name('quotations.reversar_quotation_multipayment');
    
 });
 

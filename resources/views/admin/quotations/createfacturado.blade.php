@@ -30,7 +30,7 @@
                 
                 <div class="card-body" >
                         <div class="form-group row">
-                            <label for="date_quotation" class="col-md-2 col-form-label text-md-right">CI/Rif Cliente:</label>
+                            <label for="date_quotation" class="col-md-2 col-form-label text-md-right">CI/Rif Cliente: </label>
                             <div class="col-md-4">
                                 <input id="date_quotation" type="text" class="form-control @error('date_quotation') is-invalid @enderror" name="date_quotation" value="{{ $quotation->clients['cedula_rif']  ?? '' }}" readonly required autocomplete="date_quotation">
 
@@ -207,12 +207,43 @@
             </div>
         </div>
 </div>
+<!-- Delete Warning Modal -->
+<div class="modal modal-danger fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Eliminar Multipago</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+           
+                <h5 class="text-center">Esta factura fue pagada con multipago, al reversarla, reversará todas las facturas 
+                    realizadas en el multipago.</h5>
+                <h5 class="text-center">Seguro quiere reversar todas las facturas?</h5>
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <a href="{{ route('quotations.reversar_quotation_multipayment',[$quotation->id,$reverso ?? null]) }}" type="submit" class="btn btn-danger">Eliminar</a>
+            </div>
+            
+        </div>
+    </div>
+</div>
 @endsection
 
 
 
 @section('consulta')
-
+    @if (isset($reverso))
+        <script>
+            $( document ).ready(function() {
+                $('#deleteModal').modal('toggle')
+            });
+        </script>
+    @endif
 
     <script type="text/javascript">
 

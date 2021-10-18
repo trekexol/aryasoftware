@@ -27,7 +27,10 @@ class InventoryController extends Controller
        $user       =   auth()->user();
        $users_role =   $user->role_id;
        
-        $inventories = Inventory::on(Auth::user()->database_name)->orderBy('id' ,'DESC')->where('status',1)->get();
+        $inventories = Inventory::on(Auth::user()->database_name)
+        ->join('products','products.id','inventories.product_id')
+        ->where('products.type','MERCANCIA')
+        ->orderBy('products.description' ,'ASC')->where('products.status',1)->get();
         
        return view('admin.inventories.index',compact('inventories'));
    }

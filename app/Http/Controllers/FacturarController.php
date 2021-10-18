@@ -1906,7 +1906,7 @@ class FacturarController extends Controller
 
 
 
-    public function createfacturado($id_quotation,$coin)
+    public function createfacturado($id_quotation,$coin,$reverso = null)
     {
          $quotation = null;
              
@@ -1918,10 +1918,7 @@ class FacturarController extends Controller
          if(isset($quotation)){
                 // $product_quotations = QuotationProduct::on(Auth::user()->database_name)->where('id_quotation',$quotation->id)->get();
                 $payment_quotations = QuotationPayment::on(Auth::user()->database_name)->where('id_quotation',$quotation->id)->get();
-
-           
-              
-            
+     
              $date = Carbon::now();
              $datenow = $date->format('Y-m-d');    
 
@@ -1936,7 +1933,7 @@ class FacturarController extends Controller
                $bcv = null;
             }
              
-             return view('admin.quotations.createfacturado',compact('quotation','payment_quotations', 'datenow','bcv','coin'));
+             return view('admin.quotations.createfacturado',compact('quotation','payment_quotations', 'datenow','bcv','coin','reverso'));
             }else{
              return redirect('/invoices')->withDanger('La factura no existe');
          } 
