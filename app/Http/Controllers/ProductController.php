@@ -61,7 +61,6 @@ class ProductController extends Controller
             
         
             'segment'         =>'required',
-            'Subsegment'         =>'required',
             'unit_of_measure_id'         =>'required',
 
 
@@ -198,7 +197,6 @@ class ProductController extends Controller
         
        
         'segment'         =>'required',
-        'Subsegment'         =>'required',
         'unit_of_measure_id'         =>'required',
 
 

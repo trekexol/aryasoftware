@@ -1097,7 +1097,7 @@ class ReportController extends Controller
                  
     }
 
-    function purchases_books_pdf($coin,$date_begin,$date_end)
+    function purchases_book_pdf($coin,$date_begin,$date_end)
     {
         
         $pdf = App::make('dompdf.wrapper');
@@ -1108,7 +1108,7 @@ class ReportController extends Controller
         $expenses = ExpensesAndPurchase::on(Auth::user()->database_name)
                                     ->where('amount','<>',null)
                                     ->whereRaw(
-                                        "(DATE_FORMAT(date_billing, '%Y-%m-%d') >= ? AND DATE_FORMAT(date_billing, '%Y-%m-%d') <= ?)", 
+                                        "(DATE_FORMAT(date, '%Y-%m-%d') >= ? AND DATE_FORMAT(date, '%Y-%m-%d') <= ?)", 
                                         [$date_begin, $date_end])
                                     ->orderBy('date','desc')->get();
 

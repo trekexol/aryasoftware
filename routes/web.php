@@ -815,8 +815,8 @@ Route::group(["prefix"=>'reports'],function(){
     Route::post('storesales_books','ReportController@store_sales_books')->name('reports.store_sales_books');
     Route::get('sales_bookspdf/{coin}/{date_begin}/{date_end}','ReportController@sales_books_pdf')->name('reports.sales_books_pdf');
     
-    Route::get('purchases_book','ReportController@index_purchases_book')->name('reports.purchases_book');
-    Route::post('storepurchases_book','ReportController@store_purchases_book')->name('reports.store_purchases_book');
+    Route::get('purchases_book','ReportController@index_purchases_books')->name('reports.purchases_book');
+    Route::post('storepurchases_book','ReportController@store_purchases_books')->name('reports.store_purchases_books');
     Route::get('purchases_bookpdf/{coin}/{date_begin}/{date_end}','ReportController@purchases_book_pdf')->name('reports.purchases_book_pdf');
     
     Route::get('inventory','ReportController@index_inventory')->name('reports.inventory');
@@ -901,4 +901,16 @@ Route::group(["prefix"=>'export'],function(){
   });
 
   
+  Route::group(["prefix"=>'combos'],function(){
+    Route::get('/','ComboController@index')->name('combos');
+    Route::get('create','ComboController@create')->name('combos.create');
+    Route::post('store','ComboController@store')->name('combos.store');
+
+    Route::get('{id}/edit','ProductController@edit')->name('combos.edit');
+    Route::delete('delete','ProductController@destroy')->name('combos.delete');
+    Route::patch('{id}/update','ProductController@update')->name('combos.update');
+
+    Route::get('assign','ComboController@create_assign')->name('combos.create_assign');
+  });
+
   

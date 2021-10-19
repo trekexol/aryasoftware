@@ -11,7 +11,7 @@
                 <input type="hidden" name="id_client" value="{{$client->id ?? null}}" readonly>
 
                 <div class="card-header text-center h4">
-                        Libro de Ventas
+                        Libro de Compras
                 </div>
 
                 <div class="card-body">
@@ -58,7 +58,7 @@
                         </div>
                     </form>
                         <div class="embed-responsive embed-responsive-16by9">
-                            <iframe class="embed-responsive-item" src="{{ route('reports.purchases_books_pdf',[$coin ?? 'bolivares',$datebeginyear ?? $date_begin ?? $datenow,$date_end ?? $datenow]) }}" allowfullscreen></iframe>
+                            <iframe class="embed-responsive-item" src="{{ route('reports.purchases_book_pdf',[$coin ?? 'bolivares',$datebeginyear ?? $date_begin ?? $datenow,$date_end ?? $datenow]) }}" allowfullscreen></iframe>
                           </div>
                         
                         </div>

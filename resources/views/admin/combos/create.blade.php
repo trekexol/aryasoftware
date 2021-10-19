@@ -23,22 +23,15 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header text-center font-weight-bold h3">Registro de Productos</div>
+                <div class="card-header text-center font-weight-bold h3">Registro de Combo</div>
 
                 <div class="card-body">
-                    <form method="POST" action="{{ route('products.store') }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('combos.store') }}" enctype="multipart/form-data">
                         @csrf
 
                         <input id="id_user" type="hidden" class="form-control @error('id_user') is-invalid @enderror" name="id_user" value="{{ Auth::user()->id }}" readonly required autocomplete="id_user">
                        
                         <div class="form-group row">
-                            <label for="type" class="col-md-2 col-form-label text-md-right">Tipo</label>
-                            <div class="col-md-4">
-                            <select class="form-control" name="type" id="type">
-                                <option value="MERCANCIA">Mercancía</option>
-                                <option value="SERVICIO">Servicio</option>
-                            </select>
-                            </div>
                             <label for="description" class="col-md-2 col-form-label text-md-right">Descripción</label>
 
                             <div class="col-md-4">
@@ -236,11 +229,11 @@
                         <div class="form-group row mb-0">
                             <div class="col-md-3 offset-md-2">
                                 <button type="submit" class="btn btn-primary">
-                                   Registrar Producto
+                                   Registrar Combo
                                 </button>
                             </div>
                             <div class="col-md-2">
-                                <a href="{{ route('products') }}" id="btnfacturar" name="btnfacturar" class="btn btn-danger" title="facturar">Volver</a>  
+                                <a href="{{ route('combos') }}" id="btnfacturar" name="btnfacturar" class="btn btn-danger" title="facturar">Volver</a>  
                             </div>
                         </div>
                     </form>

@@ -4,14 +4,14 @@
 
 <ul class="nav nav-tabs justify-content-center" id="myTab" role="tablist">
     <li class="nav-item" role="presentation">
-      <a class="nav-link active font-weight-bold" style="color: black;" id="home-tab"  href="{{ route('products') }}" role="tab" aria-controls="home" aria-selected="true">Productos</a>
+      <a class="nav-link font-weight-bold" style="color: black;" id="home-tab"  href="{{ route('products') }}" role="tab" aria-controls="home" aria-selected="true">Productos</a>
     </li>
     <li class="nav-item" role="presentation">
       <a class="nav-link font-weight-bold" style="color: black;" id="profile-tab"  href="{{ route('inventories') }}" role="tab" aria-controls="profile" aria-selected="false">Inventarios</a>
     </li>
     <li class="nav-item" role="presentation">
-      <a class="nav-link font-weight-bold" style="color: black;" id="home-tab"  href="{{ route('combos') }}" role="tab" aria-controls="home" aria-selected="true">Combos</a>
-  </li>
+      <a class="nav-link active font-weight-bold" style="color: black;" id="home-tab"  href="{{ route('combos') }}" role="tab" aria-controls="home" aria-selected="true">Combos</a>
+    </li>
     <li class="nav-item" role="presentation">
       <a class="nav-link font-weight-bold" style="color: black;" id="contact-tab"  href="{{ route('inventories.movement') }}" role="tab" aria-controls="contact" aria-selected="false">Movimientos de Inventario</a>
     </li>
@@ -24,10 +24,9 @@
     <!-- Page Heading -->
     <div class="row py-lg-2">
       <div class="col-md-6">
-          
       </div>
       <div class="col-md-6">
-        <a href="{{ route('products.create')}}" class="btn btn-primary float-md-right" role="button" aria-pressed="true">Registrar un Producto</a>
+        <a href="{{ route('combos.create')}}" class="btn btn-primary float-md-right" role="button" aria-pressed="true">Registrar un Combo</a>
       </div>
     </div>
   </div>
@@ -55,39 +54,36 @@
         <table class="table table-light2 table-bordered" id="dataTable" width="100%" cellspacing="0">
             <thead>
             <tr> 
-                <th class="text-center">Código</th>
-                <th class="text-center">Descripción</th>
-                <th class="text-center">Tipo</th>
-                <th class="text-center">Precio</th>
-                <th class="text-center">Moneda</th>
-                <th class="text-center">Foto del Producto</th>
-              
-                <th class="text-center" width="7%"></th>
+               
+            
+              <th class="text-center">Código</th>
+              <th class="text-center">Descripción</th>
+              <th class="text-center">Precio</th>
+              <th class="text-center">Moneda</th>
+            
+              <th class="text-center" width="7%"></th>
             </tr>
             </thead>
             
             <tbody>
-                @if (empty($products))
+                @if (empty($combos))
                 @else  
-                    @foreach ($products as $product)
+                    @foreach ($combos as $combo)
                         <tr>
                            
-                            <td class="text-center">{{$product->code_comercial}}</td>
-                            <td class="text-center">{{$product->description}}</td>
-                            <td class="text-center">{{$product->type}}</td>
-                            <td class="text-right">{{number_format($product->price, 2, ',', '.')}}</td>
+                            <td class="text-center">{{$combo->code_comercial}}</td>
+                            <td class="text-center">{{$combo->description}}</td>
+                            <td class="text-right">{{number_format($combo->price, 2, ',', '.')}}</td>
                             
-                            @if ($product->money == 'Bs')
+                            @if ($combo->money == 'Bs')
                               <td class="text-center">Bolivares</td>
                             @else
                               <td class="text-center">Dolares</td>
                             @endif
                             
-                            <td class="text-center"><img src="{{ asset('/storage/descarga.jpg') }} " ></td>
-
                             <td class="text-center">
-                                <a href="{{ route('products.edit',$product->id) }}"  title="Editar"><i class="fa fa-edit"></i></a>
-                                <a href="#" class="delete" data-id-product={{$product->id}} data-toggle="modal" data-target="#deleteModal" title="Eliminar"><i class="fa fa-trash text-danger"></i></a>  
+                                <a href="{{ route('combos.edit',$combo->id) }}"  title="Editar"><i class="fa fa-edit"></i></a>
+                                <a href="#" class="delete" data-id-combo={{$combo->id}} data-toggle="modal" data-target="#deleteModal" title="Eliminar"><i class="fa fa-trash text-danger"></i></a>  
                             </td>
                         </tr>     
                     @endforeach   
@@ -109,10 +105,10 @@
               </button>
           </div>
           <div class="modal-body">
-          <form action="{{ route('products.delete') }}" method="post">
+          <form action="{{ route('combos.delete') }}" method="post">
               @csrf
               @method('DELETE')
-              <input id="id_product_modal" type="hidden" class="form-control @error('id_product_modal') is-invalid @enderror" name="id_product_modal" readonly required autocomplete="id_product_modal">
+              <input id="id_combo_modal" type="hidden" class="form-control @error('id_combo_modal') is-invalid @enderror" name="id_combo_modal" readonly required autocomplete="id_combo_modal">
                      
               <h5 class="text-center">Seguro que desea eliminar?</h5>
               
@@ -137,9 +133,9 @@
 
         $(document).on('click','.delete',function(){
          
-            let id_product = $(this).attr('data-id-product');
+            let id_combo = $(this).attr('data-id-combo');
     
-            $('#id_product_modal').val(id_product);
+            $('#id_combo_modal').val(id_combo);
         });
         </script> 
 @endsection
