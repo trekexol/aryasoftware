@@ -71,7 +71,7 @@
                 <th class="text-center">N° de Control/Serie</th>
                 <th class="text-center">Cliente</th>
                 <th class="text-center">Vendedor</th>
-                <th class="text-center">Transporte</th>
+                <th class="text-center">Transp. / Tipo de Entrega</th>
                 <th class="text-center">Fecha de Cotización</th>
                 <th class="text-center"></th>
                
