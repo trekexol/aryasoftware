@@ -32,29 +32,30 @@
 
 <body>
 
-  <br><br><br>
+  <br><br><br><br>
 
-  <div style="color: black;font-size: 11pt; font-weight: bold; text-align: right;">FACTURA NRO: {{ str_pad($quotation->number_invoice ?? $quotation->id, 6, "0", STR_PAD_LEFT)}}</div>
 
  
-<table>
+<table style="width: 100%;">
   @if (isset($company->franqueo_postal))
   <tr>
-    <th style="font-weight: normal; width: 40%;">Concesión Postal:</th>
-    <th style="font-weight: normal;">Nº {{ $company->franqueo_postal ?? ''}}</th>
+    <th style="font-weight: normal; width: 10%;">Concesión Postal:</th>
+    <th style="font-weight: normal; width: 10%;">Nº {{ $company->franqueo_postal ?? ''}}</th>
    
   </tr>
   @endif
-    
-  @if (isset($quotation->credit_days))
-      <td style="width: 40%;">Fecha de Emisión:</td>
-      <td style="">{{ $quotation->date_billing }} | Dias de Crédito: {{ $quotation->credit_days }}</td>
+    <tr>
+     @if (isset($quotation->credit_days))
+      <td style="width: 10%;">Fecha de Emisión:</td>
+      <td style="width: 10%;">{{ $quotation->date_billing }} | Dias de Crédito: {{ $quotation->credit_days }}</td>
     
     @else
-      <td style="width: 40%;">Fecha de Emisión:</td>
-      <td style="">{{ $quotation->date_billing }}</td>
+      <td style="width: 10%;">Fecha de Emisión:</td>
+      <td style="width: 10%;">{{ $quotation->date_billing }}</td>
     @endif
-    
+      <td  style="font-size: 11pt; width: 40%; color: black; font-weight: bold; text-align: right; border-top-color: white; border-right-color: white;">FACTURA NRO: {{ str_pad($quotation->number_invoice ?? $quotation->id, 6, "0", STR_PAD_LEFT)}}</td>
+     
+
   </tr>
   
 </table>
