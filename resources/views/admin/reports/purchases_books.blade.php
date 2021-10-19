@@ -39,7 +39,7 @@
 <table style="width: 100%;">
   <tr>
     <th style="text-align: center; ">Nº</th>
-    <th style="text-align: center; ">Fecha</th>
+    <th style="text-align: center; " width="7%">Fecha</th>
     <th style="text-align: center; ">Rif</th>
     <th style="text-align: center; ">Razón Social</th>
     <th style="text-align: center; ">Serie</th>
@@ -55,10 +55,10 @@
     <tr>
       
       <td style="text-align: center; ">{{ $expense->id ?? ''}}</td>
-      <td style="text-align: center; ">{{ $expense->date_billing ?? ''}}</td>
+      <td style="text-align: center; ">{{ $expense->date ?? ''}}</td>
       
-      <td style="text-align: center; font-weight: normal;">{{ $expense->clients['cedula_rif'] ?? '' }}</td>
-      <td style="text-align: center; font-weight: normal;">{{ $expense->clients['name'] ?? '' }}</td>
+      <td style="text-align: center; font-weight: normal;">{{ $expense->providers['code_provider'] ?? '' }}</td>
+      <td style="text-align: center; font-weight: normal;">{{ $expense->providers['razon_social'] ?? '' }}</td>
       <td style="text-align: center; font-weight: normal;">{{ $expense->serie ?? ''}}</td>
       @if (isset($coin) && ($coin == 'bolivares'))
         <td style="text-align: right; font-weight: normal;">{{ number_format(($expense->amount ?? 0), 2, ',', '.') }}</td>

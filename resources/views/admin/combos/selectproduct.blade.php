@@ -7,10 +7,18 @@
 
     <!-- Page Heading -->
     <div class="row py-lg-2">
-      <div class="col-md-6">
-          <h2>Seleccione los Producto</h2>
+      <div class="col-md-8">
+          <h2>Seleccione los Productos para el Combo</h2>
       </div>
-      
+      <div class="col-md-4">
+        <form method="POST" action="{{ route('combos.store_assign') }}" enctype="multipart/form-data">
+            @csrf
+            <input id="id_products" type="hidden" class="form-control @error('id_products') is-invalid @enderror" name="id_products"  readonly required autocomplete="id_products">
+            <input id="id_combo" type="hidden" class="form-control @error('id_combo') is-invalid @enderror" name="id_combo" value="{{ $id_combo }}" readonly required autocomplete="id_combo">
+                       
+            <button type="submit" class="btn btn-primary float-md-right" role="button" aria-pressed="true">Asignar Productos</button>
+        </form>
+    </div>
     </div>
   </div>
   <!-- /.container-fluid -->
@@ -38,20 +46,13 @@
             <thead>
             <tr> 
                 <th></th>
-                <th>Descripción</th>
                 <th>Código Comercial</th>
+                <th>Descripción</th>
                 <th>Precio</th>
-                <th>Foto del Producto</th>
-                <th>Tipo</th>
-                <th>Precio de Compra</th>
-                <th>Costo Promedio</th>
+                <th>Moneda</th>
                 <th>Segmento</th>
                 <th>Sub Segmento</th>
-                <th>Unidad de Medida</th>
-                <th>Moneda</th>
-                <th>Exento</th>
-                <th>ISLR</th>
-                <th>Impuesto Especial</th>
+                
                 
             </tr>
             </thead>
@@ -62,36 +63,20 @@
                     @foreach ($products as $product)
                         <tr>
                             <td>
-                                <input onclick="changestatus({{ $product->id }});" type="checkbox" id="flexCheckChecked{{$anticipo->id}}">                        
+                                <input onclick="addProduct({{ $product->id }});" type="checkbox" id="flexCheckChecked{{$product->id}}">                        
                             </td>
-                            <td>{{$product->description}}</td>
-                            <td>{{$product->code_comercial}}</td>
-                            <td>{{$product->price}}</td>
-                            <td><img src="{{ asset('/storage/descarga.jpg') }} " ></td>
-                            <td>{{$product->type}}</td>
-                            <td>{{$product->price_buy}}</td>
-                            <td>{{$product->cost_average}}</td>
-                            <td>{{$product->segments['description']}}</td>
-                            <td>{{$product->subsegments['description']}}</td> 
-                            <td>{{$product->unitofmeasures['description']}}</td> 
-                           
+                            <td>{{$product->code_comercial ?? ''}}</td>
+                            <td>{{$product->description ?? ''}}</td>
+                            <td>{{$product->price ?? ''}}</td>
                             @if($product->money == "D")
                                 <td>Dolar</td>
                             @else
                                 <td>Bolívar</td>
                             @endif
-                            @if($product->exento == "1")
-                                <td>Si</td>
-                            @else
-                                <td>No</td>
-                            @endif
-                            @if($product->islr == "1")
-                                <td>Si</td>
-                            @else
-                                <td>No</td>
-                            @endif
+                            <td>{{$product->segments['description'] ?? ''}}</td>
+                            <td>{{$product->subsegments['description'] ?? ''}}</td> 
+                           
                             
-                            <td>{{$product->special_impuesto}}</td>
                            
                          
                         </tr>     
@@ -105,11 +90,18 @@
   
 @endsection
 @section('javascript')
-     <script>
+    <script>
         $('#dataTable').DataTable({
             "ordering": false,
             "order": [],
             'aLengthMenu': [[50, 100, 150, -1], [50, 100, 150, "All"]]
         });
-        </script> 
+
+        let products = [];
+        function addProduct(id_product){
+
+            products.push(id_product);
+            document.getElementById("id_products").value = products;
+        }
+    </script> 
 @endsection

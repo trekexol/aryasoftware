@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Combo;
+use App\ComboProduct;
 use App\Inventory;
 use App\Product;
 
@@ -49,11 +50,12 @@ class ComboController extends Controller
          return view('admin.combos.create',compact('segments','subsegments','unitofmeasures'));
     }
 
-    public function create_assign()
+    public function create_assign($id_combo)
     {
-        $products = Product::on(Auth::user()->database_name)->orderBy('description' ,'asc')->get();
+        $products = Product::on(Auth::user()->database_name)->orderBy('description' ,'asc')->where('type','not like','COMBO')->get();
 
-        return view('admin.combos.selectproduct',compact('products'));
+        
+        return view('admin.combos.selectproduct',compact('products','id_combo'));
     }
  
     /**
@@ -146,6 +148,22 @@ class ComboController extends Controller
          return redirect('/combos/assign')->withSuccess('Registro del Combo Exitosamente!');
      }
 
+     public function store_assign(Request $request)
+     {
+         //falta validar que no ingrese valores repetidos
+         $id_products = explode(",", $request->id_products);
+
+         foreach($id_products as $id_product){
+            $var = new ComboProduct();
+            $var->setConnection(Auth::user()->database_name);
+
+            $var->id_combo = $request->id_combo;
+            $var->id_product = $id_product;
+            $var->save();
+         }
+         
+        return redirect('combos')->withSuccess('Registro del Combo Exitosamente!');
+     }
 
      public function edit($id)
      {

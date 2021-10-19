@@ -910,7 +910,8 @@ Route::group(["prefix"=>'export'],function(){
     Route::delete('delete','ProductController@destroy')->name('combos.delete');
     Route::patch('{id}/update','ProductController@update')->name('combos.update');
 
-    Route::get('assign','ComboController@create_assign')->name('combos.create_assign');
+    Route::get('assign/{id_combo}','ComboController@create_assign')->name('combos.create_assign');
+    Route::post('storeassign','ComboController@store_assign')->name('combos.store_assign');
   });
 
   

@@ -61,7 +61,7 @@
               <th class="text-center">Precio</th>
               <th class="text-center">Moneda</th>
             
-              <th class="text-center" width="7%"></th>
+              <th class="text-center" width="9%"></th>
             </tr>
             </thead>
             
@@ -82,7 +82,8 @@
                             @endif
                             
                             <td class="text-center">
-                                <a href="{{ route('combos.edit',$combo->id) }}"  title="Editar"><i class="fa fa-edit"></i></a>
+                              <a href="{{ route('combos.create_assign',$combo->id) }}"  title="Asignar Productos"><i class="fa fa-check"></i></a>
+                              <a href="{{ route('combos.edit',$combo->id) }}"  title="Editar"><i class="fa fa-edit"></i></a>
                                 <a href="#" class="delete" data-id-combo={{$combo->id}} data-toggle="modal" data-target="#deleteModal" title="Eliminar"><i class="fa fa-trash text-danger"></i></a>  
                             </td>
                         </tr>     

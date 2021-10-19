@@ -19,7 +19,7 @@ class CreateComboProductsTable extends Migration
             $table->unsignedBigInteger('id_product'); 
             
             $table->foreign('id_product')->references('id')->on('products');
-            $table->foreign('id_combo')->references('id')->on('combos');
+            $table->foreign('id_combo')->references('id')->on('products');
             $table->timestamps();
         });
     }
