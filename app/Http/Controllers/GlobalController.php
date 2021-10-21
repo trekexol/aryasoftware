@@ -116,7 +116,10 @@ class GlobalController extends Controller
                                     ->where('quotation_products.id_quotation','=',$id_quotation)
                                     ->where('quotation_products.amount','<','inventories.amount')
                                     ->where('quotation_products.status','1')
-                                    ->where('products.type','LIKE','MERCANCIA')
+                                    ->where(function ($query){
+                                        $query->where('products.type','MERCANCIA')
+                                            ->orWhere('products.type','COMBO');
+                                    })
                                     ->select('inventories.code as code','quotation_products.id_quotation as id_quotation','quotation_products.discount as discount',
                                     'quotation_products.amount as amount_quotation')
                                     ->first(); 

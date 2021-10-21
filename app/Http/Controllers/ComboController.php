@@ -15,6 +15,8 @@ use App\UnitOfMeasure;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use PhpParser\Node\Stmt\Foreach_;
+
 class ComboController extends Controller
 {
     public function __construct(){
@@ -54,8 +56,9 @@ class ComboController extends Controller
     {
         $products = Product::on(Auth::user()->database_name)->orderBy('description' ,'asc')->where('type','not like','COMBO')->get();
 
+        $combo_products = ComboProduct::on(Auth::user()->database_name)->where('id_combo',$id_combo)->get();
         
-        return view('admin.combos.selectproduct',compact('products','id_combo'));
+        return view('admin.combos.selectproduct',compact('products','id_combo','combo_products'));
     }
  
     /**
@@ -150,37 +153,66 @@ class ComboController extends Controller
 
      public function store_assign(Request $request)
      {
-         //falta validar que no ingrese valores repetidos
-         $id_products = explode(",", $request->id_products);
+        //falta validar que no ingrese valores repetidos
+        $id_products = explode(",", $request->id_products);
+        
+        if(isset($request->combo_products)){
+            
+            $id_combos = explode(",", $request->combo_products);
 
-         foreach($id_products as $id_product){
-            $var = new ComboProduct();
-            $var->setConnection(Auth::user()->database_name);
-
-            $var->id_combo = $request->id_combo;
-            $var->id_product = $id_product;
-            $var->save();
-         }
-         
+            $diferencias = array_diff($id_products,$id_combos);
+            
+            if(empty($diferencias) || (isset($diferencias[0]) && $diferencias[0] == "")){
+                $diferencias = array_diff($id_combos,$id_products);
+            }
+            
+            if(count($diferencias) > 0){
+                foreach($diferencias as $diferencia){
+                    $combo_exist = ComboProduct::on(Auth::user()->database_name)->where('id_combo',$request->id_combo)->where('id_product',$diferencia)->first();
+                    
+                    if(isset($combo_exist)){
+                        ComboProduct::on(Auth::user()->database_name)->where('id_combo',$request->id_combo)->where('id_product',$diferencia)->delete();
+                    }else{
+                        $var = new ComboProduct();
+                        $var->setConnection(Auth::user()->database_name);
+                        $var->id_combo = $request->id_combo;
+                        $var->id_product = $diferencia;
+                        $var->save();
+                    }
+                }
+            }
+        }else{
+            foreach($id_products as $id_product){
+                $var = new ComboProduct();
+                $var->setConnection(Auth::user()->database_name);
+    
+                $var->id_combo = $request->id_combo;
+                $var->id_product = $id_product;
+                $var->save();
+             }
+             
+        }
+        
+        
         return redirect('combos')->withSuccess('Registro del Combo Exitosamente!');
      }
 
      public function edit($id)
      {
-          $product = Product::on(Auth::user()->database_name)->find($id);
+          $combo = Product::on(Auth::user()->database_name)->find($id);
           $segments     = Segment::on(Auth::user()->database_name)->orderBY('description','asc')->get();
          
           $subsegments  = Subsegment::on(Auth::user()->database_name)->orderBY('description','asc')->get();
   
-          $twosubsegments  = TwoSubsegment::on(Auth::user()->database_name)->where('subsegment_id',$product->subsegment_id)->orderBY('description','asc')->get();
+          $twosubsegments  = TwoSubsegment::on(Auth::user()->database_name)->where('subsegment_id',$combo->subsegment_id)->orderBY('description','asc')->get();
        
-          $threesubsegments  = ThreeSubsegment::on(Auth::user()->database_name)->where('twosubsegment_id',$product->twosubsegment_id)->orderBY('description','asc')->get();
+          $threesubsegments  = ThreeSubsegment::on(Auth::user()->database_name)->where('twosubsegment_id',$combo->twosubsegment_id)->orderBY('description','asc')->get();
        
           $unitofmeasures   = UnitOfMeasure::on(Auth::user()->database_name)->orderBY('description','asc')->get();
   
           //dd($product->subsegment_id);
          
-          return view('admin.products.edit',compact('threesubsegments','twosubsegments','product','segments','subsegments','unitofmeasures'));
+          return view('admin.combos.edit',compact('threesubsegments','twosubsegments','combo','segments','subsegments','unitofmeasures'));
     
      }
   
@@ -203,21 +235,15 @@ class ComboController extends Controller
       $data = request()->validate([
           
          
-          'segment'         =>'required',
-          'unit_of_measure_id'         =>'required',
-  
-  
-          'type'         =>'required',
+          'segment'             =>'required',
+          'unit_of_measure_id'  =>'required',
           'description'         =>'required',
-        
-          'price'         =>'required',
-          'price_buy'         =>'required',
-          'cost_average'         =>'required',
-  
-          'money'         =>'required',
-        
-          'special_impuesto'         =>'required',
-          'status'         =>'required',
+          'price'               =>'required',
+          'price_buy'           =>'required',
+          'cost_average'        =>'required',
+          'money'               =>'required',
+          'special_impuesto'    =>'required',
+          'status'              =>'required',
          
       ]);
   
@@ -241,7 +267,6 @@ class ComboController extends Controller
       $var->unit_of_measure_id = request('unit_of_measure_id');
   
       $var->code_comercial = request('code_comercial');
-      $var->type = request('type');
       $var->description = request('description');
   
       $valor_sin_formato_price = str_replace(',', '.', str_replace('.', '',request('price')));

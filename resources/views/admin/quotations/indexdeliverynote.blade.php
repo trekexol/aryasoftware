@@ -101,7 +101,7 @@
                             <td class="text-center">{{number_format($quotation->amount_with_iva, 2, ',', '.') ?? 0}}</td>
                             <td class="text-center">{{ $quotation->date_quotation ?? ''}}</td>
                             <td class="text-center">
-                                <a href="{{ route('quotations.createfacturar',[$quotation->id,$quotation->coin])}}" title="Seleccionar"><i class="fa fa-check"></i></a>
+                                <a href="{{ route('quotations.create',[$quotation->id,$quotation->coin])}}" title="Seleccionar"><i class="fa fa-check"></i></a>
                                 <a href="{{ route('quotations.createdeliverynote',[$quotation->id,$quotation->coin])}}" title="Mostrar"><i class="fa fa-file-alt"></i></a>
                                 <a href="{{ route('quotations.reversar_delivery_note',$quotation->id)}}" title="Borrar"><i class="fa fa-trash text-danger"></i></a>
                             </td>                        

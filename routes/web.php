@@ -906,9 +906,9 @@ Route::group(["prefix"=>'export'],function(){
     Route::get('create','ComboController@create')->name('combos.create');
     Route::post('store','ComboController@store')->name('combos.store');
 
-    Route::get('{id}/edit','ProductController@edit')->name('combos.edit');
-    Route::delete('delete','ProductController@destroy')->name('combos.delete');
-    Route::patch('{id}/update','ProductController@update')->name('combos.update');
+    Route::get('{id}/edit','ComboController@edit')->name('combos.edit');
+    Route::delete('delete','ComboController@destroy')->name('combos.delete');
+    Route::patch('{id}/update','ComboController@update')->name('combos.update');
 
     Route::get('assign/{id_combo}','ComboController@create_assign')->name('combos.create_assign');
     Route::post('storeassign','ComboController@store_assign')->name('combos.store_assign');
