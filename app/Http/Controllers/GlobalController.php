@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Anticipo;
 use App\Inventory;
+use App\QuotationPayment;
 use App\QuotationProduct;
 use Illuminate\Http\Request;
 
@@ -12,10 +13,10 @@ use Illuminate\Support\Facades\DB;
 
 class GlobalController extends Controller
 {
-    public function procesar_anticipos($quotation,$sin_formato_total_pay)
+    public function procesar_anticipos($quotation,$total_pay)
     {
         
-        if($sin_formato_total_pay >= 0){
+        if($total_pay >= 0){
             $anticipos_old = DB::connection(Auth::user()->database_name)->table('anticipos')
                                 ->where('id_client', '=', $quotation->id_client)
                                 ->where(function ($query) use ($quotation){
@@ -59,6 +60,64 @@ class GlobalController extends Controller
                                                                                             ->orWhere('id_quotation',$quotation->id);
                                                                                     })
                                                                                     ->where('status', '=', '1')->get();
+
+            foreach($anticipos as $anticipo){
+
+                //si el anticipo esta en dolares, multiplico los dolares por la tasa de la cotizacion, para sacar el monto real en bolivares
+                if($anticipo->coin != "bolivares"){
+                    $anticipo->amount = ($anticipo->amount / $anticipo->rate) * $quotation->bcv;
+                }
+
+                if($total_pay >= $anticipo->amount){
+                    DB::connection(Auth::user()->database_name)->table('anticipos')
+                                                                ->where('id', $anticipo->id)
+                                                                ->update(['status' => 'C']);
+                   
+                    DB::connection(Auth::user()->database_name)->table('anticipo_quotations')->insert(['id_quotation' => $quotation->id,'id_anticipo' => $anticipo->id]);
+                                                         
+                    $total_pay -= $anticipo->amount;
+                }else{
+
+                    DB::connection(Auth::user()->database_name)->table('anticipos')
+                                                                ->where('id', $anticipo->id)
+                                                                ->update(['status' => 'C']);
+                                                    
+                    DB::connection(Auth::user()->database_name)->table('anticipo_quotations')->insert(['id_quotation' => $quotation->id,'id_anticipo' => $anticipo->id]);
+                      
+
+                    $amount_anticipo_new = $anticipo->amount - $total_pay;
+
+                    $var = new Anticipo();
+                    $var->setConnection(Auth::user()->database_name);
+                    
+                    $var->date = $quotation->date_billing;
+                    $var->id_client = $quotation->id_client;
+                    $user       =   auth()->user();
+                    $var->id_user = $user->id;
+                    $var->id_account = $anticipo->id_account;
+                    $var->coin = $anticipo->coin;
+                    $var->amount = $amount_anticipo_new;
+                    $var->rate = $quotation->bcv;
+                    $var->reference = $anticipo->reference;
+                    $var->status = 1;
+                    $var->save();
+                    break;
+                }
+            }
+
+            
+    }
+
+    public function check_anticipo_multipayment($quotation,$quotations_id,$total_pay)
+    {
+        
+            $anticipos = DB::connection(Auth::user()->database_name)->table('anticipos')->where('id_client', '=', $quotation->id_client)
+                                                                                    ->where(function ($query) use ($quotations_id){
+                                                                                        $query->where('id_quotation',null)
+                                                                                            ->orWhereIn('id_quotation', $quotations_id);
+                                                                                    })
+                                                                                    ->where('status', '=', '1')->get();
+            
 
             foreach($anticipos as $anticipo){
 
@@ -168,5 +227,24 @@ class GlobalController extends Controller
 
             return "exito";
 
+    }
+
+    public function add_payment($quotation,$id_account,$payment_type,$amount,$bcv){
+        $var = new QuotationPayment();
+        $var->setConnection(Auth::user()->database_name);
+
+        $var->id_quotation = $quotation->id;
+        $var->id_account = $id_account;
+   
+        $var->payment_type = $payment_type;
+        $var->amount = $amount;
+        
+        
+        $var->rate = $bcv;
+        
+        $var->status =  1;
+        $var->save();
+        
+        return $var->id;
     }
 }

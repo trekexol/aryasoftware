@@ -1490,7 +1490,7 @@ class FacturarController extends Controller
                     $this->check_anticipo($quotation,$sin_formato_grandtotal);
                     $quotation->anticipo =  $sin_formato_grandtotal;
                     $quotation->status = "C";
-                    $this->add_payment($quotation,$account_anticipo_cliente->id,8,$quotation->anticipo,$bcv);
+                    $global->add_payment($quotation,$account_anticipo_cliente->id,8,$quotation->anticipo,$bcv);
                 }else{
                     $quotation->anticipo =  $anticipo;
                 }
@@ -1664,22 +1664,7 @@ class FacturarController extends Controller
         
     }
 
-    public function add_payment($quotation,$id_account,$payment_type,$amount,$bcv){
-        $var = new QuotationPayment();
-        $var->setConnection(Auth::user()->database_name);
-
-        $var->id_quotation = $quotation->id;
-        $var->id_account = $id_account;
-   
-        $var->payment_type = $payment_type;
-        $var->amount = $amount;
-        
-        
-        $var->rate = $bcv;
-        
-        $var->status =  1;
-        $var->save();
-    }
+    
 
     public function check_anticipo($quotation,$total_pay)
     {
