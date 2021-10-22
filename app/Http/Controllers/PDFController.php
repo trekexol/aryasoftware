@@ -160,18 +160,18 @@ class PDFController extends Controller
                  
 
                  if(!(isset($quotation->date_delivery_note))){
+                    if(empty($quotation->number_delivery_note)){
+                        //Me busco el ultimo numero en notas de entrega
+                        $last_number = Quotation::on(Auth::user()->database_name)->where('number_delivery_note','<>',NULL)->orderBy('number_delivery_note','desc')->first();
 
-                    //Me busco el ultimo numero en notas de entrega
-                    $last_number = Quotation::on(Auth::user()->database_name)->where('number_delivery_note','<>',NULL)->orderBy('number_delivery_note','desc')->first();
-
-                   
-                    //Asigno un numero incrementando en 1
-                    if(isset($last_number)){
-                        $quotation->number_delivery_note = $last_number->number_delivery_note + 1;
-                    }else{
-                        $quotation->number_delivery_note = 1;
+                    
+                        //Asigno un numero incrementando en 1
+                        if(isset($last_number)){
+                            $quotation->number_delivery_note = $last_number->number_delivery_note + 1;
+                        }else{
+                            $quotation->number_delivery_note = 1;
+                        }
                     }
-
                     
                     $global = new GlobalController();
                     $retorno = $global->discount_inventory($id_quotation);
@@ -293,17 +293,17 @@ class PDFController extends Controller
                  $quotation = Quotation::on(Auth::user()->database_name)->findOrFail($id_quotation);
                 
                  if(!(isset($quotation->date_order))){
-
-                    //Me busco el ultimo numero en notas de entrega
-                    $last_number = Quotation::on(Auth::user()->database_name)->where('number_order','<>',NULL)->orderBy('number_order','desc')->first();
-                   
-                    //Asigno un numero incrementando en 1
-                    if(isset($last_number)){
-                        $quotation->number_order = $last_number->number_order + 1;
-                    }else{
-                        $quotation->number_order = 1;
+                    if(empty($quotation->number_order)){
+                        //Me busco el ultimo numero en notas de entrega
+                        $last_number = Quotation::on(Auth::user()->database_name)->where('number_order','<>',NULL)->orderBy('number_order','desc')->first();
+                    
+                        //Asigno un numero incrementando en 1
+                        if(isset($last_number)){
+                            $quotation->number_order = $last_number->number_order + 1;
+                        }else{
+                            $quotation->number_order = 1;
+                        }
                     }
-
                     //if(!(isset($quotation->date_delivery_note)) && !(isset($quotation->date_order))){
                     $global = new GlobalController();
                     $retorno = $global->discount_inventory($id_quotation);
@@ -428,18 +428,16 @@ class PDFController extends Controller
                  
 
                  if(!(isset($quotation->date_delivery_note))){
-                     
-                     //Me busco el ultimo numero en notas de entrega
-                    $last_number = Quotation::on(Auth::user()->database_name)->where('number_delivery_note','<>',NULL)->orderBy('number_delivery_note','desc')->first();
-
-                   
-                    //Asigno un numero incrementando en 1
-                    if(isset($last_number)){
-                        $quotation->number_delivery_note = $last_number->number_delivery_note + 1;
-                    }else{
-                        $quotation->number_delivery_note = 1;
+                    if(empty($quotation->number_delivery_note)){
+                        //Me busco el ultimo numero en notas de entrega
+                        $last_number = Quotation::on(Auth::user()->database_name)->where('number_delivery_note','<>',NULL)->orderBy('number_delivery_note','desc')->first();
+                        //Asigno un numero incrementando en 1
+                        if(isset($last_number)){
+                            $quotation->number_delivery_note = $last_number->number_delivery_note + 1;
+                        }else{
+                            $quotation->number_delivery_note = 1;
+                        }
                     }
-
                     
                     $global = new GlobalController();
                     $retorno = $global->discount_inventory($id_quotation);

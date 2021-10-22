@@ -29,7 +29,10 @@ class InventoryController extends Controller
        
         $inventories = Inventory::on(Auth::user()->database_name)
         ->join('products','products.id','inventories.product_id')
-        ->where('products.type','MERCANCIA')
+        ->where(function ($query){
+            $query->where('products.type','MERCANCIA')
+                ->orWhere('products.type','COMBO');
+        })
         ->orderBy('products.description' ,'ASC')
         ->where('products.status',1)
         ->select('inventories.id as id_inventory','inventories.*','products.*')
@@ -195,12 +198,9 @@ class InventoryController extends Controller
 
         if($valor_sin_formato_amount_new > 0){
 
-            
-
             $var = Inventory::on(Auth::user()->database_name)->findOrFail($id_inventory);
         
             $var->code = request('code');
-            
             
             $var->amount = $amount_old + $valor_sin_formato_amount_new;
             
