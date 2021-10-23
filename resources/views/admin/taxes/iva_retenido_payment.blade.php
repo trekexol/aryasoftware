@@ -21,31 +21,31 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header text-center font-weight-bold h3">Debito Fiscal IVA por Pagar</div>
+                <div class="card-header text-center font-weight-bold h3">IVA por pagar retenido</div>
 
                 <div class="card-body">
                     <form method="POST" action="{{ route('taxes.store') }}" enctype="multipart/form-data" onsubmit="return validacion()">
                         @csrf
-                        <input id="id_account" type="hidden" class="form-control @error('id_account') is-invalid @enderror" name="id_account" value="{{ $account->id }}" required autocomplete="id_account" autofocus>
+                        <input id="account" type="hidden" class="form-control @error('account') is-invalid @enderror" name="account" value="{{ $account->id }}" required autocomplete="account" autofocus>
                         <input id="user_id" type="hidden" class="form-control @error('user_id') is-invalid @enderror" name="user_id" value="{{ Auth::user()->id }}" required autocomplete="user_id">
                         
                         
                         <div class="form-group row">
-                            <div class="col-sm-2">
+                            <div class="col-sm-2  col-form-label text-sm-right">
                                 <label id="Tipo" for="type" >Tipo:</label>
                             </div>
                             <div class="col-sm-4">
-                                <select class="form-control" required name="Tipo" id="type_contado">
+                                <select class="form-control" required name="type" id="type_contado">
                                     <option selected value="">Seleccione..</option>
                                     <option value="contado">Contado</option>
                                     <option value="credito">Credito</option>
                                 </select>
                             </div>
-                            <div class="col-sm-2" >
+                            <div class="col-sm-2  col-form-label text-sm-right" >
                                 <label for="Filtro">Retirar / Pagar:</label>
                             </div>
                             <div class="col-sm-4 ">
-                                <select  id="account" required name="Filtro" class="form-control">
+                                <select  id="account_counterpart" required name="account_counterpart" class="form-control">
                                     <option value="" >Seleccionar</option>
                                 </select>
 
@@ -57,7 +57,7 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <div class="col-sm-2" >
+                            <div class="col-sm-2  col-form-label text-sm-right" >
                                 <label for="Filtro">Descripción:</label>
                             </div>
                             <div class="col-sm-10 ">
@@ -70,16 +70,16 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <div class="col-sm-2" >
+                            <div class="col-sm-2  col-form-label text-sm-right" >
                                 <label for="money">Moneda:</label>
                             </div>
                             <div class="col-sm-4 ">
-                                <select class="form-control" name="Moneda" id="coin">
+                                <select class="form-control" name="coin" id="coin">
                                     <option selected value="bolivares">Bolívares</option>
                                     <option value="dolares">Dolares</option>
                                 </select>
                             </div>
-                            <div class="col-sm-2">
+                            <div class="col-sm-2  col-form-label text-sm-right">
                                 <label for="rate">Tasa:</label>
                             </div>
                             <div class="col-sm-4">
@@ -92,7 +92,7 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <div class="col-sm-2">
+                            <div class="col-sm-2  col-form-label text-sm-right">
                                 <label for="beneficiario">Beneficiario:</label>
                             </div>
                             <div class="col-sm-4">
@@ -103,10 +103,21 @@
                                     </span>
                                 @enderror
                             </div>
+                            <label for="date_begin" class="col-sm-2  col-form-label text-sm-right">Fecha del Retiro:</label>
+
+                            <div class="col-sm-4">
+                                <input id="date_begin" type="date" class="form-control @error('date_begin') is-invalid @enderror" name="date" value="{{ $datenow ?? old('date_begin') }}" required autocomplete="date_begin">
+
+                                @error('date_begin')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
                         </div>
                        
                         <div class="form-group row">
-                            <div class="col-sm-2">
+                            <div class="col-sm-2  col-form-label text-sm-right">
                                 <label for="amount">Total a Pagar:</label>
                             </div>
                             <div class="col-sm-4">
@@ -117,7 +128,7 @@
                                     </span>
                                 @enderror
                             </div>
-                            <div class="col-sm-2">
+                            <div class="col-sm-2  col-form-label text-sm-right">
                                 <label for="counterpart">Contrapartida:</label>
                             </div>
                             <div class="col-sm-4">
@@ -127,7 +138,7 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <div class="col-sm-2">
+                            <div class="col-sm-2  col-form-label text-sm-right">
                                 <label for="id_branch">Centro de costo:</label>
                             </div>
                             <div class="col-sm-4">
@@ -140,7 +151,7 @@
                                         @endforeach
                                     </select>
                             </div>
-                            <div class="col-sm-2">
+                            <div class="col-sm-2  col-form-label text-sm-right">
                                 <label for="cheque">Emitir Cheque:</label>
                             </div>
                             <div class="col-sm-4">
@@ -153,12 +164,12 @@
                        
                         <div id="div_nro" style="display: none">
                             <div class="form-group row">
-                                <div class="col-sm-2">
+                                <div class="col-sm-2  col-form-label text-sm-right">
                                     <label for="nro_ref">Nro Referencia:</label>
                                 </div>
                                 <div class="col-sm-4">
-                                    <input id="nro_ref" type="text" class="form-control @error('nro_ref') is-invalid @enderror" placeholder="0000" name="Nro_Ref" value="{{ old('Nro_Ref') }}" autocomplete="nro_ref">
-                                    @error('nro_ref')
+                                    <input id="reference" type="text" class="form-control @error('reference') is-invalid @enderror" placeholder="0000" name="reference" value="{{ old('reference') }}" autocomplete="reference">
+                                    @error('reference')
                                     <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
                                         </span>
@@ -187,42 +198,7 @@
 @section('javascript_iva_payment')
 
     <script>
-
-            var fecha = new Date();
-            var ano = fecha.getFullYear();
-            document.getElementsByName("Fecha_Year")[0].value = ano ;
-
-            $("#filtro_mount").on('change',function(){
-                var mes_id = $(this).val();
-                var fecha   = new Date();
-                var ano     = fecha.getFullYear();
-                $fe
-
-                if(metodo_id == 1){
-                    document.getElementById("pp-button").style.display   = "none";
-                    document.getElementById("div_pagar").style.display   = "block";
-                }
-
-                if(metodo_id == 2){
-                    document.getElementById("pp-button").style.display   = "block";
-                    document.getElementById("div_pagar").style.display   = "none";
-                }
-
-            });
-
-            $("#type_contado").on('change',function(){
-            var type_id = $(this).val();
-
-            if(type_id == 'contado'){
-                document.getElementById("div_nro").style.display   = "block";
-            }
-
-            if(type_id == 'credito'){
-                document.getElementById("div_nro").style.display   = "none";
-            }
-
-        });
-
+        
         $(document).ready(function () {
             $("#amount").mask('000.000.000.000.000,00', { reverse: true });
 
@@ -234,21 +210,28 @@
         });
 
         $("#type_contado").on('change',function(){
-
             var type = $(this).val();
+            
+            if(type == 'contado'){
+                document.getElementById("div_nro").style.display   = "block";
+            }
 
+            if(type == 'credito'){
+                document.getElementById("div_nro").style.display   = "none";
+            }
             getAccount(type);
+            
         });
-
+        
         function getAccount(type){
-
+            
             $.ajax({
                 url:"{{ route('taxes.list_account','') }}" + '/' + type,
                 beforSend:()=>{
                     alert('consultando datos');
                 },
                 success:(response)=>{
-                    let subbeneficiario = $("#account");
+                    let subbeneficiario = $("#account_counterpart");
                     let htmlOptions = `<option value='' >Seleccione..</option>`;
                     // console.clear();
                     if(response.length > 0){
@@ -262,8 +245,6 @@
                     // console.log(htmlOptions);
                     subbeneficiario.html('');
                     subbeneficiario.html(htmlOptions);
-
-
 
                 },
                 error:(xhr)=>{

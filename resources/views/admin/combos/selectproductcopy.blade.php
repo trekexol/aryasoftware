@@ -7,17 +7,20 @@
 
     <!-- Page Heading -->
     <div class="row py-lg-2">
-        <div class="col-sm-7">
-            <h2>Seleccione los Productos para el Combo</h2>
-        </div>
-        <div class="col-sm-3">
-           <input type="button" title="Agregar" value="Asignar Productos" class="btn btn-primary float-md-right" role="button" aria-pressed="true"  onclick="formSend();" >
-        </div>
-        <div class="col-sm-2">
-            <a href="{{ route('combos') }}" class="btn btn-danger">
-                Volver
-            </a>
-        </div>
+      <div class="col-md-8">
+          <h2>Seleccione los Productos para el Combo</h2>
+      </div>
+      <div class="col-md-4">
+        <form method="POST" action="{{ route('combos.store_assign') }}" enctype="multipart/form-data">
+            @csrf
+            <input id="id_products" type="hidden" class="form-control @error('id_products') is-invalid @enderror" name="id_products"  readonly required autocomplete="id_products">
+            <input id="id_combo" type="hidden" class="form-control @error('id_combo') is-invalid @enderror" name="id_combo" value="{{ $id_combo }}" readonly required autocomplete="id_combo">
+            
+            <input id="combo_products" type="hidden" class="form-control @error('combo_products') is-invalid @enderror" name="combo_products" readonly required autocomplete="combo_products">
+                      
+            <button type="submit" class="btn btn-primary float-md-right" role="button" aria-pressed="true">Asignar Productos</button>
+        
+    </div>
     </div>
   </div>
   <!-- /.container-fluid -->
@@ -27,14 +30,6 @@
   @include('admin.layouts.delete')    {{-- DELELTE --}}
   {{-- VALIDACIONES-RESPUESTA --}}
 <!-- DataTales Example -->
-<form id="formSend" method="POST" action="{{ route('combos.store_assign') }}" enctype="multipart/form-data">
-    @csrf
-    <input id="id_products" type="hidden" class="form-control @error('id_products') is-invalid @enderror" name="id_products"  readonly required autocomplete="id_products">
-    <input id="id_combo" type="hidden" class="form-control @error('id_combo') is-invalid @enderror" name="id_combo" value="{{ $id_combo }}" readonly required autocomplete="id_combo">
-    
-    <input id="combo_products" type="hidden" class="form-control @error('combo_products') is-invalid @enderror" name="combo_products" readonly required autocomplete="combo_products">
-              
-    
 <div class="card shadow mb-4">
     
     <div class="card-body">
@@ -53,7 +48,6 @@
             <thead>
             <tr> 
                 <th></th>
-                <th>Cantidad</th>
                 <th>Código Comercial</th>
                 <th>Descripción</th>
                 <th>Precio</th>
@@ -72,9 +66,6 @@
                         <tr>
                             <td>
                                 <input onclick="addProduct({{ $product->id }});" type="checkbox" id="flexCheckChecked{{$product->id}}">                        
-                            </td>
-                            <td>
-                                <input id="amount{{ $product->id }}" type="text" class="form-control @error('amount{{ $product->id }}') is-invalid @enderror" name="amount{{ $product->id }}" placeholder="0,00" autocomplete="amount{{ $product->id }}">
                             </td>
                             <td>{{$product->code_comercial ?? ''}}</td>
                             <td>{{$product->description ?? ''}}</td>
@@ -95,22 +86,12 @@
                 @endif
             </tbody>
         </table>
-        
         </div>
     </div>
 </div>
-
 </form>
 @endsection
 @section('javascript')
-    @foreach ($products as $product)
-    <script>
-        $(document).ready(function () {
-            $("#amount{{ $product->id }}").mask('000.000.000.000.000.000.000,00', { reverse: true });
-        });
-    </script>
-    @endforeach
-    
     <script>
         $('#dataTable').DataTable({
             "ordering": false,
@@ -118,10 +99,6 @@
             'aLengthMenu': [[50, 100, 150, -1], [50, 100, 150, "All"]]
         });
 
-        function formSend(){
-            document.getElementById("formSend").submit();       
-        }
-        
         let products = [];
         var controller_add = true;
         
@@ -156,7 +133,6 @@
                 products.push("{{ $combo->id_product }}");
                 document.getElementById("combo_products").value = products;
                 document.getElementById("flexCheckChecked{{ $combo->id_product }}").checked = true;
-                document.getElementById("amount{{ $combo->id_product }}").value = "{{ number_format($combo->amount_per_product, 2, ',', '.') }}";
                 document.getElementById("id_products").value = products;
             </script> 
         @endforeach

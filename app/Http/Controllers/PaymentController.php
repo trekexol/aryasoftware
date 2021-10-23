@@ -156,6 +156,12 @@ class PaymentController extends Controller
         return redirect('payments/index')->withSuccess('Reverso de Pagos Exitoso!');
     }
 
+    public function check_quotation_in_multipayment($id_quotation){
+
+        Multipayment::on(Auth::user()->database_name)
+                    ->where('id_quotation',$id_quotation)
+                    ->first();
+    }
   
 
     function asignar_payment_type($type){

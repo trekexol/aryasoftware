@@ -423,13 +423,16 @@ class FacturarController extends Controller
         //P de por pagar
         $quotation->status = 'P';
 
-        $last_number = Quotation::on(Auth::user()->database_name)->where('number_invoice','<>',NULL)->orderBy('number_invoice','desc')->first();
+        $last_number = Quotation::on(Auth::user()->database_name)
+        ->where('number_invoice','<>',NULL)->orderBy('number_invoice','desc')->first();
  
         //Asigno un numero incrementando en 1
-        if(isset($last_number)){
-            $quotation->number_invoice = $last_number->number_invoice + 1;
-        }else{
-            $quotation->number_invoice = 1;
+        if(empty($quotation->number_invoice)){
+            if(isset($last_number)){
+                $quotation->number_invoice = $last_number->number_invoice + 1;
+            }else{
+                $quotation->number_invoice = 1;
+            }
         }
 
         $quotation->save();
@@ -1477,21 +1480,22 @@ class FacturarController extends Controller
 
             /*Anticipos*/
             if(isset($anticipo) && ($anticipo != 0)){
-                
-                //Si el total a pagar es negativo, quiere decir que los anticipos sobrepasan al monto total de la factura
-                if($sin_formato_total_pay < 0){
-                    $this->check_anticipo($quotation,$sin_formato_grandtotal);
-                    $quotation->anticipo =  $sin_formato_grandtotal;
-                    $quotation->status = "C";
-                }else{
-                    $quotation->anticipo =  $anticipo;
-                }
-                
                 $account_anticipo_cliente = Account::on(Auth::user()->database_name)->where('code_one',2)
                                                         ->where('code_two',3)
                                                         ->where('code_three',1)
                                                         ->where('code_four',1)
                                                         ->where('code_five',2)->first(); 
+                //Si el total a pagar es negativo, quiere decir que los anticipos sobrepasan al monto total de la factura
+                if($sin_formato_total_pay < 0){
+                    $this->check_anticipo($quotation,$sin_formato_grandtotal);
+                    $quotation->anticipo =  $sin_formato_grandtotal;
+                    $quotation->status = "C";
+                    $global->add_payment($quotation,$account_anticipo_cliente->id,8,$quotation->anticipo,$bcv);
+                }else{
+                    $quotation->anticipo =  $anticipo;
+                }
+                
+                
 
                 if(isset($account_anticipo_cliente)){
                     $this->add_movement($bcv,$header_voucher->id,$account_anticipo_cliente->id,$quotation->id,$user_id,$quotation->anticipo,0);
@@ -1532,15 +1536,17 @@ class FacturarController extends Controller
             
             
             if(($quotation_status != 'C') && ($quotation_status != 'P')){
-                //Me busco el ultimo numero en notas de entrega
-                $last_number = Quotation::on(Auth::user()->database_name)->where('number_invoice','<>',NULL)->orderBy('number_invoice','desc')->first();
 
-                    
-                //Asigno un numero incrementando en 1
-                if(isset($last_number)){
-                    $quotation->number_invoice = $last_number->number_invoice + 1;
-                }else{
-                    $quotation->number_invoice = 1;
+                if(empty($quotation->number_invoice))
+                {   //Me busco el ultimo numero en notas de entrega
+                    $last_number = Quotation::on(Auth::user()->database_name)->where('number_invoice','<>',NULL)->orderBy('number_invoice','desc')->first();
+
+                    //Asigno un numero incrementando en 1
+                    if(isset($last_number)){
+                        $quotation->number_invoice = $last_number->number_invoice + 1;
+                    }else{
+                        $quotation->number_invoice = 1;
+                    }
                 }
             }
 
@@ -1658,6 +1664,7 @@ class FacturarController extends Controller
         
     }
 
+    
 
     public function check_anticipo($quotation,$total_pay)
     {

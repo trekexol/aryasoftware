@@ -15,6 +15,8 @@ use App\UnitOfMeasure;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use PhpParser\Node\Stmt\Foreach_;
+
 class ComboController extends Controller
 {
     public function __construct(){
@@ -52,10 +54,20 @@ class ComboController extends Controller
 
     public function create_assign($id_combo)
     {
-        $products = Product::on(Auth::user()->database_name)->orderBy('description' ,'asc')->where('type','not like','COMBO')->get();
+        $combo = Product::on(Auth::user()->database_name)->find($id_combo);
+
+        if($combo->type == "COMBO"){
+
+            $products = Product::on(Auth::user()->database_name)->orderBy('description' ,'asc')->where('type','not like','COMBO')->where('type','not like','SERVICIO')->get();
+
+            $combo_products = ComboProduct::on(Auth::user()->database_name)->where('id_combo',$id_combo)->get();
+            
+            return view('admin.combos.selectproduct',compact('products','id_combo','combo_products'));
+        }else{
+            return redirect('combos')->withDanger('Debe seleccionar un Combo!');
+        }
 
         
-        return view('admin.combos.selectproduct',compact('products','id_combo'));
     }
  
     /**
@@ -145,42 +157,117 @@ class ComboController extends Controller
  
          $inventory->save();
  
-         return redirect('/combos/assign')->withSuccess('Registro del Combo Exitosamente!');
+         return redirect('combos/assign/'.$var->id.'')->withSuccess('Registro del Combo Exitosamente!');
      }
 
      public function store_assign(Request $request)
      {
-         //falta validar que no ingrese valores repetidos
-         $id_products = explode(",", $request->id_products);
+        if(isset($request->combo_products) || isset($request->id_products)){
+            $array = $request->all();
+           
+            $amounts = collect();
+            
+            $count = 0;
+            //dd($request);
+            foreach ($array as $key => $item) {
+                
+                if(isset($item)){
+                    if(substr($key,0, 6) == 'amount'){
+                        $collection = collect();
+                        $collection->id = substr($key,6);
+                        $collection->amount = str_replace(',', '.', str_replace('.', '', $item));
+                        $amounts->push($collection);
+                    }
+                }
+            }
+            
+            //convierte a array
+            $id_products = explode(",", $request->id_products);
+            
+            if(isset($request->combo_products)){
+                
+                $id_combos = explode(",", $request->combo_products);
 
-         foreach($id_products as $id_product){
-            $var = new ComboProduct();
-            $var->setConnection(Auth::user()->database_name);
+                $diferencias = array_diff($id_products,$id_combos);
+                
+                if(empty($diferencias) || (isset($diferencias[0]) && $diferencias[0] == "")){
+                    $diferencias = array_diff($id_combos,$id_products);
+                }
+                
+                if(count($diferencias) > 0){
+                    foreach($diferencias as $diferencia){
+                        $combo_exist = ComboProduct::on(Auth::user()->database_name)->where('id_combo',$request->id_combo)->where('id_product',$diferencia)->first();
+                        
+                        if(isset($combo_exist)){
+                            ComboProduct::on(Auth::user()->database_name)->where('id_combo',$request->id_combo)->where('id_product',$diferencia)->delete();
+                        }else{
+                            $var = new ComboProduct();
+                            $var->setConnection(Auth::user()->database_name);
+                            $var->id_combo = $request->id_combo;
+                            $var->id_product = $diferencia;
 
-            $var->id_combo = $request->id_combo;
-            $var->id_product = $id_product;
-            $var->save();
-         }
-         
+                            foreach($amounts as $amount){
+                                if($amount->id == $var->id_product){
+                                    $var->amount_per_product = $amount->amount;
+                                }
+                            }
+
+                            $var->save();
+                        }
+                    }
+                }
+                //Revisar si todas los montos estan actualizados, sino actualizar
+                foreach($amounts as $amount){
+                    $combo_actual = ComboProduct::on(Auth::user()->database_name)->where('id_combo',$request->id_combo)->where('id_product',$amount->id)->first();
+                    if(isset($combo_actual)){
+                        if($combo_actual->amount_per_product != $amount->amount){
+                            ComboProduct::on(Auth::user()->database_name)->where('id_combo',$request->id_combo)
+                            ->where('id_product',$amount->id)->update(['amount_per_product' => $amount->amount]);
+                        }
+                    }
+                }
+            }else{
+                
+                foreach($id_products as $id_product){
+                    $var = new ComboProduct();
+                    $var->setConnection(Auth::user()->database_name);
+                    $var->id_combo = $request->id_combo;
+                    $var->id_product = $id_product;
+                    
+                    foreach($amounts as $amount){
+                        if($amount->id == $var->id_product){
+                            $var->amount_per_product = $amount->amount;
+                        }
+                    }
+                    $var->save();
+                }
+                
+            }
+
+        }else{
+            return redirect('combos');
+        }
+        
+        
         return redirect('combos')->withSuccess('Registro del Combo Exitosamente!');
-     }
+    }
 
      public function edit($id)
      {
-          $product = Product::on(Auth::user()->database_name)->find($id);
+          $combo = Product::on(Auth::user()->database_name)->find($id);
           $segments     = Segment::on(Auth::user()->database_name)->orderBY('description','asc')->get();
          
           $subsegments  = Subsegment::on(Auth::user()->database_name)->orderBY('description','asc')->get();
   
-          $twosubsegments  = TwoSubsegment::on(Auth::user()->database_name)->where('subsegment_id',$product->subsegment_id)->orderBY('description','asc')->get();
+          $twosubsegments  = TwoSubsegment::on(Auth::user()->database_name)->where('subsegment_id',$combo->subsegment_id)->orderBY('description','asc')->get();
        
-          $threesubsegments  = ThreeSubsegment::on(Auth::user()->database_name)->where('twosubsegment_id',$product->twosubsegment_id)->orderBY('description','asc')->get();
+          $threesubsegments  = ThreeSubsegment::on(Auth::user()->database_name)->where('twosubsegment_id',$combo->twosubsegment_id)->orderBY('description','asc')->get();
        
           $unitofmeasures   = UnitOfMeasure::on(Auth::user()->database_name)->orderBY('description','asc')->get();
   
           //dd($product->subsegment_id);
          
-          return view('admin.products.edit',compact('threesubsegments','twosubsegments','product','segments','subsegments','unitofmeasures'));
+          return view('admin.combos.edit',compact('threesubsegments','twosubsegments','combo','segments','subsegments','unitofmeasures'));
     
      }
   
@@ -203,21 +290,15 @@ class ComboController extends Controller
       $data = request()->validate([
           
          
-          'segment'         =>'required',
-          'unit_of_measure_id'         =>'required',
-  
-  
-          'type'         =>'required',
+          'segment'             =>'required',
+          'unit_of_measure_id'  =>'required',
           'description'         =>'required',
-        
-          'price'         =>'required',
-          'price_buy'         =>'required',
-          'cost_average'         =>'required',
-  
-          'money'         =>'required',
-        
-          'special_impuesto'         =>'required',
-          'status'         =>'required',
+          'price'               =>'required',
+          'price_buy'           =>'required',
+          'cost_average'        =>'required',
+          'money'               =>'required',
+          'special_impuesto'    =>'required',
+          'status'              =>'required',
          
       ]);
   
@@ -241,7 +322,6 @@ class ComboController extends Controller
       $var->unit_of_measure_id = request('unit_of_measure_id');
   
       $var->code_comercial = request('code_comercial');
-      $var->type = request('type');
       $var->description = request('description');
   
       $valor_sin_formato_price = str_replace(',', '.', str_replace('.', '',request('price')));
@@ -292,9 +372,10 @@ class ComboController extends Controller
       * @param  int  $id
       * @return \Illuminate\Http\Response
       */
-     public function destroy()
+     public function destroy(Request $request)
      {
-          $product = Product::on(Auth::user()->database_name)->find(request('id_product_modal')); 
+        
+          $product = Product::on(Auth::user()->database_name)->find(request('id_combo_modal')); 
   
           if(isset($product)){
               
@@ -306,7 +387,7 @@ class ComboController extends Controller
   
               $product->save();
       
-              return redirect('/products')->withSuccess('Se ha Deshabilitado el Producto Correctamente!!');
+              return redirect('combos')->withSuccess('Se ha Deshabilitado el Combo Correctamente!!');
           }
      }
 }

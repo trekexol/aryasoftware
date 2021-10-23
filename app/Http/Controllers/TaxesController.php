@@ -7,6 +7,7 @@ use App\Branch;
 use App\Company;
 use App\DetailVoucher;
 use App\HeaderVoucher;
+use App\PaymentOrder;
 use App\Provider;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -244,63 +245,128 @@ class TaxesController extends Controller
     {
         
         $data = request()->validate([
-            'rate'  =>'required',
-            'nro_mes'  =>'required',
-            'Fecha_Year'  =>'required',
-            'amount'  =>'required',
-            'Filtro'  =>'required'
-
+            
+        
+            'account'               =>'required',
+            'account_counterpart'   =>'required',
+            'user_id'               =>'required',
+            'amount'                =>'required',
+            'date'                  =>'required',
+        
+        
         ]);
-        $user       =   auth()->user();
-        $month = request('nro_mes');
-        $year = request('Fecha_Year');
+        //dd($request);
+        $account = request('account');
+        $contrapartida = request('account_counterpart');
+        $coin = request('coin');
 
-        $rate = str_replace(',', '.', str_replace('.', '',request('rate')));
-        $total_pay = str_replace(',', '.', str_replace('.', '',request('total_pay')));
-        $amount = str_replace(',', '.', str_replace('.', '',request('amount')));
+        if($account != $contrapartida){
 
-        if($total_pay == 0){
-            return redirect('/taxes/ivapayment/'.$month.'/'.$year)->withDanger('No tiene deuda por pagar!');
-        } 
-        if($amount == 0){
-            return redirect('/taxes/ivapayment/'.$month.'/'.$year)->withDanger('El monto a pagar debe ser distinto de cero!');
-        } 
-        if($amount > $total_pay){
-            return redirect('/taxes/ivapayment/'.$month.'/'.$year)->withDanger('El monto a pagar no puede ser mayor al monto total del Pago!');
-        } 
+            $amount = str_replace(',', '.', str_replace('.', '', request('amount')));
+            $rate = str_replace(',', '.', str_replace('.', '', request('rate')));
 
+            if($coin != 'bolivares'){
+                $amount = $amount * $rate;
+            }
 
-        $datenow        = Carbon::now();
+            if($rate == 0){
+                return redirect('taxes/ivaretenidopayment')->withDanger('La tasa no puede ser cero!');
+            }
 
-        $header_voucher  = new HeaderVoucher();
-        $header_voucher->setConnection(Auth::user()->database_name);
+            /*$check_amount = $this->check_amount($account);
+            se desabilita esta validacion por motivos que el senor nestor queria ingresar datos y que queden en negativo
+            if($check_amount->saldo_actual >= $amount){*/
+
+            /*$payment_order = new PaymentOrder();
+            $payment_order->setConnection(Auth::user()->database_name);
+
+            if(request('beneficiario') == 1){
+                $payment_order->id_client = request('Subbeneficiario');
+                
+            }else{
+                $payment_order->id_provider = request('Subbeneficiario');
+            }
+            $payment_order->id_user = request('user_id');
+            if(request('branch') != 'ninguno'){
+                $payment_order->id_branch = request('branch');
+            }
+            $payment_order->date = request('date');
+            $payment_order->reference = request('reference');
+            $payment_order->description = request('description');
+            $payment_order->amount = $amount;
+            $payment_order->rate = $rate;
+            $payment_order->coin = $coin;
+            $payment_order->status = 1;
+
+            $payment_order->save();*/
+
+            $header = new HeaderVoucher();
+            $header->setConnection(Auth::user()->database_name);
+
+            $header->description = "IVA por pagar retenido ". request('description');
+            $header->date = request('date');
+            $header->reference = request('reference');
+            $header->status =  1;
         
-        $header_voucher->description = "Pago Iva Debito Fiscal ".$month."/".$year." ".request('description');
-        $header_voucher->date = $datenow;
-        $header_voucher->reference = request('Nro_Ref');
+            $header->save();
+
+
+            $movement = new DetailVoucher();
+            $movement->setConnection(Auth::user()->database_name);
+
+            $movement->id_header_voucher = $header->id;
+            $movement->id_account = $account;
+            $movement->user_id = request('user_id');
+            $movement->debe = 0;
+            $movement->haber = $amount;
+            $movement->tasa = $rate;
+            $movement->status = "C";
         
-        $header_voucher->status =  "1";
-    
-        $header_voucher->save();
+            $movement->save();
+            
+            $account = Account::on(Auth::user()->database_name)->findOrFail($account);
 
-        
-        
-        $account_iva = Account::on(Auth::user()->database_name)->where('code_one', 2)
-        ->where('code_two', 1)
-        ->where('code_three', 3)
-        ->where('code_four', 1)
-        ->where('code_five',4)
-        ->first();
+            if($account->status != "M"){
+                $account->status = "M";
+                $account->save();
+            }
 
-        $id_counterpart = request('Filtro');
-        $account_counterpart = Account::on(Auth::user()->database_name)->find($id_counterpart);
+            $movement_counterpart = new DetailVoucher();
+            $movement_counterpart->setConnection(Auth::user()->database_name);
 
+            $movement_counterpart->id_header_voucher = $header->id;
+            $movement_counterpart->id_account = $contrapartida;
+            $movement_counterpart->user_id = request('user_id');
+            $movement_counterpart->debe = $amount;
+            $movement_counterpart->haber = 0;
+            $movement_counterpart->tasa = $rate;
+            $movement_counterpart->status = "C";
 
-        $this->add_movement($rate,$header_voucher->id,$account_iva->id,$user->id,$amount,0);
-        
-        $this->add_movement($rate,$header_voucher->id,$account_counterpart->id,$user->id,0,$amount);
+            $movement_counterpart->save();
 
-        return redirect('/taxes/ivapayment/'.$month.'/'.$year)->withSuccess('Pago Exitoso!');
+            $account = Account::on(Auth::user()->database_name)->findOrFail($contrapartida);
+
+            if($account->status != "M"){
+                $account->status = "M";
+                $account->save();
+            }
+
+            $account = Account::on(Auth::user()->database_name)->findOrFail($movement->id_account);
+
+            if($account->status != "M"){
+                $account->status = "M";
+                $account->save();
+            }
+
+            return redirect('taxes/ivaretenidopayment')->withSuccess('Registro Exitoso!');
+
+           /* }else{
+                return redirect('taxes/ivaretenidopayment'.request('id_account').'')->withDanger('El saldo de la Cuenta '.$check_amount->description.' es menor al monto del retiro!');
+            }*/
+
+        }else{
+            return redirect('taxes/ivaretenidopayment')->withDanger('No se puede hacer un movimiento a la misma cuenta!');
+        }
     }
 
 

@@ -76,7 +76,7 @@
                                                 @if ( isset($product->twosubsegment_id) )
                                                     <option  selected style="backgroud-color:blue;" value="{{ $product->twosubsegments['id'] }}"><strong>{{ $product->twosubsegments['description']}}</strong></option>
                                                 @else
-                                                    <option  selected style="backgroud-color:blue;"><strong>No tiene</strong></option>
+                                                    <option  selected style="backgroud-color:blue;" value="null"><strong>No tiene</strong></option>
                                                 @endif
                                                 <option disabled  style="backgroud-color:blue;"><strong>------------</strong></option>
                                                 <option style="backgroud-color:blue;" value="null"><strong>Ninguno</strong></option>
@@ -91,7 +91,7 @@
                                                 @if ( isset($product->threesubsegments['id']) )
                                                     <option  selected style="backgroud-color:blue;" value="{{ $product->threesubsegments['id'] }}"><strong>{{ $product->threesubsegments['description']}}</strong></option>
                                                 @else
-                                                    <option  selected style="backgroud-color:blue;"><strong>No tiene</strong></option>
+                                                    <option  selected style="backgroud-color:blue;" value="null"><strong>No tiene</strong></option>
                                                 @endif
                                                 <option disabled  style="backgroud-color:blue;"><strong>------------</strong></option>
                                                 <option style="backgroud-color:blue;" value="null"><strong>Ninguno</strong></option>
