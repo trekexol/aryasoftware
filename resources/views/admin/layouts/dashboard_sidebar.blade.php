@@ -214,7 +214,9 @@
             <div class="bg-white py-2 collapse-inner rounded">
                 <a  class="collapse-header text-danger" href="{{ route('accounts') }}">Contabilidad</a>                         
                 <a class="collapse-item" href="{{ route('reports.sales_books') }}" > <i class="fas fa-book fa-sm fa-fw mr-2 text-blue-400"></i><strong>Libro de Ventas</strong></a>                            
+                <a class="collapse-item" href="{{ route('reports.accountsreceivable_note') }}" > <i class="fas fa-book fa-sm fa-fw mr-2 text-blue-400"></i><strong>Notas de Entregas</strong></a>
             </div>
+
         </div>
     </li>
     @endif
@@ -257,7 +259,8 @@
                     <a class="collapse-item" href="{{ route('balancegenerals') }}" > <i class="fas fa-clipboard-check fa-sm fa-fw mr-2 text-blue-400"></i><strong>Balance General</strong></a>
                     <a class="collapse-item" href="{{ route('balanceingresos') }}" > <i class="fas fa-compress-alt fa-sm fa-fw mr-2 text-blue-400"></i><strong>Ingresos y Egresos</strong></a>
                     <a class="collapse-item" href="{{ route('daily_listing') }}" > <i class="fas fa-book-reader fa-sm fa-fw mr-2 text-blue-400"></i><strong>Listado Diario</strong></a>                            
-                    <a class="collapse-item" href="{{ route('reports.sales_books') }}" > <i class="fas fa-book fa-sm fa-fw mr-2 text-blue-400"></i><strong>Libro de Ventas</strong></a>                            
+                    <a class="collapse-item" href="{{ route('reports.sales_books') }}" > <i class="fas fa-book fa-sm fa-fw mr-2 text-blue-400"></i><strong>Libro de Ventas</strong></a> 
+                    <a class="collapse-item" href="{{ route('reports.accounts_receivable_note') }}" > <i class="fas fa-book fa-sm fa-fw mr-2 text-blue-400"></i><strong>Notas de Entregas</strong></a>                           
                     <a class="collapse-item" href="{{ route('reports.purchases_book') }}" > <i class="fas fa-bookmark fa-sm fa-fw mr-2 text-blue-400"></i><strong>Libro de Compras</strong></a>                       
                     <a class="collapse-item" href="{{ route('reports.operating_margin') }}" > <i class="fas fa-chart-bar fa-sm fa-fw mr-2 text-blue-400"></i><strong>Margen Operativo</strong></a>                       
                     <a class="collapse-item" href="{{ route('reports.inventory') }}" > <i class="fas fa-boxes fa-sm fa-fw mr-2 text-blue-400"></i><strong>Inventario</strong></a>                         

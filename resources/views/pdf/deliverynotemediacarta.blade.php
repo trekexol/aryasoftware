@@ -113,13 +113,11 @@
   </tr> 
   @foreach ($inventories_quotations as $var)
       <?php
-
-
       $percentage = (($var->price * $var->amount_quotation) * $var->discount)/100;
 
-      $total_less_percentage = (number_format($var->price,2,'.','') * $var->amount_quotation) - $percentage;
+      $total_less_percentage = (number_format(bcdiv($var->price, '1', 2),2,'.','') * $var->amount_quotation) - $percentage;
 
-      $total_less_percentage = $total_less_percentage / ($bcv ?? 1);
+      $total_less_percentage = bcdiv($total_less_percentage / ($bcv ?? 1), '1', 2);
       ?>
     <tr>
       <th style="text-align: center; font-weight: normal;">{{ $var->code_comercial }}</th>
@@ -140,9 +138,9 @@
 
   $total_petro = $total / ($bcv ?? 1) / $company->rate_petro;
 
-  $iva = $iva / ($bcv ?? 1);
+  $iva = bcdiv($iva / ($bcv ?? 1),'1',2);
 
-  $total = $total / ($bcv ?? 1);
+  $total = bcdiv($total / ($bcv ?? 1),'1',2);
 ?>
 
 <table style="width: 100%;">
@@ -150,6 +148,7 @@
     <th style="text-align: right; font-weight: normal; width: 79%; border-bottom-color: white;">Sub Total</th>
     <th style="text-align: right; font-weight: normal; width: 21%;">{{ number_format($quotation->total_factura / ($bcv ?? 1), 2, ',', '.') }}</th>
   </tr>--> 
+
   <tr>
     <th style="text-align: right; font-weight: normal; width: 79%; border-bottom-color: white;">Base Imponible</th>
     <th style="text-align: right; font-weight: normal; width: 21%;">{{ number_format($quotation->base_imponible / ($bcv ?? 1), 2, ',', '.') }}</th>
@@ -254,7 +253,7 @@
 
       $total_less_percentage = (number_format($var->price,2,'.','') * $var->amount_quotation) - $percentage;
 
-      $total_less_percentage = $total_less_percentage / ($bcv ?? 1);
+      $total_less_percentage = bcdiv($total_less_percentage / ($bcv ?? 1),'1',2);
       ?>
     <tr>
       <th style="text-align: center; font-weight: normal;">{{ $var->code_comercial }}</th>
@@ -275,9 +274,9 @@
 
   $total_petro = $total / ($bcv ?? 1) / $company->rate_petro;
 
-  $iva = $iva / ($bcv ?? 1);
+  $iva = bcdiv($iva / ($bcv ?? 1),'1',2);
 
-  $total = $total / ($bcv ?? 1);
+  $total = bcdiv($total / ($bcv ?? 1),'1',2);
 ?>
 
 <table style="width: 100%;">
@@ -389,7 +388,7 @@
 
       $total_less_percentage = (number_format($var->price,2,'.','') * $var->amount_quotation) - $percentage;
 
-      $total_less_percentage = $total_less_percentage / ($bcv ?? 1);
+      $total_less_percentage = bcdiv($total_less_percentage / ($bcv ?? 1),'1',2);
       ?>
     <tr>
       <th style="text-align: center; font-weight: normal;">{{ $var->code_comercial }}</th>
@@ -410,9 +409,9 @@
 
   $total_petro = $total / ($bcv ?? 1) / $company->rate_petro;
 
-  $iva = $iva / ($bcv ?? 1);
+  $iva = bcdiv($iva / ($bcv ?? 1),'1',2);
 
-  $total = $total / ($bcv ?? 1);
+  $total = bcdiv($total / ($bcv ?? 1),'1',2);
 ?>
 
 <table style="width: 100%;">
