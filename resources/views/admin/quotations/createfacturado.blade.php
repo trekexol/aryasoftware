@@ -160,12 +160,12 @@
                                     </span>
                                 @enderror
                             </div>
-                            <label id="coinlabel" for="coin" class="col-md-2 col-form-label text-md-right">Taza:</label> 
+                            <label id="coinlabel" for="coin" class="col-md-1 col-form-label text-md-right">Taza:</label> 
                             <div class="col-md-2">
                                 <input id="monto_taza" type="text" class="form-control" name="monto_taza" value="{{ number_format( $quotation->bcv ?? 1, 2,',', '.') }}" readonly> <!--By dacson-->
                             </div>                              
                             @if (isset($quotation->credit_days))
-                                <label for="total_pays" class="col-md-2 col-form-label text-md-right">Dias de Crédito:</label> joa
+                                <label for="total_pays" class="col-md-2 col-form-label text-md-right">Dias de Crédito:</label>
                                 <div class="col-md-1">
                                     <input id="credit" type="text" class="form-control @error('credit') is-invalid @enderror" name="credit" value="{{ $quotation->credit_days ?? '' }}" readonly autocomplete="credit"> 
                                 </div>
