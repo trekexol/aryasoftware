@@ -29,7 +29,17 @@
                 <div class="card-header" >Facturar</div>
                 
                 <div class="card-body" >
-                        <div class="form-group row">
+                        
+                    <div class="form-group row">
+                        <label for="total_factura" class="col-md-2 col-form-label text-md-right">Nº Factura:</label>
+                        <div class="col-md-4">
+                            <input id="num_factura" type="text" class="form-control @error('total_factura') is-invalid @enderror" name="num_factura" value="{{ $quotation->number_invoice}}" readonly>
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="form-group row">
                             <label for="date_quotation" class="col-md-2 col-form-label text-md-right">CI/Rif Cliente: </label>
                             <div class="col-md-4">
                                 <input id="date_quotation" type="text" class="form-control @error('date_quotation') is-invalid @enderror" name="date_quotation" value="{{ $quotation->clients['cedula_rif']  ?? '' }}" readonly required autocomplete="date_quotation">
@@ -150,8 +160,12 @@
                                     </span>
                                 @enderror
                             </div>
+                            <label id="coinlabel" for="coin" class="col-md-2 col-form-label text-md-right">Taza:</label> 
+                            <div class="col-md-2">
+                                <input id="monto_taza" type="text" class="form-control" name="monto_taza" value="{{ number_format( $quotation->bcv ?? 1, 2,',', '.') }}" readonly> <!--By dacson-->
+                            </div>                              
                             @if (isset($quotation->credit_days))
-                                <label for="total_pays" class="col-md-2 col-form-label text-md-right">Dias de Crédito:</label>
+                                <label for="total_pays" class="col-md-2 col-form-label text-md-right">Dias de Crédito:</label> joa
                                 <div class="col-md-1">
                                     <input id="credit" type="text" class="form-control @error('credit') is-invalid @enderror" name="credit" value="{{ $quotation->credit_days ?? '' }}" readonly autocomplete="credit"> 
                                 </div>
@@ -172,6 +186,7 @@
                                 </select>
                             </div>
                         </div>
+
                         <br>
                         <div class="form-group row">
                            
