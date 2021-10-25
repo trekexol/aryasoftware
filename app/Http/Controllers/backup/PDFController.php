@@ -134,7 +134,7 @@ class PDFController extends Controller
 
                 $company = Company::on(Auth::user()->database_name)->find(1);                
                 
-                 $pdf = $pdf->loadView('pdf.factura_media',compact('quotation','inventories_quotations','payment_quotations','bcv','company','coin'))->setPaper('letter','portrait');
+                 $pdf = $pdf->loadView('pdf.factura_media',compact('quotation','inventories_quotations','payment_quotations','bcv','company','coin'));
                  return $pdf->stream();
          
                 }else{
@@ -240,7 +240,7 @@ class PDFController extends Controller
                 $quotation->amount_iva = $base_imponible * $quotation->iva_percentage / 100;
                 $quotation->amount_with_iva = $quotation->amount + $quotation->amount_iva;
                 $quotation->iva_percentage = $iva;
-                $quotation->date_delivery_note = $date;
+                 $quotation->date_delivery_note = $date;
                 $quotation->save();
 
 

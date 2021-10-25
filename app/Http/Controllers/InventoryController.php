@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Account;
+use App\Combo;
+use App\ComboProduct;
 use App\Company;
 use App\DetailVoucher;
 use App\HeaderVoucher;
@@ -29,7 +31,10 @@ class InventoryController extends Controller
        
         $inventories = Inventory::on(Auth::user()->database_name)
         ->join('products','products.id','inventories.product_id')
-        ->where('products.type','MERCANCIA')
+        ->where(function ($query){
+            $query->where('products.type','MERCANCIA')
+                ->orWhere('products.type','COMBO');
+        })
         ->orderBy('products.description' ,'ASC')
         ->where('products.status',1)
         ->select('inventories.id as id_inventory','inventories.*','products.*')
@@ -193,18 +198,18 @@ class InventoryController extends Controller
 
         $id_inventory = request('id_inventory');
 
+
         if($valor_sin_formato_amount_new > 0){
 
-            
+            $inventory = Inventory::on(Auth::user()->database_name)->findOrFail($id_inventory);
 
-            $var = Inventory::on(Auth::user()->database_name)->findOrFail($id_inventory);
+            $this->discountCombo($inventory,$valor_sin_formato_amount_new);
         
-            $var->code = request('code');
+            $inventory->code = request('code');
             
+            $inventory->amount = $amount_old + $valor_sin_formato_amount_new;
             
-            $var->amount = $amount_old + $valor_sin_formato_amount_new;
-            
-            $var->save();
+            $inventory->save();
 
             $date = Carbon::now();
             $datenow = $date->format('Y-m-d');   
@@ -224,7 +229,7 @@ class InventoryController extends Controller
             
                 $header_voucher->save();
     
-                if($var->products['money'] == 'Bs'){
+                if($inventory->products['money'] == 'Bs'){
                     $total = $valor_sin_formato_amount_new * $valor_sin_formato_price_buy;
                 }else{
                     $total = $valor_sin_formato_amount_new * $valor_sin_formato_price_buy * $valor_sin_formato_rate;
@@ -248,7 +253,7 @@ class InventoryController extends Controller
             }
             
         
-            return redirect('/inventories')->withSuccess('Actualizado el inventario del producto: '.$var->products['description'].' Exitosamente!');
+            return redirect('/inventories')->withSuccess('Actualizado el inventario del producto: '.$inventory->products['description'].' Exitosamente!');
     
         }else{
             return redirect('/inventories/createincreaseinventory/'.$id_inventory.'')->withDanger('La cantidad nueva debe ser mayor a cero!');
@@ -258,6 +263,17 @@ class InventoryController extends Controller
     
     }
 
+
+    public function discountCombo($inventory,$amount_discount)
+    {
+        $product = ComboProduct::on(Auth::user()->database_name)
+                    ->join('products','products.id','combo_products.id_product')
+                    ->join('inventories','inventories.product_id','products.id')
+                    ->where('combo_products.id_combo',$inventory->product_id)
+                    ->update(['inventories.amount' => DB::raw('inventories.amount - (combo_products.amount_per_product *'.$amount_discount.')')]);
+
+
+    }
 
 
     public function store_decrease_inventory(Request $request)

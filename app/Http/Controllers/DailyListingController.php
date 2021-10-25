@@ -165,6 +165,7 @@ class DailyListingController extends Controller
                 ->from('detail_vouchers')
                 ->where('id_account',$id_account);
             })
+            ->where('detail_vouchers.status','C')
             ->select('detail_vouchers.*','header_vouchers.*'
             ,'accounts.description as account_description'
             ,'header_vouchers.id as id_header'
@@ -177,7 +178,7 @@ class DailyListingController extends Controller
                         ->join('accounts', 'accounts.id', '=', 'detail_vouchers.id_account')
                         ->where('header_vouchers.date','<' ,$date_begin)
                         ->where('accounts.id',$id_account)
-                       
+                        ->where('detail_vouchers.status','C')
                         ->sum('detail_vouchers.debe');
 
             $detailvouchers_saldo_haber =  DB::connection(Auth::user()->database_name)->table('detail_vouchers')
@@ -185,7 +186,7 @@ class DailyListingController extends Controller
                         ->join('accounts', 'accounts.id', '=', 'detail_vouchers.id_account')
                         ->where('header_vouchers.date','<' ,$date_begin)
                         ->where('accounts.id',$id_account)
-                       
+                        ->where('detail_vouchers.status','C')
                         ->sum('detail_vouchers.haber');       
             //-----------------------------------------------
         }else{
@@ -198,6 +199,7 @@ class DailyListingController extends Controller
                 ->from('detail_vouchers')
                 ->where('id_account',$id_account);
             })
+            ->where('detail_vouchers.status','C')
             ->select('detail_vouchers.*','header_vouchers.*'
             ,'accounts.description as account_description'
             ,'header_vouchers.id as id_header'
@@ -211,11 +213,14 @@ class DailyListingController extends Controller
             INNER JOIN header_vouchers h 
                 ON h.id = d.id_header_voucher
             WHERE h.date < ? AND
-            a.id = ? '
-            , [$date_begin,$id_account]);
+            a.id = ? AND
+            d.status = ?'
+            , [$date_begin,$id_account,'C']);
             
             if(isset($total_debe[0]->debe)){
                 $detailvouchers_saldo_debe = $total_debe[0]->debe;
+            }else{
+                $detailvouchers_saldo_debe = 0;
             }
            
                 
@@ -226,11 +231,14 @@ class DailyListingController extends Controller
                 INNER JOIN header_vouchers h 
                     ON h.id = d.id_header_voucher
                 WHERE h.date < ? AND
-                a.id = ? '
-                , [$date_begin,$id_account]);
+                a.id = ? AND
+                d.status = ?'
+                , [$date_begin,$id_account,'C']);
                 
                 if(isset($total_haber[0]->haber)){
                     $detailvouchers_saldo_haber = $total_haber[0]->haber;
+                }else{
+                    $detailvouchers_saldo_haber = 0;
                 }
         }
 

@@ -18,7 +18,7 @@ class CreateInventoriesTable extends Migration
             $table->unsignedBigInteger('product_id');
             $table->unsignedBigInteger('id_user');
             $table->string('code',100);
-            $table->integer('amount');
+            $table->decimal('amount',64,2);
 
             $table->string('status',1);
             $table->foreign('product_id')->references('id')->on('products');

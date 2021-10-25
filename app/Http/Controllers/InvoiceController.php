@@ -55,7 +55,7 @@ class InvoiceController extends Controller
             //Buscamos a la factura para luego buscar atraves del header a la otras facturas
             $multipayment = Multipayment::on(Auth::user()->database_name)->where('id_quotation',$id_invoice)->first();
             if(isset($multipayment)){
-            $invoices = Multipayment::on(Auth::user()->database_name)->where('id_header',$multipayment->id_header)->get();
+            $invoices = Multipayment::on(Auth::user()->database_name)->where('id_header',$multipayment->id_header)->where('id_payment',$multipayment->id_payment)->get();
             $multipayments_detail = DetailVoucher::on(Auth::user()->database_name)->where('id_header_voucher',$multipayment->id_header)->get();
             }
 
@@ -1060,7 +1060,7 @@ class InvoiceController extends Controller
                 }
                 
             }
-    
+            
             $quotation = Quotation::on(Auth::user()->database_name)->findOrFail($id_quotation);
 
             $bcv = $quotation->bcv;
@@ -1099,6 +1099,10 @@ class InvoiceController extends Controller
                 $var2->id_quotation = $id_quotation;
                 $var2->save();
 
+                foreach($facturas_a_procesar as $key => $id_factura){
+                    $this->register_multipayment($id_factura,$header_voucher->id,$var2->id,$user_id);
+                }
+
                 $this->add_pay_movement($bcv,$payment_type2,$header_voucher->id,$var2->id_account,$user_id,$var2->amount,0);
                 
             }
@@ -1107,7 +1111,9 @@ class InvoiceController extends Controller
                 $var3->id_quotation = $id_quotation;
                 $var3->save();
 
-                
+                foreach($facturas_a_procesar as $key => $id_factura){
+                    $this->register_multipayment($id_factura,$header_voucher->id,$var3->id,$user_id);
+                }
 
                 $this->add_pay_movement($bcv,$payment_type3,$header_voucher->id,$var3->id_account,$user_id,$var3->amount,0);
             
@@ -1117,12 +1123,20 @@ class InvoiceController extends Controller
                 $var4->id_quotation = $id_quotation;
                 $var4->save();
 
+                foreach($facturas_a_procesar as $key => $id_factura){
+                    $this->register_multipayment($id_factura,$header_voucher->id,$var4->id,$user_id);
+                }
+
                 $this->add_pay_movement($bcv,$payment_type4,$header_voucher->id,$var4->id_account,$user_id,$var4->amount,0);
             
             }
             if($validate_boolean5 == true){
                 $var5->id_quotation = $id_quotation;
                 $var5->save();
+
+                foreach($facturas_a_procesar as $key => $id_factura){
+                    $this->register_multipayment($id_factura,$header_voucher->id,$var5->id,$user_id);
+                }
 
                 $this->add_pay_movement($bcv,$payment_type5,$header_voucher->id,$var5->id_account,$user_id,$var5->amount,0);
              
@@ -1131,12 +1145,20 @@ class InvoiceController extends Controller
                 $var6->id_quotation = $id_quotation;
                 $var6->save();
 
+                foreach($facturas_a_procesar as $key => $id_factura){
+                    $this->register_multipayment($id_factura,$header_voucher->id,$var6->id,$user_id);
+                }
+
                 $this->add_pay_movement($bcv,$payment_type6,$header_voucher->id,$var6->id_account,$user_id,$var6->amount,0);
             
             }
             if($validate_boolean7 == true){
                 $var7->id_quotation = $id_quotation;
                 $var7->save();
+
+                foreach($facturas_a_procesar as $key => $id_factura){
+                    $this->register_multipayment($id_factura,$header_voucher->id,$var7->id,$user_id);
+                }
 
                 $this->add_pay_movement($bcv,$payment_type7,$header_voucher->id,$var7->id_account,$user_id,$var7->amount,0);
             
@@ -1160,25 +1182,28 @@ class InvoiceController extends Controller
             
              /*Anticipos*/
              if(isset($anticipo) && ($anticipo != 0)){
+                $account_anticipo_cliente = Account::on(Auth::user()->database_name)->where('code_one',2)
+                ->where('code_two',3)
+                ->where('code_three',1)
+                ->where('code_four',1)
+                ->where('code_five',2)->first(); 
+
+                
                 
                 //Si el total a pagar es negativo, quiere decir que los anticipos sobrepasan al monto total de la factura
                 if($amount_with_iva  < 0){
                     $global = new GlobalController;     
-                    $global->check_anticipo($quotation,$grand_total);
+                    $global->check_anticipo_multipayment($quotation,$facturas_a_procesar,$grand_total);
                     $quotation->anticipo =  $grand_total;
                     $quotation->status = "C";
+                    $this->add_movement_anticipo_total($facturas_a_procesar,$bcv,$header_voucher->id,$account_anticipo_cliente->id,$user_id);
+                }else{
+                    $quotation->anticipo = $anticipo;
                 }
-                
-                $account_anticipo_cliente = Account::on(Auth::user()->database_name)->where('code_one',2)
-                                                        ->where('code_two',3)
-                                                        ->where('code_three',1)
-                                                        ->where('code_four',1)
-                                                        ->where('code_five',2)->first(); 
-
-                                                        
                 if(isset($account_anticipo_cliente)){
-                    $this->add_movement($bcv,$header_voucher->id,$account_anticipo_cliente->id,$user_id,$anticipo,0);
-                }
+                    $this->add_movement($bcv,$header_voucher->id,$account_anticipo_cliente->id,$user_id,$quotation->anticipo,0);
+                }                           
+                
              }
             /*---------- */
 
@@ -1211,8 +1236,9 @@ class InvoiceController extends Controller
                 $this->add_movement($bcv,$header_voucher->id,$account_cuentas_por_cobrar->id,$user_id,0,$grand_total);
             }
             
+            
             $global = new GlobalController;                                                
-            $global->procesar_anticipos($quotation,$total_pay);
+            $global->procesar_anticipos($quotation,$amount_with_iva);
             
             return redirect('invoices')->withSuccess('Facturas Guardadas con Exito!');
    
@@ -1222,7 +1248,19 @@ class InvoiceController extends Controller
     }
 
 
-    
+    public function add_movement_anticipo_total($facturas_a_procesar,$bcv,$header_voucher,$id_account,$user_id)
+    {
+        $global = new GlobalController;   
+
+        foreach($facturas_a_procesar as $factura){
+            
+            $quotation = Quotation::on(Auth::user()->database_name)->findOrFail($factura);
+            
+            $payment = $global->add_payment($quotation,$id_account,3,$quotation->amount_with_iva,$bcv);
+
+            $this->register_multipayment($factura,$header_voucher,$payment,$user_id);
+        }
+    }
     
     
     
@@ -1244,8 +1282,6 @@ class InvoiceController extends Controller
         ->where('id_quotation', '=', $quotation->id)
         ->update(['status' => 'C']);
 
-        $global = new GlobalController;                                                
-        $global->procesar_anticipos($quotation,$total_pay);
         
         $quotation->status = 'C';
         $quotation->save();
