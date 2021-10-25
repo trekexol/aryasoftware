@@ -95,7 +95,7 @@
                         <tr>
                             <td class="text-center">{{ $var->code }}</td>
                             <td class="text-center">{{ $var->description}}</td>
-                            <td class="text-right">{{ $var->amount }}</td> 
+                            <td class="text-right">{{ number_format($var->amount, 2, ',', '.')}}</td> 
                             <td class="text-right">{{number_format($var->price, 2, ',', '.')}}</td>
                             
                             @if($var->money == "D")
