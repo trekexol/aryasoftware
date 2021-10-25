@@ -62,7 +62,7 @@ body {
   line-height: 1.6;
   color: #212529;
   text-align: left;
-  background-color: #fcd5a8;
+  background-color: #f8fafc;
 }
 
 [tabindex="-1"]:focus:not(:focus-visible) {
@@ -7369,6 +7369,7 @@ button.bg-dark:focus {
 }
 
 .position-sticky {
+  position: -webkit-sticky !important;
   position: sticky !important;
 }
 
@@ -7388,8 +7389,9 @@ button.bg-dark:focus {
   z-index: 1030;
 }
 
-@supports (position: sticky) {
+@supports ((position: -webkit-sticky) or (position: sticky)) {
   .sticky-top {
+    position: -webkit-sticky;
     position: sticky;
     top: 0;
     z-index: 1020;
@@ -10385,7 +10387,7 @@ footer .copyright {
 }
 
 .bg-image {
-  background-image: url("../img/aryalogin.jpg");
+  background-image: url("https://source.unsplash.com/WEQbe2jBg40/600x1200");
   background-size: cover;
   background-position: center;
 }

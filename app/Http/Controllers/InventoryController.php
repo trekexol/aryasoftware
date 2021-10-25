@@ -203,7 +203,9 @@ class InventoryController extends Controller
 
             $inventory = Inventory::on(Auth::user()->database_name)->findOrFail($id_inventory);
 
-            $this->discountCombo($inventory,$valor_sin_formato_amount_new);
+            $global = new GlobalController;
+
+            $global->discountCombo($inventory,$valor_sin_formato_amount_new);
         
             $inventory->code = request('code');
             
@@ -264,16 +266,7 @@ class InventoryController extends Controller
     }
 
 
-    public function discountCombo($inventory,$amount_discount)
-    {
-        $product = ComboProduct::on(Auth::user()->database_name)
-                    ->join('products','products.id','combo_products.id_product')
-                    ->join('inventories','inventories.product_id','products.id')
-                    ->where('combo_products.id_combo',$inventory->product_id)
-                    ->update(['inventories.amount' => DB::raw('inventories.amount - (combo_products.amount_per_product *'.$amount_discount.')')]);
-
-
-    }
+   
 
 
     public function store_decrease_inventory(Request $request)
