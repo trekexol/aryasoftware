@@ -32,7 +32,7 @@
 
 <body>
 
-  <br><br><br><br>
+  <br><br><br><br><br>
 
 
  
@@ -41,7 +41,6 @@
   <tr>
     <th style="font-weight: normal; width: 10%;">Concesión Postal:</th>
     <th style="font-weight: normal; width: 10%;">Nº {{ $company->franqueo_postal ?? ''}}</th>
-   
   </tr>
   @endif
     <tr>
