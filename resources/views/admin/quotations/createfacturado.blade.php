@@ -35,14 +35,25 @@
                         <div class="col-md-4">
                             <input id="num_factura" type="text" class="form-control @error('total_factura') is-invalid @enderror" name="num_factura" value="{{ $quotation->number_invoice}}" readonly>
                         </div>
+
+                        <label for="date_quotation" class="col-md-2 col-form-label text-md-right">CI/Rif: </label>
+                        <div class="col-md-3">
+                            <input id="date_quotation" type="text" class="form-control @error('date_quotation') is-invalid @enderror" name="date_quotation" value="{{ $quotation->clients['cedula_rif']  ?? '' }}" readonly required autocomplete="date_quotation">
+    
+                            @error('date_quotation')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>  
                     </div>
                     
-                    
+              
                     
                     <div class="form-group row">
-                            <label for="date_quotation" class="col-md-2 col-form-label text-md-right">CI/Rif Cliente: </label>
+                            <label for="date_quotation" class="col-md-2 col-form-label text-md-right">Cliente: </label>
                             <div class="col-md-4">
-                                <input id="date_quotation" type="text" class="form-control @error('date_quotation') is-invalid @enderror" name="date_quotation" value="{{ $quotation->clients['cedula_rif']  ?? '' }}" readonly required autocomplete="date_quotation">
+                                <input id="name_cliente" type="text" class="form-control @error('date_quotation') is-invalid @enderror" name="name_cliente" value="{{ $quotation->clients['name']  ?? '' }}" readonly>
 
                                 @error('date_quotation')
                                     <span class="invalid-feedback" role="alert">

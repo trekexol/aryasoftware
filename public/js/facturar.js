@@ -39,7 +39,7 @@ $("#payment_type").on('change',function(){
         $("#account_bank").hide();
         $("#credit_days").hide();
         $("#account_efectivo").show();
-        $("#reference").hide();
+        $("#reference").show();
         $("#account_punto_de_venta").hide();
 
     }else if((inputPayment == 9) || (inputPayment == 10)){
