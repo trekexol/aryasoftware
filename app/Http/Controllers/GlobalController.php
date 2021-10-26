@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Anticipo;
+use App\ComboProduct;
 use App\Inventory;
 use App\QuotationPayment;
 use App\QuotationProduct;
@@ -201,7 +202,7 @@ class GlobalController extends Controller
                 $quotation_product = QuotationProduct::on(Auth::user()->database_name)->findOrFail($inventories_quotation->id_quotation);
 
                 if(isset($quotation_product)){
-                    if($inventories_quotation->type == 'MERCANCIA'){
+                    if(($inventories_quotation->type == 'MERCANCIA') || ($inventories_quotation->type == 'COMBO')){
                         $inventory = Inventory::on(Auth::user()->database_name)->findOrFail($quotation_product->id_inventory);
 
                         if(isset($inventory)){
@@ -209,6 +210,10 @@ class GlobalController extends Controller
                             if($inventory->amount >= $quotation_product->amount){
                                 $inventory->amount -= $quotation_product->amount;
                                 $inventory->save();
+                                if($inventories_quotation->type == 'COMBO'){
+                                    $global = new GlobalController;
+                                    $global->discountCombo($inventory,$quotation_product->amount);
+                                }
                             }else{
                                 return 'El Inventario de Codigo: '.$inventory->code.' no tiene Cantidad suficiente!';
                             }
@@ -246,5 +251,16 @@ class GlobalController extends Controller
         $var->save();
         
         return $var->id;
+    }
+
+    public function discountCombo($inventory,$amount_discount)
+    {
+        $product = ComboProduct::on(Auth::user()->database_name)
+                    ->join('products','products.id','combo_products.id_product')
+                    ->join('inventories','inventories.product_id','products.id')
+                    ->where('combo_products.id_combo',$inventory->product_id)
+                    ->update(['inventories.amount' => DB::raw('inventories.amount - (combo_products.amount_per_product *'.$amount_discount.')')]);
+
+
     }
 }

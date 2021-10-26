@@ -78,7 +78,7 @@
                             </td>
                             <td>{{$product->code_comercial ?? ''}}</td>
                             <td>{{$product->description ?? ''}}</td>
-                            <td>{{$product->price ?? ''}}</td>
+                            <td>{{ number_format($product->price ?? 0, 2, ',', '.')}}</td>
                             @if($product->money == "D")
                                 <td>Dolar</td>
                             @else
