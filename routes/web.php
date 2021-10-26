@@ -787,11 +787,12 @@ Route::group(["prefix"=>'daily_listing'],function(){
 
 
 Route::group(["prefix"=>'reports'],function(){
-    Route::get('accountsreceivable/{id_client?}','ReportController@index_accounts_receivable')->name('reports.accounts_receivable');
+    Route::get('accountsreceivable/{typeperson}/{id_client?}','ReportController@index_accounts_receivable')->name('reports.accounts_receivable');
     Route::post('storeaccounts_receivable','ReportController@store_accounts_receivable')->name('reports.store_accounts_receivable');
-    Route::get('accounts_receivablepdf/{coin}/{date_end}/{typeinvoice}/{id_client?}','ReportController@accounts_receivable_pdf')->name('reports.accounts_receivable_pdf');
+    Route::get('accounts_receivablepdf/{coin}/{date_end}/{typeinvoice}/{typeperson}/{id_client_or_vendor?}','ReportController@accounts_receivable_pdf')->name('reports.accounts_receivable_pdf');
 
     Route::get('selectclient','ReportController@select_client')->name('reports.select_client');
+    Route::get('selectvendor','ReportController@select_vendor')->name('reports.select_vendor');
 
     Route::get('debtstopay/{id_provider?}','ReportController@index_debtstopay')->name('reports.debtstopay');
     Route::post('storedebtstopay','ReportController@store_debtstopay')->name('reports.store_debtstopay');

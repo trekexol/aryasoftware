@@ -53,13 +53,14 @@
     
       if(isset($coin) && $coin != 'bolivares'){
 
-        $quotation->amount_with_iva = ($quotation->amount_with_iva ?? 0) / ($quotation->bcv ?? 1);
+        $quotation->amount_with_iva = ($quotation->amount_with_iva - ($quotation->retencion_iva ?? 0) - ($quotation->retencion_islr ?? 0)) / ($quotation->bcv ?? 1);
         //$quotation->amount_anticipo = ($quotation->amount_anticipo ?? 0) / ($quotation->bcv ?? 1);
 
         $por_cobrar = (($quotation->amount_with_iva ?? 0) - ($quotation->amount_anticipo ?? 0));
         $total_por_cobrar += $por_cobrar;
         $total_por_facturar += $quotation->amount_with_iva;
       }else{
+        $quotation->amount_with_iva = ($quotation->amount_with_iva - $quotation->retencion_iva - $quotation->retencion_islr);
         $por_cobrar = ($quotation->amount_with_iva ?? 0) - ($quotation->amount_anticipo ?? 0);
         $total_por_cobrar += $por_cobrar;
         $total_por_facturar += $quotation->amount_with_iva;
@@ -80,7 +81,7 @@
       <th style="text-align: center; font-weight: normal;">{{ $quotation->number_invoice ?? $quotation->number_delivery_note}}</th>
       <th style="text-align: center; font-weight: normal;">{{ $quotation->serie ?? ''}}</th>
       <th style="text-align: center; font-weight: normal;">{{ $quotation->name_client ?? ''}}</th>
-      <th style="text-align: center; font-weight: normal;">{{''}}</th>
+      <th style="text-align: center; font-weight: normal;">{{ $quotation->name_vendor ?? ''}}</th>
       <th style="text-align: right; font-weight: normal;">{{ number_format(($quotation->amount_with_iva ?? 0), 2, ',', '.') }}</th>
       <th style="text-align: right; font-weight: normal;">{{ number_format(($quotation->amount_anticipo ?? 0), 2, ',', '.') }}</th>
       <th style="text-align: right; font-weight: normal;">{{ number_format($por_cobrar, 2, ',', '.') }}</th>
