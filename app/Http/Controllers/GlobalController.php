@@ -253,13 +253,24 @@ class GlobalController extends Controller
         return $var->id;
     }
 
-    public function discountCombo($inventory,$amount_discount)
+    public function aumentCombo($inventory,$amount_discount)
     {
         $product = ComboProduct::on(Auth::user()->database_name)
                     ->join('products','products.id','combo_products.id_product')
                     ->join('inventories','inventories.product_id','products.id')
                     ->where('combo_products.id_combo',$inventory->product_id)
                     ->update(['inventories.amount' => DB::raw('inventories.amount - (combo_products.amount_per_product *'.$amount_discount.')')]);
+
+
+    }
+
+    public function discountCombo($inventory,$amount_discount)
+    {
+        $product = ComboProduct::on(Auth::user()->database_name)
+                    ->join('products','products.id','combo_products.id_product')
+                    ->join('inventories','inventories.product_id','products.id')
+                    ->where('combo_products.id_combo',$inventory->product_id)
+                    ->update(['inventories.amount' => DB::raw('inventories.amount + (combo_products.amount_per_product *'.$amount_discount.')')]);
 
 
     }

@@ -123,7 +123,7 @@
                                         <select id="type_form"  name="type_form" class="form-control" required>
                                             <option value="-1">Seleccionar</option>
                                             @if (isset($inventory))
-                                                @if (isset($type) && ($type == 'MERCANCIA'))
+                                                @if (isset($type) && (($type == 'MERCANCIA')|| ($type == 'COMBO')))
                                                     <option value="1" selected>Inventario de Mercancia</option>
                                                     <option value="2">Activos Fijos</option>
                                                     <option value="3">Costos</option>
@@ -548,8 +548,11 @@
     </script>
     @if ((isset($type))&& ($type == "SERVICIO"))
     <script>
-        
         var type_var = 3;
+    </script>
+    @elseif ((isset($type))&& ($type != "SERVICIO"))
+    <script>
+        var type_var = 1;
     </script>
     @else
     <script>

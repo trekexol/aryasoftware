@@ -96,7 +96,8 @@ class AnticipoController extends Controller
 
     public function selectprovider($id_anticipo = null)
     {
-        $providers = Provider::on(Auth::user()->database_name)->orderBy('name' ,'asc')->get();
+        
+        $providers = Provider::on(Auth::user()->database_name)->orderBy('razon_social' ,'asc')->get();
 
         return view('admin.anticipos.selectprovider',compact('providers','id_anticipo'));
     }
@@ -117,6 +118,7 @@ class AnticipoController extends Controller
     
     public function selectanticipo_provider($id_provider,$coin,$id_expense)
     {
+       
         $anticipos = Anticipo::on(Auth::user()->database_name)
                                                             ->where('id_provider',$id_provider)
                                                             ->where(function ($query) use ($id_expense){

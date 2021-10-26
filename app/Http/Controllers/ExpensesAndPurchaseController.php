@@ -120,7 +120,7 @@ class ExpensesAndPurchaseController extends Controller
 
         if(isset($expense)){
            
-           $inventories_expenses = DB::connection(Auth::user()->database_name)->table('products')->join('inventories', 'products.id', '=', 'inventories.product_id')
+            $inventories_expenses = DB::connection(Auth::user()->database_name)->table('products')->join('inventories', 'products.id', '=', 'inventories.product_id')
                                                            ->join('expenses_details', 'inventories.id', '=', 'expenses_details.id_inventory')
                                                            ->where('expenses_details.id_expense',$expense->id)
                                                            ->select('products.*','expenses_details.price as price','expenses_details.rate as rate',
@@ -401,9 +401,10 @@ class ExpensesAndPurchaseController extends Controller
                                         FROM anticipos
                                         WHERE id_provider = ? AND
                                         coin not like ? AND
-                                        status = ?
+                                        status = ? AND
+                                        (id_expense = NULL OR id_expense = ?)
                                         '
-                                        , [$expense->id_provider,'bolivares',1]);
+                                        , [$expense->id_provider,'bolivares',1,$expense->id]);
 
 
             

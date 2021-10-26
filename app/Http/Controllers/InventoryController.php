@@ -203,9 +203,11 @@ class InventoryController extends Controller
 
             $inventory = Inventory::on(Auth::user()->database_name)->findOrFail($id_inventory);
 
-            $global = new GlobalController;
-
-            $global->discountCombo($inventory,$valor_sin_formato_amount_new);
+            if($inventory->products['type'] == 'COMBO'){
+                $global = new GlobalController;
+                $global->aumentCombo($inventory,$valor_sin_formato_amount_new);
+            }
+            
         
             $inventory->code = request('code');
             
@@ -296,13 +298,18 @@ class InventoryController extends Controller
         if($valor_sin_formato_amount_new > 0){
             if($valor_sin_formato_amount_new <= $amount_old){
 
-                $var = Inventory::on(Auth::user()->database_name)->findOrFail($id_inventory);
-            
-                $var->code = request('code');
+                $inventory = Inventory::on(Auth::user()->database_name)->findOrFail($id_inventory);
+
+                if($inventory->products['type'] == 'COMBO'){
+                    $global = new GlobalController;
+                    $global->discountCombo($inventory,$valor_sin_formato_amount_new);
+                }
+
+                $inventory->code = request('code');
                 
-                $var->amount = $amount_old - $valor_sin_formato_amount_new;
+                $inventory->amount = $amount_old - $valor_sin_formato_amount_new;
                 
-                $var->save();
+                $inventory->save();
 
                 $date = Carbon::now();
                 $datenow = $date->format('Y-m-d');   
@@ -317,7 +324,7 @@ class InventoryController extends Controller
             
                 $header_voucher->save();
 
-                if($var->products['money'] == 'Bs'){
+                if($inventory->products['money'] == 'Bs'){
                     $total = $valor_sin_formato_amount_new * $valor_sin_formato_price_buy;
                 }else{
                     $total = $valor_sin_formato_amount_new * $valor_sin_formato_price_buy * $valor_sin_formato_rate;
@@ -335,7 +342,7 @@ class InventoryController extends Controller
                 $this->add_movement($valor_sin_formato_rate,$header_voucher->id,$account_gastos_ajuste_inventario->id,
                                     $id_user,$total,0);
             
-                return redirect('/inventories')->withSuccess('Actualizado el inventario del producto: '.$var->products['description'].' Exitosamente!');
+                return redirect('/inventories')->withSuccess('Actualizado el inventario del producto: '.$inventory->products['description'].' Exitosamente!');
             
             }else{
                 return redirect('/inventories/createdecreaseinventory/'.$id_inventory.'')->withDanger('La cantidad a disminuir no puede ser mayor a la cantidad antigua!');

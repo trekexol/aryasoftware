@@ -53,7 +53,7 @@
 
     if(isset($coin) && $coin != "bolivares"){
       $expense->amount_with_iva = $expense->amount_with_iva / $expense->rate;
-      $expense->amount_anticipo = $expense->amount_anticipo / $expense->rate;
+      $expense->amount_anticipo = $expense->amount_anticipo;
     }
     
     $por_pagar = ($expense->amount_with_iva ?? 0) - ($expense->amount_anticipo ?? 0);
