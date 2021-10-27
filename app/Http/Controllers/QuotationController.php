@@ -534,14 +534,20 @@ class QuotationController extends Controller
                             ->where('id_quotation',$id_quotation)
                             ->where('id_inventory',$id_inventory)
                             ->sum('amount');
-    
-            $total_in_quotation = $sum_amount + $amount_new;
-    
-            if($inventory->amount >= $total_in_quotation){
+
+
+            if ($sum_amount <> $amount_new) {
+                $total_in_quotation = $amount_new;
+            } else {
+                $total_in_quotation = $sum_amount;
+            }
+            
+            if ($inventory->amount >= $total_in_quotation){
                 return "exito";
             }else{
                 return "no_hay_cantidad_suficiente";
-            }
+            } 
+
         }else{
             return "exito";
         }
@@ -743,8 +749,8 @@ class QuotationController extends Controller
             }
 
             if($value_return != 'exito'){
-                return redirect('quotations/quotationproduct/'.$var->id.'/'.$coin.'/edit')->withDanger('La cantidad de este producto excede a la cantidad puesta en inventario!');
-           }
+                return redirect('quotations/quotationproduct/'.$var->id.'/'.$coin.'/edit')->withDanger('La cantidad de este producto excede a la cantidad puesta en inventario! ');
+            }
 
         
             $var->save();
