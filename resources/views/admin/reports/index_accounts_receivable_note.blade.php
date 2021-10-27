@@ -16,17 +16,15 @@
 
                 <div class="card-body">
                         <div class="form-group row">
+                           
                             <div class="col-sm-1">
-                                <label for="date_end" class="">Hasta:</label>
+                                <label for="date_begin" class="">Desde:</label> 
                             </div>
                             <div class="col-sm-3">
-                                <input id="date_end" type="date" class="form-control @error('date_end') is-invalid @enderror" name="date_end" value="{{ date('Y-m-d', strtotime($date_end ?? $datenow))}}" required autocomplete="date_end">
-                                @error('date_end')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
+                                <input id="date_begin" type="date" class="form-control @error('date_begin') is-invalid @enderror" name="date_begin" value="{{  date('Y-m-d', strtotime($datebeginyear ?? $date_begin ?? $datenow)) }}" required autocomplete="date_begin">
+                            </div>              
+                           
+                        
                             <div class="col-sm-2 text-right">
                                 <label id="client_label1" for="clients" >Cliente:</label>
                             </div>
@@ -60,10 +58,15 @@
 
                         <div class="form-group row">
                             <div class="col-sm-1">
-                                <label for="date_end" class="">Desde:</label> 
+                                <label for="date_end" class="">Hasta:</label>
                             </div>
                             <div class="col-sm-3">
-                                <input id="date_begin" type="date" class="form-control @error('date_begin') is-invalid @enderror" name="date_begin" value="{{  date('Y-m-d', strtotime($datebeginyear ?? $date_begin ?? $datenow)) }}" required autocomplete="date_begin">
+                                <input id="date_end" type="date" class="form-control @error('date_end') is-invalid @enderror" name="date_end" value="{{ date('Y-m-d', strtotime($date_end ?? $datenow))}}" required autocomplete="date_end">
+                                @error('date_end')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
                             </div>
                           
                             <div class="col-sm-2 offset-sm-1">
@@ -77,27 +80,7 @@
                                     @endif
                                 </select>
                             </div>
-                            <div class="col-sm-4">
-                                <select class="form-control" name="typeinvoice" id="typeinvoice">
-                                    @if (isset($typeinvoice))
-                                        @if ($typeinvoice == 'notas')
-                                            <option selected value="notas">Notas de Entrega</option>
-                                        @elseif($typeinvoice == 'facturas')
-                                            <option selected value="facturas">Facturas</option>
-                                        @else
-                                            <option selected value="todo">Facturas y Notas de Entrega</option>
-                                        @endif
-                                        <option disabled value="todo">-----------------</option>
-                                        <option value="todo">Facturas y Notas de Entrega</option>
-                                        <option value="notas">Notas de Entrega</option>
-                                        <option value="facturas">Facturas</option>
-                                    @else
-                                        <option selected value="todo">Facturas y Notas de Entrega</option>
-                                        <option value="notas">Notas de Entrega</option>
-                                        <option value="facturas">Facturas</option>
-                                    @endif
-                                </select>
-                            </div>
+                           
                         </div>
                     </form>
                         <div class="embed-responsive embed-responsive-16by9">
