@@ -583,7 +583,8 @@
                     $("#btn_code_inventary").show();
                     $("#centro_costo_label").hide();
                     $("#centro_costo").hide();
-                    
+                    document.getElementById("btnselectinventory").href = "{{ route('expensesandpurchases.selectinventary',[$expense->id,$coin,'mercancia']) }}";
+
                     
                 }else if(type_var == 3){
                     $("#code_inventary_label").show();

@@ -9,6 +9,7 @@
                     @csrf
 
                 <input type="hidden" name="id_client" value="{{$client->id ?? null}}" readonly>
+                <input type="hidden" name="id_vendor" value="{{$vendor->id ?? null}}" readonly>
 
                 <div class="card-header text-center h4">
                         Cuentas por Cobrar
@@ -27,14 +28,16 @@
                                     </span>
                                 @enderror
                             </div>
-                            
-                            <label id="client_label1" for="clients" class="col-sm-1 text-md-right">Cliente:</label>
                             @if (isset($client))
-                                <label id="client_label2" name="id_client" value="{{ $client->id }}" for="clients" class="col-sm-2 ">{{ $client->name }}</label>
+                                <label id="client_label1" for="clients" class="col-sm-1 text-md-right">Cliente:</label>
+                                <label id="client_label2" name="id_client" value="{{ $client->id }}" for="clients" class="col-sm-3">{{ $client->name }}</label>
+                            @endif
+                            @if (isset($vendor))
+                                <label id="vendor_label2" name="id_vendor" value="{{ $vendor->id }}" for="vendors" class="col-sm-3">{{ $vendor->name }}</label>
                             @endif
                             
                             <div id="client_label3" class="form-group col-sm-1">
-                                <a href="{{ route('reports.select_client') }}" title="Seleccionar Cliente"><i class="fa fa-eye"></i></a>  
+                                <a id="route_select" href="{{ route('reports.select_client') }}" title="Seleccionar Cliente"><i class="fa fa-eye"></i></a>  
                             </div>
                             <div class="col-sm-2">
                                 <select class="form-control" name="coin" id="coin">
@@ -62,9 +65,15 @@
                                     @if (isset($client))
                                         <option value="todo">Todo</option>
                                         <option selected value="cliente">Por Cliente</option>
+                                        <option value="vendor">Por Vendedor</option>
+                                    @elseif (isset($vendor))
+                                        <option value="todo">Todo</option>
+                                        <option value="cliente">Por Cliente</option>
+                                        <option selected value="vendor">Por Vendedor</option>
                                     @else
                                         <option selected value="todo">Todo</option>
                                         <option value="cliente">Por Cliente</option>
+                                        <option value="vendor">Por Vendedor</option>
                                     @endif
                                 </select>
                             </div>
@@ -92,7 +101,7 @@
                         </div>
                     </form>
                         <div class="embed-responsive embed-responsive-16by9">
-                            <iframe class="embed-responsive-item" src="{{ route('reports.accounts_receivable_pdf',[$coin ?? 'bolivares',$date_end ?? $datenow,$typeinvoice ?? 'todo',$client->id ?? null]) }}" allowfullscreen></iframe>
+                            <iframe class="embed-responsive-item" src="{{ route('reports.accounts_receivable_pdf',[$coin ?? 'bolivares',$date_end ?? $datenow,$typeinvoice ?? 'todo',$typeperson ?? 'ninguno',$client->id ?? $vendor->id ?? null]) }}" allowfullscreen></iframe>
                           </div>
                         
                         </div>
@@ -120,8 +129,13 @@
     };
 
     let client  = "<?php echo $client->name ?? 0 ?>";  
+    let vendor  = "<?php echo $vendor->name ?? 0 ?>"; 
 
     if(client != 0){
+        $("#client_label1").show();
+        $("#client_label2").show();
+        $("#client_label3").show();
+    }else if(vendor != 0){
         $("#client_label1").show();
         $("#client_label2").show();
         $("#client_label3").show();
@@ -139,6 +153,11 @@
                 $("#client_label1").hide();
                 $("#client_label2").hide();
                 $("#client_label3").hide();
+            }else if(type == 'vendor'){
+                document.getElementById("route_select").href = "{{ route('reports.select_vendor') }}";
+                $("#client_label1").show();
+                $("#client_label2").show();
+                $("#client_label3").show();
             }else{
                 $("#client_label1").show();
                 $("#client_label2").show();

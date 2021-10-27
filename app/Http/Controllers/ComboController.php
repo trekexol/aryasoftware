@@ -56,7 +56,7 @@ class ComboController extends Controller
     {
         $combo = Product::on(Auth::user()->database_name)->find($id_combo);
 
-        if($combo->type == "COMBO"){
+        if(isset($combo) && $combo->type == "COMBO"){
 
             $products = Product::on(Auth::user()->database_name)->orderBy('description' ,'asc')->where('type','not like','COMBO')->where('type','not like','SERVICIO')->get();
 
