@@ -931,3 +931,9 @@ Route::group(["prefix"=>'imports'],function(){
     Route::get('calcular/{id}','ImportController@calcular')->name('imports.calcular');
     Route::patch('{id}/calcularfiltro','ImportController@calcularfiltro')->name('imports.calcularfiltro');
 });
+
+Route::group(["prefix"=>'reportspayment'],function(){
+    Route::get('payment/{typeperson}/{id_client?}','ReportPaymentController@index_payment')->name('reports.payment');
+    Route::post('storepayment','ReportController@store_payment')->name('reports.store_payment');
+    Route::get('paymentpdf/{coin}/{date_end}/{typeinvoice}/{typeperson}/{id_client_or_vendor?}','ReportController@payment_pdf')->name('reports.payment_pdf');
+});

@@ -60,20 +60,20 @@ class FacturarController extends Controller
             }
             
 
-             $accounts_bank = DB::connection(Auth::user()->database_name)->table('accounts')->where('code_one', 1)
+            $accounts_bank = DB::connection(Auth::user()->database_name)->table('accounts')->where('code_one', 1)
                                             ->where('code_two', 1)
                                             ->where('code_three', 1)
                                             ->where('code_four', 2)
                                             ->where('code_five', '<>',0)
                                             ->where('description','not like', 'Punto de Venta%')
                                             ->get();
-             $accounts_efectivo = DB::connection(Auth::user()->database_name)->table('accounts')->where('code_one', 1)
+            $accounts_efectivo = DB::connection(Auth::user()->database_name)->table('accounts')->where('code_one', 1)
                                             ->where('code_two', 1)
                                             ->where('code_three', 1)
                                             ->where('code_four', 1)
                                             ->where('code_five', '<>',0)
                                             ->get();
-             $accounts_punto_de_venta = DB::connection(Auth::user()->database_name)->table('accounts')->where('description','LIKE', 'Punto de Venta%')
+            $accounts_punto_de_venta = DB::connection(Auth::user()->database_name)->table('accounts')->where('description','LIKE', 'Punto de Venta%')
                                             ->get();
 
             $inventories_quotations = DB::connection(Auth::user()->database_name)->table('products')->join('inventories', 'products.id', '=', 'inventories.product_id')
