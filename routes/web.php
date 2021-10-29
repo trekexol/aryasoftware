@@ -933,7 +933,10 @@ Route::group(["prefix"=>'imports'],function(){
 });
 
 Route::group(["prefix"=>'reportspayment'],function(){
-    Route::get('payment/{typeperson}/{id_client?}','ReportPaymentController@index_payment')->name('reports.payment');
-    Route::post('storepayment','ReportController@store_payment')->name('reports.store_payment');
-    Route::get('paymentpdf/{coin}/{date_end}/{typeinvoice}/{typeperson}/{id_client_or_vendor?}','ReportController@payment_pdf')->name('reports.payment_pdf');
+    Route::get('payment/{typeperson}/{id?}','ReportPaymentController@index_payment')->name('reportspayment.payments');
+    Route::post('storepayment','ReportPaymentController@store_payment')->name('reportspayment.store_payment');
+    Route::get('paymentpdf/{coin}/{date_begin}/{date_end}/{typeperson}/{id_client_or_vendor?}','ReportPaymentController@payment_pdf')->name('reportspayment.payment_pdf');
+
+    Route::get('selectclient','ReportPaymentController@select_client')->name('reportspayment.select_client');
+    Route::get('selectprovider','ReportPaymentController@select_provider')->name('reportspayment.select_provider');
 });

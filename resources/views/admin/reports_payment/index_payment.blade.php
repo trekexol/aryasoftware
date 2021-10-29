@@ -5,11 +5,11 @@
     <div class="row justify-content-center">
         <div class="col-sm-12">
             <div class="card">
-                <form method="POST" action="{{ route('reports.store_accounts_receivable') }}">
+                <form method="POST" action="{{ route('reportspayment.store_payment') }}">
                     @csrf
 
                 <input type="hidden" name="id_client" value="{{$client->id ?? null}}" readonly>
-                <input type="hidden" name="id_vendor" value="{{$vendor->id ?? null}}" readonly>
+                <input type="hidden" name="id_provider" value="{{$provider->id ?? null}}" readonly>
 
                 <div class="card-header text-center h4">
                         Pagos Realizados
@@ -17,6 +17,15 @@
 
                 <div class="card-body">
                         <div class="form-group row">
+                            <div class="col-sm-3">
+                                <input id="date_begin" type="date" class="form-control @error('date_begin') is-invalid @enderror" name="date_begin" value="{{  date('Y-m-d', strtotime($datebeginyear ?? $date_begin ?? $datenow)) }}" required autocomplete="date_begin">
+
+                                @error('date_begin')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
                             <label for="date_end" class="col-sm-1 col-form-label text-md-right">hasta:</label>
 
                             <div class="col-sm-3">
@@ -28,17 +37,7 @@
                                     </span>
                                 @enderror
                             </div>
-                            @if (isset($client))
-                                <label id="client_label1" for="clients" class="col-sm-1 text-md-right">Cliente:</label>
-                                <label id="client_label2" name="id_client" value="{{ $client->id }}" for="clients" class="col-sm-3">{{ $client->name }}</label>
-                            @endif
-                            @if (isset($vendor))
-                                <label id="vendor_label2" name="id_vendor" value="{{ $vendor->id }}" for="vendors" class="col-sm-3">{{ $vendor->name }}</label>
-                            @endif
-                            
-                            <div id="client_label3" class="form-group col-sm-1">
-                                <a id="route_select" href="{{ route('reports.select_client') }}" title="Seleccionar Cliente"><i class="fa fa-eye"></i></a>  
-                            </div>
+                          
                             <div class="col-sm-2">
                                 <select class="form-control" name="coin" id="coin">
                                     @if(isset($coin))
@@ -65,23 +64,33 @@
                                     @if (isset($client))
                                         <option value="todo">Todo</option>
                                         <option selected value="cliente">Por Cliente</option>
-                                        <option value="vendor">Por Vendedor</option>
-                                    @elseif (isset($vendor))
+                                        <option value="provider">Por Proveedor</option>
+                                    @elseif (isset($provider))
                                         <option value="todo">Todo</option>
                                         <option value="cliente">Por Cliente</option>
-                                        <option selected value="vendor">Por Vendedor</option>
+                                        <option selected value="provider">Por Proveedor</option>
                                     @else
                                         <option selected value="todo">Todo</option>
                                         <option value="cliente">Por Cliente</option>
-                                        <option value="vendor">Por Vendedor</option>
+                                        <option value="provider">Por Proveedor</option>
                                     @endif
                                 </select>
                             </div>
-                           
-                        </div>
+                            @if (isset($client))
+                            <label id="client_label1" for="clients" class="col-sm-1 text-md-right">Cliente:</label>
+                                <label id="client_label2" name="id_client" value="{{ $client->id }}" for="clients" class="col-sm-3">{{ $client->name }}</label>
+                            @endif
+                            @if (isset($provider))
+                                <label id="provider_label2" name="id_provider" value="{{ $provider->id }}" for="providers" class="col-sm-3">{{ $provider->razon_social ?? ''}}</label>
+                            @endif
+                            
+                            <div id="client_label3" class="form-group col-sm-1">
+                                <a id="route_select" href="{{ route('reportspayment.select_client') }}" title="Seleccionar Cliente"><i class="fa fa-eye"></i></a>  
+                            </div>
+                            </div>
                     </form>
                         <div class="embed-responsive embed-responsive-16by9">
-                            <iframe class="embed-responsive-item" src="{{ route('reports.accounts_receivable_pdf',[$coin ?? 'bolivares',$date_end ?? $datenow,$typeinvoice ?? 'todo',$typeperson ?? 'ninguno',$client->id ?? $vendor->id ?? null]) }}" allowfullscreen></iframe>
+                            <iframe class="embed-responsive-item" src="{{ route('reportspayment.payment_pdf',[$coin ?? 'bolivares',$date_begin ?? $datenow,$date_end ?? $datenow,$typeperson ?? 'ninguno',$client->id ?? $provider->id ?? null]) }}" allowfullscreen></iframe>
                           </div>
                         
                         </div>
@@ -133,8 +142,8 @@
                 $("#client_label1").hide();
                 $("#client_label2").hide();
                 $("#client_label3").hide();
-            }else if(type == 'vendor'){
-                document.getElementById("route_select").href = "{{ route('reports.select_vendor') }}";
+            }else if(type == 'provider'){
+                document.getElementById("route_select").href = "{{ route('reportspayment.select_provider') }}";
                 $("#client_label1").show();
                 $("#client_label2").show();
                 $("#client_label3").show();

@@ -640,6 +640,11 @@ class FacturarController extends Controller
                             }else{
                                 return redirect('quotations/facturar/'.$quotation->id.'/'.$quotation->coin.'')->withDanger('Debe seleccionar una Cuenta Bancaria!');
                             }
+                        }if($payment_type == 2){
+                    
+                            $account_contado = Account::on(Auth::user()->database_name)->where('description', 'like', 'Caja Chica')->first(); 
+
+                            $var->id_account = $account_contado->id;
                         }
                         if($payment_type == 4){
                             //DIAS DE CREDITO
@@ -752,6 +757,12 @@ class FacturarController extends Controller
                             return redirect('quotations/facturar/'.$quotation->id.'/'.$quotation->coin.'')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 2!');
                         }
                     }
+                    if($payment_type2 == 2){
+                    
+                        $account_contado = Account::on(Auth::user()->database_name)->where('description', 'like', 'Caja Chica')->first(); 
+
+                        $var2->id_account = $account_contado->id;
+                    }
                     if($payment_type2 == 4){
                         //DIAS DE CREDITO
                         if(isset($credit_days2)){
@@ -861,6 +872,12 @@ class FacturarController extends Controller
                                 }else{
                                     return redirect('quotations/facturar/'.$quotation->id.'/'.$quotation->coin.'')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 3!');
                                 }
+                            }
+                            if($payment_type3 == 2){
+                    
+                                $account_contado = Account::on(Auth::user()->database_name)->where('description', 'like', 'Caja Chica')->first(); 
+    
+                                $var3->id_account = $account_contado->id;
                             }
                             if($payment_type3 == 4){
                                 //DIAS DE CREDITO
@@ -972,6 +989,12 @@ class FacturarController extends Controller
                                     return redirect('quotations/facturar/'.$quotation->id.'/'.$quotation->coin.'')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 4!');
                                 }
                             }
+                            if($payment_type4 == 2){
+                    
+                                $account_contado = Account::on(Auth::user()->database_name)->where('description', 'like', 'Caja Chica')->first(); 
+    
+                                $var4->id_account = $account_contado->id;
+                            }
                             if($payment_type4 == 4){
                                 //DIAS DE CREDITO
                                 if(isset($credit_days4)){
@@ -1081,6 +1104,12 @@ class FacturarController extends Controller
                             }else{
                                 return redirect('quotations/facturar/'.$quotation->id.'/'.$quotation->coin.'')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 5!');
                             }
+                        }
+                        if($payment_type5 == 2){
+                    
+                            $account_contado = Account::on(Auth::user()->database_name)->where('description', 'like', 'Caja Chica')->first(); 
+
+                            $var5->id_account = $account_contado->id;
                         }
                         if($payment_type5 == 4){
                             //DIAS DE CREDITO
@@ -1193,6 +1222,12 @@ class FacturarController extends Controller
                                 return redirect('quotations/facturar/'.$quotation->id.'/'.$quotation->coin.'')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 6!');
                             }
                         }
+                        if($payment_type6 == 2){
+                    
+                            $account_contado = Account::on(Auth::user()->database_name)->where('description', 'like', 'Caja Chica')->first(); 
+
+                            $var6->id_account = $account_contado->id;
+                        }
                         if($payment_type6 == 4){
                             //DIAS DE CREDITO
                             if(isset($credit_days6)){
@@ -1304,6 +1339,12 @@ class FacturarController extends Controller
                                 return redirect('quotations/facturar/'.$quotation->id.'/'.$quotation->coin.'')->withDanger('Debe seleccionar una Cuenta Bancaria en pago numero 7!');
                             }
                         }
+                        if($payment_type7 == 2){
+                    
+                            $account_contado = Account::on(Auth::user()->database_name)->where('description', 'like', 'Caja Chica')->first(); 
+
+                            $var7->id_account = $account_contado->id;
+                        }
                         if($payment_type7 == 4){
                             //DIAS DE CREDITO
                             if(isset($credit_days7)){
@@ -1377,11 +1418,8 @@ class FacturarController extends Controller
                 return redirect('quotations/facturar/'.$quotation->id.'/'.$quotation->coin.'');
             }
             
-            
         
             /*---------------- */
-
-                
 
                 $header_voucher  = new HeaderVoucher();
                 $header_voucher->setConnection(Auth::user()->database_name);

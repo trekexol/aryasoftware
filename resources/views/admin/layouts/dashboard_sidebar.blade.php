@@ -256,7 +256,8 @@
                     <a class="collapse-item" href="{{ route('reports.accounts_receivable','index')}}" > <i class="fas fa-hand-holding-usd fa-sm fa-fw mr-2 text-black-400"></i><strong>Cuentas por Cobrar</strong></a>
                     <a class="collapse-item" href="{{ route('reports.debtstopay')}}" > <i class="fas fa-coins fa-sm fa-fw mr-2 text-black-400"></i><strong>Cuentas por Pagar</strong></a>
                     <a class="collapse-item" href="{{ route('reports.bankmovements')}}" > <i class="fas fa-money-bill-wave fa-sm fa-fw mr-2 text-black-400"></i><strong>Movimientos<br> <div style="text-indent: 22px;">Bancarios</div></strong></a>
-
+                    <a class="collapse-item" href="{{ route('reportspayment.payments','index')}}" > <i class="fas fa-hand-holding-usd fa-sm fa-fw mr-2 text-black-400"></i><strong>Pagos Realizados</strong></a>
+                    
                     <a  class="collapse-header text-danger" href="{{ route('accounts') }}">Contabilidad</a>
                     <a class="collapse-item" href="{{ route('balancegenerals') }}" > <i class="fas fa-clipboard-check fa-sm fa-fw mr-2 text-blue-400"></i><strong>Balance General</strong></a>
                     <a class="collapse-item" href="{{ route('balanceingresos') }}" > <i class="fas fa-compress-alt fa-sm fa-fw mr-2 text-blue-400"></i><strong>Ingresos y Egresos</strong></a>

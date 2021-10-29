@@ -6,7 +6,7 @@
     <div class="row py-lg-2">
        
         <div class="col-md-6">
-            <h2>Seleccione un Cliente</h2>
+            <h2>Seleccione un Proveedor</h2>
         </div>
         
     
@@ -29,8 +29,8 @@
                 <tr> 
                     <th></th>
                    
-                    <th>Nombre</th>
-                    <th>Cedula o Rif</th>
+                    <th>Nombre / Razón Social</th>
+                    <th>Código Proveedor</th>
                     <th>Dirección</th>
                     <th>Ciudad</th>
                     <th>Pais</th>
@@ -41,48 +41,46 @@
                 </thead>
                 
                 <tbody>
-                    @if (empty($clients))
+                    @if (empty($providers))
                     @else  
-                        @foreach ($clients as $client)
+                        @foreach ($providers as $provider)
                             <tr>
                                 <td >
-                                    <a href="{{ route('reportspayment.payment',['Cliente',$client->id]) }}"  title="Seleccionar"><i class="fa fa-check" style="color: orange"></i></a>
-                               </td>
-                                <td >{{$client->name}}</td>
-                                <td >{{$client->cedula_rif}}</td>
-                                <td >{{$client->direction}}</td>
-                                <td >{{$client->city}}</td>
-                                <td >{{$client->country}}</td>
-                                <td >{{$client->phone1}}</td>
-                                <td >{{$client->phone2}}</td>
+                                    <a href="{{ route('reportspayment.payments',['Proveedor',$provider->id]) }}"  title="Seleccionar"><i class="fa fa-check" style="color: orange"></i></a>
+                                </td>
+                                <td >{{$provider->razon_social}}</td>
+                                <td >{{$provider->code_provider}}</td>
+                                <td >{{$provider->direction}}</td>
+                                <td >{{$provider->city}}</td>
+                                <td >{{$provider->country}}</td>
+                                <td >{{$provider->phone1}}</td>
+                                <td >{{$provider->phone2}}</td>
                                 
                             </tr>     
                         @endforeach   
                     @endif
                 </tbody>
             </table>
+            
+        </div>
+        <br>
+        <div class="form-group row col-md-4">
+                
+            <div class="col-md-2">
+                <a href="{{ route('expensesandpurchases.create') }}" id="btnfacturar" name="btnfacturar" class="btn btn-danger" title="facturar">Volver</a>  
+            </div>
         </div>
     </div>
 </div>
-
-
-    
 @endsection
 @section('javascript')
 
-    <script>
-    $('#dataTable').DataTable({
-        "ordering": false,
-        "order": [],
-        'aLengthMenu': [[-1, 50, 100, 150, 200], ["Todo",50, 100, 150, 200]]
-    });
-
-    $("body").toggleClass("sidebar-toggled");
-    $(".sidebar").toggleClass("toggled");
-    if ($(".sidebar").hasClass("toggled")) {
-        $('.sidebar .collapse').collapse('hide');
-    };
+<script>
+    $('#dataTable').dataTable( {
+      "ordering": false,
+      "order": [],
+        'aLengthMenu': [[50, 100, 150, -1], [50, 100, 150, "All"]]
+} );
+</script>
     
-    </script> 
-
 @endsection
