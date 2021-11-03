@@ -41,10 +41,10 @@
   <tr>
     @if (isset($quotation->credit_days))
       <td style="width: 20%;">Fecha de Emisión:</td>
-      <td style="width: 40%;"> {{ $quotation->date_billing }} | Dias de Crédito: {{ $quotation->credit_days }}</td>
+      <td style="width: 40%;"> {{ date_format(date_create($quotation->date_billing),"d-m-Y") }} | Dias de Crédito: {{ $quotation->credit_days }}</td>
     @else
       <td style="width: 20%;">Fecha de Emisión:</td>
-      <td style="width: 40%;">{{ $quotation->date_billing }}</td>
+      <td style="width: 40%;">{{ date_format(date_create($quotation->date_billing),"d-m-Y")}}</td>
     @endif
     
   </tr>
@@ -83,7 +83,7 @@
   </tr>
   <tr>
     <td style="text-align: center;">{{ $quotation->clients['phone1'] ?? '' }}</td>
-    <td style="text-align: center;">{{ $quotation->clients['cedula_rif'] ?? '' }}</td>
+    <td style="text-align: center;">{{ $quotation->clients['type_code'] ?? ''}} {{ $quotation->clients['cedula_rif'] ?? '' }}</td>
     <td style="text-align: center;">{{ $quotation->serie ?? '' }}</td>
     <td style="text-align: center;">{{ $quotation->number_delivery_note ?? '' }}</td>
     <td style="text-align: center;">{{ $quotation->transports['placa'] ?? '' }}</td>

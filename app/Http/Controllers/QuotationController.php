@@ -272,7 +272,10 @@ class QuotationController extends Controller
 
         $inventories = DB::connection(Auth::user()->database_name)->table('inventories')
             ->join('products', 'products.id', '=', 'inventories.product_id')
-            ->where('products.type','MERCANCIA')
+            ->where(function ($query){
+                $query->where('products.type','MERCANCIA')
+                    ->orWhere('products.type','COMBO');
+            })
             ->where('products.status',1)
             ->select('products.*','inventories.amount as amount','inventories.id as id_inventory')
             ->orderBy('products.code_comercial','desc')
@@ -477,8 +480,9 @@ class QuotationController extends Controller
         $amount = request('amount');
         $cost = str_replace(',', '.', str_replace('.', '',request('cost')));
 
+        $global = new GlobalController();
         
-        $value_return = $this->check_amount($quotation->id,$var->id_inventory,$amount);
+        $value_return = $global->check_amount($quotation->id,$var->id_inventory,$amount);
 
         if($value_return != 'exito'){
                 return redirect('quotations/registerproduct/'.$var->id_quotation.'/'.$coin.'/'.$var->id_inventory.'')->withDanger('La cantidad de este producto excede a la cantidad puesta en inventario!');
@@ -516,46 +520,7 @@ class QuotationController extends Controller
         * @return \Illuminate\Http\Response
         */
 
-    public function check_amount($id_quotation,$id_inventory,$amount_new)
-    {
-        $inventories_quotations = DB::connection(Auth::user()->database_name)
-                ->table('products')
-                ->join('inventories', 'products.id', '=', 'inventories.product_id')
-                ->where('inventories.id',$id_inventory)
-                ->select('products.*')
-                ->first(); 
-
-        //si es un servicio no se chequea que posea inventario
-
-        if(isset($inventories_quotations) && ($inventories_quotations->type == "MERCANCIA")){
-            $inventory = Inventory::on(Auth::user()->database_name)->find($id_inventory);
-
-            $sum_amount = DB::connection(Auth::user()->database_name)->table('quotation_products')
-                            ->where('id_quotation',$id_quotation)
-                            ->where('id_inventory',$id_inventory)
-                            ->sum('amount');
-
-
-            if ($sum_amount <> $amount_new) {
-                $total_in_quotation = $amount_new;
-            } else {
-                $total_in_quotation = $sum_amount;
-            }
-            
-            if ($inventory->amount >= $total_in_quotation){
-                return "exito";
-            }else{
-                return "no_hay_cantidad_suficiente";
-            } 
-
-        }else{
-            return "exito";
-        }
-        
-
-        
-    
-    }
+   
 
 
     public function show($id)
@@ -730,8 +695,9 @@ class QuotationController extends Controller
         
             $var->discount = request('discount');
         
+            $global = new GlobalController();
 
-            $value_return = $this->check_amount($var->id_quotation,$var->id_inventory,$var->amount);
+            $value_return = $global->check_amount($var->id_quotation,$var->id_inventory,$var->amount);
 
 
             $islr = request('islr');
@@ -793,12 +759,15 @@ class QuotationController extends Controller
             QuotationProduct::on(Auth::user()->database_name)
                 ->join('inventories','inventories.id','quotation_products.id_inventory')
                 ->join('products','products.id','inventories.product_id')
-                ->where('products.type','MERCANCIA')
-                ->where('inventories.id',$quotation_product->id_inventory)
-                ->update(['inventories.amount' => DB::raw('inventories.amount+quotation_products.amount')]);
+                ->where(function ($query){
+                    $query->where('products.type','MERCANCIA')
+                        ->orWhere('products.type','COMBO');
+                })
+                ->where('quotation_products.id',$quotation_product->id)
+                ->update(['inventories.amount' => DB::raw('inventories.amount+quotation_products.amount'), 'quotation_products.status' => 'X']);
+        }else{
+            $quotation_product->delete(); 
         }
-
-        $quotation_product->delete(); 
 
         return redirect('/quotations/register/'.request('id_quotation_modal').'/'.request('coin_modal').'')->withDanger('Eliminacion exitosa!!');
         
@@ -809,7 +778,8 @@ class QuotationController extends Controller
         
         $quotation = Quotation::on(Auth::user()->database_name)->find(request('id_quotation_modal')); 
 
-        QuotationProduct::on(Auth::user()->database_name)->where('id_quotation',$quotation->id)->delete();
+        $global = new GlobalController();
+        $global->deleteAllProducts($quotation->id);
 
         Anticipo::on(Auth::user()->database_name)->where('id_quotation',$quotation->id)->delete();
 
@@ -833,18 +803,13 @@ class QuotationController extends Controller
                 $detail = DetailVoucher::on(Auth::user()->database_name)->where('id_invoice',$id_quotation)
                 ->update(['status' => 'X']);
     
-                QuotationProduct::on(Auth::user()->database_name)
-                                ->join('inventories','inventories.id','quotation_products.id_inventory')
-                                ->join('products','products.id','inventories.product_id')
-                                ->where('products.type','MERCANCIA')
-                                ->where('id_quotation',$quotation->id)
-                                ->update(['inventories.amount' => DB::raw('inventories.amount+quotation_products.amount') , 'quotation_products.status' => 'X']);
-    
+                
+                $global = new GlobalController();
+                $global->deleteAllProducts($quotation->id);
+
                 QuotationPayment::on(Auth::user()->database_name)
                                 ->where('id_quotation',$quotation->id)
                                 ->update(['status' => 'X']);
-    
-                
     
                 $quotation->status = 'X';
                 $quotation->save();
@@ -878,7 +843,10 @@ class QuotationController extends Controller
                 ->join('quotation_products', 'quotation_products.id_quotation','=','multipayments.id_quotation')
                 ->join('inventories','inventories.id','quotation_products.id_inventory')
                 ->join('products','products.id','inventories.product_id')
-                ->where('products.type','MERCANCIA')
+                ->where(function ($query){
+                    $query->where('products.type','MERCANCIA')
+                        ->orWhere('products.type','COMBO');
+                })
                 ->where('multipayments.id_header','=',$id_header)
                 ->update(['inventories.amount' => DB::raw('inventories.amount+quotation_products.amount') ,
                         'quotation_products.status' => 'X']);

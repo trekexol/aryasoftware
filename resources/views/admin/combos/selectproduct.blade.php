@@ -35,6 +35,7 @@
     <input id="combo_products" type="hidden" class="form-control @error('combo_products') is-invalid @enderror" name="combo_products" readonly required autocomplete="combo_products">
               
     
+    
 <div class="card shadow mb-4">
     
     <div class="card-body">

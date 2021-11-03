@@ -120,7 +120,7 @@
                             <label for="price_buy" class="col-md-2 col-form-label text-md-right">Precio de Compra</label>
 
                             <div class="col-md-4">
-                                <input id="price_buy" type="text" readonly class="form-control @error('price_buy') is-invalid @enderror" value="{{ number_format($inventory->products['price_buy'], 2, ',', '.')}}" name="price_buy" required autocomplete="price_buy">
+                                <input id="price_buy" type="text" readonly class="form-control @error('price_buy') is-invalid @enderror" value="{{ number_format($inventory->products['price_buy'] ?? 0, 2, ',', '.')}}" name="price_buy" required autocomplete="price_buy">
 
                                 @error('price_buy')
                                     <span class="invalid-feedback" role="alert">
@@ -131,7 +131,7 @@
                             <label for="rate" class="col-md-2 col-form-label text-md-right">Tasa</label>
 
                             <div class="col-md-4">
-                                <input id="rate" type="text" class="form-control @error('rate') is-invalid @enderror" value="{{ $bcv }}" name="rate" required autocomplete="rate">
+                                <input id="rate" type="text" class="form-control @error('rate') is-invalid @enderror" value="{{ number_format($bcv ?? 0, 2, ',', '.')}}" name="rate" required autocomplete="rate">
 
                                 @error('rate')
                                     <span class="invalid-feedback" role="alert">

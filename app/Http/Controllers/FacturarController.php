@@ -118,13 +118,13 @@ class FacturarController extends Controller
                 }
 
                 //me suma todos los precios de costo de los productos
-                 if(($var->money == 'Bs') && ($var->type == "MERCANCIA")){
+                 if(($var->money == 'Bs') && (($var->type == "MERCANCIA") || ($var->type == "COMBO"))){
                     $price_cost_total += $var->price_buy * $var->amount_quotation;
-                }else if(($var->money != 'Bs') && ($var->type == "MERCANCIA")){
+                }else if(($var->money != 'Bs') && (($var->type == "MERCANCIA") || ($var->type == "COMBO"))){
                     $price_cost_total += $var->price_buy * $var->amount_quotation * $quotation->bcv;
                 }
 
-                if($var->type == "MERCANCIA"){
+                if(($var->type == "MERCANCIA") || ($var->type == "COMBO")){
                     $total_mercancia += ($var->price * $var->amount_quotation) - $percentage;
                 }else{
                     $total_servicios += ($var->price * $var->amount_quotation) - $percentage;
@@ -1528,15 +1528,15 @@ class FacturarController extends Controller
                     $this->check_anticipo($quotation,$sin_formato_grandtotal);
                     $quotation->anticipo =  $sin_formato_grandtotal;
                     $quotation->status = "C";
-                    $global->add_payment($quotation,$account_anticipo_cliente->id,8,$quotation->anticipo,$bcv);
+                   
                 }else{
                     $quotation->anticipo =  $anticipo;
+                    $global->associate_anticipos_quotation($quotation);
                 }
                 
-                
-
                 if(isset($account_anticipo_cliente)){
                     $this->add_movement($bcv,$header_voucher->id,$account_anticipo_cliente->id,$quotation->id,$user_id,$quotation->anticipo,0);
+                    $global->add_payment($quotation,$account_anticipo_cliente->id,8,$quotation->anticipo,$bcv);
                 }
              }else{
                  $quotation->anticipo = 0;
@@ -1837,67 +1837,6 @@ class FacturarController extends Controller
 
     }
 
-
-
-   /* public function discount_inventory($id_quotation){
-            //Primero Revisa que todos los productos tengan inventario suficiente
-            $no_hay_cantidad_suficiente = DB::connection(Auth::user()->database_name)->table('inventories')
-                                    ->join('quotation_products', 'quotation_products.id_inventory','=','inventories.id')
-                                    ->join('products', 'products.id','=','inventories.product_id')
-                                    ->where('quotation_products.id_quotation','=',$id_quotation)
-                                    ->where('products.type','LIKE','MERCANCIA')
-                                    ->where('quotation_products.amount','<=','inventories.amount')
-                                    ->select('inventories.code as code','quotation_products.price as price','quotation_products.rate as rate','quotation_products.id_quotation as id_quotation','quotation_products.discount as discount',
-                                    'quotation_products.amount as amount_quotation')
-                                    ->first(); 
-        
-            if(isset($no_hay_cantidad_suficiente)){
-                return redirect('quotations/facturar/'.$id_quotation.'/bolivares')->withDanger('En el Inventario de Codigo: '.$no_hay_cantidad_suficiente->code.' no hay Cantidad suficiente!');
-            }
-
-        //Luego, descuenta del Inventario
-            $inventories_quotations = DB::connection(Auth::user()->database_name)->table('products')->join('inventories', 'products.id', '=', 'inventories.product_id')
-            ->join('quotation_products', 'inventories.id', '=', 'quotation_products.id_inventory')
-            ->where('quotation_products.id_quotation',$id_quotation)
-            ->where('products.type','LIKE','MERCANCIA')
-            ->select('products.*','quotation_products.price as price','quotation_products.rate as rate','quotation_products.id as id_quotation','quotation_products.discount as discount',
-            'quotation_products.amount as amount_quotation')
-            ->get(); 
-
-                foreach($inventories_quotations as $inventories_quotation){
-
-                    $quotation_product = QuotationProduct::on(Auth::user()->database_name)->findOrFail($inventories_quotation->id_quotation);
-
-                    if(isset($quotation_product)){
-                    $inventory = Inventory::on(Auth::user()->database_name)->findOrFail($quotation_product->id_inventory);
-
-                        if(isset($inventory)){
-                            //REVISO QUE SEA MAYOR EL MONTO DEL INVENTARIO Y LUEGO DESCUENTO
-                            if($inventory->amount >= $quotation_product->amount){
-                                $inventory->amount -= $quotation_product->amount;
-                                $inventory->save();
-
-                                //CAMBIAMOS EL ESTADO PARA SABER QUE ESE PRODUCTO YA SE COBRO Y SE RESTO DEL INVENTARIO
-                                $quotation_product->status = 'C';  
-                                //$quotation_product->price = $inventories_quotation->price;
-                                $quotation_product->save();
-                            }else{
-                                return redirect('quotations/facturar/'.$id_quotation.'/bolivares')->withDanger('El Inventario de Codigo: '.$inventory->code.' no tiene Cantidad suficiente!');
-                            }
-                            
-                        }else{
-                            return redirect('quotations/facturar/'.$id_quotation.'/bolivares')->withDanger('El Inventario no existe!');
-                        }
-                    }else{
-                    return redirect('quotations/facturar/'.$id_quotation.'/bolivares')->withDanger('El Inventario de la cotizacion no existe!');
-                    }
-
-                }
-
-                return "exito";
-
-    }
-*/
 
 
 

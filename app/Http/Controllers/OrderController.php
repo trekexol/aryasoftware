@@ -139,7 +139,10 @@ class OrderController extends Controller
         QuotationProduct::on(Auth::user()->database_name)
                         ->join('inventories','inventories.id','quotation_products.id_inventory')
                         ->join('products','products.id','inventories.product_id')
-                        ->where('products.type','MERCANCIA')
+                        ->where(function ($query){
+                            $query->where('products.type','MERCANCIA')
+                                ->orWhere('products.type','COMBO');
+                        })
                         ->where('id_quotation',$quotation->id)
                         ->update(['inventories.amount' => DB::raw('inventories.amount+quotation_products.amount') , 'quotation_products.status' => 'X']);
     

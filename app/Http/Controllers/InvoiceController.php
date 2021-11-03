@@ -1344,7 +1344,10 @@ class InvoiceController extends Controller
                                 ->join('quotation_products', 'quotation_products.id_inventory','=','inventories.id')
                                 ->join('products', 'products.id','=','inventories.product_id')
                                 ->where('quotation_products.id_quotation','=',$id_quotation)
-                                ->where('products.type','LIKE','MERCANCIA')
+                                ->where(function ($query){
+                                    $query->where('products.type','MERCANCIA')
+                                        ->orWhere('products.type','COMBO');
+                                })
                                 ->where('quotation_products.amount','<','inventories.amount')
                                 ->select('inventories.code as code','quotation_products.price as price','quotation_products.rate as rate','quotation_products.id_quotation as id_quotation','quotation_products.discount as discount',
                                 'quotation_products.amount as amount_quotation')
@@ -1358,7 +1361,10 @@ class InvoiceController extends Controller
         $inventories_quotations = DB::connection(Auth::user()->database_name)->table('products')->join('inventories', 'products.id', '=', 'inventories.product_id')
         ->join('quotation_products', 'inventories.id', '=', 'quotation_products.id_inventory')
         ->where('quotation_products.id_quotation',$id_quotation)
-        ->where('products.type','LIKE','MERCANCIA')
+        ->where(function ($query){
+            $query->where('products.type','MERCANCIA')
+                ->orWhere('products.type','COMBO');
+        })
         ->select('products.*','quotation_products.price as price','quotation_products.rate as rate','quotation_products.id as id_quotation','quotation_products.discount as discount',
         'quotation_products.amount as amount_quotation')
         ->get(); 
@@ -1511,13 +1517,13 @@ class InvoiceController extends Controller
                }
 
                //me suma todos los precios de costo de los productos
-                if(($var->money == 'Bs') && ($var->type == "MERCANCIA")){
+                if(($var->money == 'Bs') && (($var->type == "MERCANCIA") || ($var->type == "COMBO"))){
                    $price_cost_total += $var->price_buy * $var->amount_quotation;
-               }else if(($var->money != 'Bs') && ($var->type == "MERCANCIA")){
+               }else if(($var->money != 'Bs') && (($var->type == "MERCANCIA") || ($var->type == "COMBO"))){
                    $price_cost_total += $var->price_buy * $var->amount_quotation * $quotation->bcv;
                }
 
-               if($var->type == "MERCANCIA"){
+               if(($var->type == "MERCANCIA") || ($var->type == "COMBO")){
                    $total_mercancia += ($var->price * $var->amount_quotation) - $percentage;
                }else{
                    $total_servicios += ($var->price * $var->amount_quotation) - $percentage;

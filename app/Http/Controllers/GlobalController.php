@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Anticipo;
 use App\ComboProduct;
+use App\ExpensesDetail;
 use App\Inventory;
 use App\QuotationPayment;
 use App\QuotationProduct;
@@ -91,6 +92,7 @@ class GlobalController extends Controller
                     $var = new Anticipo();
                     $var->setConnection(Auth::user()->database_name);
                     
+                    $var->id_anticipo_restante = $anticipo->id;
                     $var->date = $quotation->date_billing;
                     $var->id_client = $quotation->id_client;
                     $user       =   auth()->user();
@@ -107,6 +109,94 @@ class GlobalController extends Controller
             }
 
             
+    }
+
+    public function checkAnticipoExpense($expense,$total_pay)
+    {
+        
+            $anticipos = DB::connection(Auth::user()->database_name)->table('anticipos')->where('id_provider', '=', $expense->id_provider)
+                                                                                    ->where(function ($query) use ($expense){
+                                                                                        $query->where('id_expense',null)
+                                                                                            ->orWhere('id_expense',$expense->id);
+                                                                                    })
+                                                                                    ->where('status', '=', '1')->get();
+
+            foreach($anticipos as $anticipo){
+
+                //si el anticipo esta en dolares, multiplico los dolares por la tasa de la cotizacion, para sacar el monto real en bolivares
+                if($anticipo->coin != "bolivares"){
+                    $anticipo->amount = ($anticipo->amount / $anticipo->rate) * $expense->bcv;
+                }
+
+                if($total_pay >= $anticipo->amount){
+                    DB::connection(Auth::user()->database_name)->table('anticipos')
+                                                                ->where('id', $anticipo->id)
+                                                                ->update(['status' => 'C']);
+                   
+                    DB::connection(Auth::user()->database_name)->table('anticipo_expenses')->insert(['id_expense' => $expense->id,'id_anticipo' => $anticipo->id]);
+                                                         
+                    $total_pay -= $anticipo->amount;
+                }else{
+
+                    DB::connection(Auth::user()->database_name)->table('anticipos')
+                                                                ->where('id', $anticipo->id)
+                                                                ->update(['status' => 'C']);
+                                                    
+                    DB::connection(Auth::user()->database_name)->table('anticipo_expenses')->insert(['id_expense' => $expense->id,'id_anticipo' => $anticipo->id]);
+                      
+
+                    $amount_anticipo_new = $anticipo->amount - $total_pay;
+
+                    $var = new Anticipo();
+                    $var->setConnection(Auth::user()->database_name);
+
+                    $var->id_anticipo_restante = $anticipo->id;
+                    $var->date = $expense->date_billing;
+                    $var->id_provider = $expense->id_provider;
+                    $user       =   auth()->user();
+                    $var->id_user = $user->id;
+                    $var->id_account = $anticipo->id_account;
+                    $var->coin = $anticipo->coin;
+                    $var->amount = $amount_anticipo_new;
+                    $var->rate = $expense->bcv;
+                    $var->reference = $anticipo->reference;
+                    $var->status = 1;
+                    $var->save();
+                    break;
+                }
+            }
+
+            
+    }
+
+    public function associate_anticipos_quotation($quotation){
+
+        $anticipos = DB::connection(Auth::user()->database_name)->table('anticipos')->where('id_client', '=', $quotation->id_client)
+        ->where(function ($query) use ($quotation){
+            $query->where('id_quotation',null)
+                ->orWhere('id_quotation',$quotation->id);
+        })
+        ->where('status', '=', '1')->get();
+
+        foreach($anticipos as $anticipo){
+            DB::connection(Auth::user()->database_name)->table('anticipo_quotations')->insert(['id_quotation' => $quotation->id,'id_anticipo' => $anticipo->id]);
+        }
+                  
+    }
+
+    public function associate_anticipos_expense($expense){
+
+        $anticipos = DB::connection(Auth::user()->database_name)->table('anticipos')->where('id_provider', '=', $expense->id_provider)
+        ->where(function ($query) use ($expense){
+            $query->where('id_expense',null)
+                ->orWhere('id_expense',$expense->id);
+        })
+        ->where('status', '=', '1')->get();
+
+        foreach($anticipos as $anticipo){
+            DB::connection(Auth::user()->database_name)->table('anticipo_expenses')->insert(['id_expense' => $expense->id,'id_anticipo' => $anticipo->id]);
+        }
+                  
     }
 
     public function check_anticipo_multipayment($quotation,$quotations_id,$total_pay)
@@ -234,6 +324,47 @@ class GlobalController extends Controller
 
     }
 
+    public function check_amount($id_quotation,$id_inventory,$amount_new)
+    {
+        $inventories_quotations = DB::connection(Auth::user()->database_name)
+                ->table('products')
+                ->join('inventories', 'products.id', '=', 'inventories.product_id')
+                ->where('inventories.id',$id_inventory)
+                ->select('products.*')
+                ->first(); 
+
+        //si es un servicio no se chequea que posea inventario
+
+        if(isset($inventories_quotations) && (($inventories_quotations->type == "MERCANCIA") || ($inventories_quotations->type == "COMBO"))){
+            $inventory = Inventory::on(Auth::user()->database_name)->find($id_inventory);
+
+            $sum_amount = DB::connection(Auth::user()->database_name)->table('quotation_products')
+                            ->where('id_quotation',$id_quotation)
+                            ->where('id_inventory',$id_inventory)
+                            ->sum('amount');
+
+
+            if ($sum_amount <> $amount_new) {
+                $total_in_quotation = $amount_new;
+            } else {
+                $total_in_quotation = $sum_amount;
+            }
+            
+            if ($inventory->amount >= $total_in_quotation){
+                return "exito";
+            }else{
+                return "no_hay_cantidad_suficiente";
+            } 
+
+        }else{
+            return "exito";
+        }
+        
+
+        
+    
+    }
+
     public function add_payment($quotation,$id_account,$payment_type,$amount,$bcv){
         $var = new QuotationPayment();
         $var->setConnection(Auth::user()->database_name);
@@ -275,7 +406,6 @@ class GlobalController extends Controller
 
     }
 
-
     function asignar_payment_type($type){
       
         if($type == 1){
@@ -310,6 +440,50 @@ class GlobalController extends Controller
         }
         if($type == 11){
             return "Transferencia";
+        }
+    }
+
+    public function deleteAllProducts($id_quotation)
+    {
+        $quotation_products = QuotationProduct::on(Auth::user()->database_name)->where('id_quotation',$id_quotation)->get(); 
+        
+        if(isset($quotation_products)){
+            foreach($quotation_products as $quotation_product){
+                if(isset($quotation_product) && $quotation_product->status == "C"){
+                    QuotationProduct::on(Auth::user()->database_name)
+                        ->join('inventories','inventories.id','quotation_products.id_inventory')
+                        ->join('products','products.id','inventories.product_id')
+                        ->where(function ($query){
+                            $query->where('products.type','MERCANCIA')
+                                ->orWhere('products.type','COMBO');
+                        })
+                        ->where('quotation_products.id',$quotation_product->id)
+                        ->update(['inventories.amount' => DB::raw('inventories.amount+quotation_products.amount'), 'quotation_products.status' => 'X']);
+                }
+            }
+        }
+    }
+
+    public function deleteAllProductsExpense($id_expense)
+    {
+        
+        $expense_products = ExpensesDetail::on(Auth::user()->database_name)->where('id_expense',$id_expense)->get(); 
+        
+        
+        if(isset($expense_products)){
+            foreach($expense_products as $expense_product){
+                if(isset($expense_product) && $expense_product->status == "C"){
+                    ExpensesDetail::on(Auth::user()->database_name)
+                        ->join('inventories','inventories.id','expenses_details.id_inventory')
+                        ->join('products','products.id','inventories.product_id')
+                        ->where(function ($query){
+                            $query->where('products.type','MERCANCIA')
+                                ->orWhere('products.type','COMBO');
+                        })
+                        ->where('expenses_details.id',$expense_product->id)
+                        ->update(['inventories.amount' => DB::raw('inventories.amount-expenses_details.amount'), 'expenses_details.status' => 'X']);
+                }
+            }
         }
     }
 }

@@ -39,6 +39,7 @@ class ExpensesAndPurchaseController extends Controller
 
         $expensesandpurchases = ExpensesAndPurchase::on(Auth::user()->database_name)->orderBy('id' ,'DESC')
                                                     ->where('amount_with_iva','=',null)
+                                                    ->where('status',1)
                                                     ->get();
 
        
@@ -289,7 +290,7 @@ class ExpensesAndPurchaseController extends Controller
 
             if(isset($id_inventory)){
                 $inventory = Inventory::on(Auth::user()->database_name)->find($id_inventory);
-                if($inventory->products['type'] == 'MERCANCIA'){
+                if(($inventory->products['type'] == 'MERCANCIA') || ($inventory->products['type'] == 'COMBO')){
                     $accounts_inventory = Account::on(Auth::user()->database_name)->select('id','description')->where('code_one',1)
                     ->where('code_two', 1)
                     ->where('code_three', 3)
@@ -800,6 +801,7 @@ class ExpensesAndPurchaseController extends Controller
         //Saber cuantos pagos vienen
         $come_pay = request('amount_of_payments');
 
+        $global = new GlobalController();
 
         $user_id = request('user_id');
 
@@ -1753,16 +1755,25 @@ class ExpensesAndPurchaseController extends Controller
                 $anticipo = request('anticipo_form');
 
                 if(isset($anticipo) && ($anticipo != 0)){
-                  $expense->anticipo =  $anticipo;
 
                     $account_anticipo_proveedor = Account::on(Auth::user()->database_name)->where('code_one',1)
                                                             ->where('code_two',1)
                                                             ->where('code_three',4)
                                                             ->where('code_four',2)
                                                             ->where('code_five',1)->first(); 
+                    if($sin_formato_total_pay < 0){
+                        $global->checkAnticipoExpense($expense,$sin_formato_grandtotal);
+                        $expense->anticipo =  $sin_formato_grandtotal;
+                        $expense->status = "C";
+                        
+                    }else{
+                        $expense->anticipo =  $anticipo;
+                        $global->associate_anticipos_expense($expense);
+                    }
                 
                     if(isset($account_anticipo_proveedor)){
-                        $this->add_movement($bcv,$header_voucher->id,$account_anticipo_proveedor->id,$expense->id,$user_id,0,$anticipo);
+                        $this->add_movement($bcv,$header_voucher->id,$account_anticipo_proveedor->id,$expense->id,$user_id,0,$expense->anticipo);
+                        $global->add_payment($expense,$account_anticipo_proveedor->id,8,$expense->anticipo,$bcv);
                     }
                 }else{
                     $expense->anticipo = 0;
@@ -1884,6 +1895,11 @@ class ExpensesAndPurchaseController extends Controller
                     ->where('status', '=', 'M')
                     ->update(['status' => '1']);
                 /*------------------------------------------------- */
+
+                 //Aqui pasa los quotation_products a status C de Cobrado
+                DB::connection(Auth::user()->database_name)->table('expenses_details')
+                ->where('id_expense', '=', $expense->id)
+                ->update(['status' => 'C']);
 
             }else{
                 return redirect('expensesandpurchases/registerpaymentafter/'.$expense->id.'/'.$coin.'')->withDanger('La suma de los pagos es diferente al monto Total a Pagar!');
@@ -2038,7 +2054,7 @@ class ExpensesAndPurchaseController extends Controller
                     
                     if(isset($inventory)){
                            
-                        if($inventory->products['type'] == 'MERCANCIA'){
+                        if(($inventory->products['type'] == 'MERCANCIA') || ($inventory->products['type'] == 'COMBO')){
                             $inventory->amount += $var->amount;
                             $inventory->save();
                         }
@@ -2179,27 +2195,7 @@ class ExpensesAndPurchaseController extends Controller
 
     }
 
-    public function reversar_expense($id_expense)
-    { 
-        
-        $expense = ExpensesAndPurchase::on(Auth::user()->database_name)->findOrFail($id_expense);
-
-        $detail = DetailVoucher::on(Auth::user()->database_name)->where('id_expense',$id_expense)
-                                                                ->update(['status' => 'X']);
-
-        
-        DB::connection(Auth::user()->database_name)->table('detail_vouchers')
-                            ->join('header_vouchers', 'header_vouchers.id','=','detail_vouchers.id_header_voucher')
-                            ->join('multipayment_expenses', 'multipayment_expenses.id_header','=','header_vouchers.id')
-                            ->where('multipayment_expenses.id_expense','=',$id_expense)
-                            ->update(['detail_vouchers.status' => 'X']);
-
-        $expense->status = 'X';
-        $expense->save();
-        
-        return redirect('expensesandpurchases/indexhistorial')->withSuccess('Reverso de Compra Exitosa!');
-
-    }
+   
 
     /**
         * Display the specified resource.
@@ -2412,13 +2408,90 @@ class ExpensesAndPurchaseController extends Controller
     public function destroy(Request $request)
     {
         $expense = ExpensesAndPurchase::on(Auth::user()->database_name)->find(request('id_expense_modal')); 
+        
+        $detail = DetailVoucher::on(Auth::user()->database_name)->where('id_invoice',$expense->id)
+        ->update(['status' => 'X']);
 
-        ExpensesDetail::on(Auth::user()->database_name)->where('id_expense',$expense->id)->delete();
+        
+        $global = new GlobalController();
+        $global->deleteAllProductsExpense($expense->id);
 
-        $expense->delete(); 
+        ExpensePayment::on(Auth::user()->database_name)
+                        ->where('id_expense',$expense->id)
+                        ->update(['status' => 'X']);
 
-        return redirect('/expensesandpurchases')->withDanger('Eliminacion exitosa!!');
+        $expense->status = 'X';
+        $expense->save();
+       
+        
+        return redirect('/expensesandpurchases')->withDanger('Reverso Exitoso!!');
     }
+    public function reversar_expense($id_expense)
+    { 
+        
+        $expense = ExpensesAndPurchase::on(Auth::user()->database_name)->find(request('id_expense_modal')); 
+        
+        $detail = DetailVoucher::on(Auth::user()->database_name)->where('id_invoice',$expense->id)
+        ->update(['status' => 'X']);
+
+        
+        $global = new GlobalController();
+        $global->deleteAllProductsExpense($expense->id);
+
+        ExpensePayment::on(Auth::user()->database_name)
+                        ->where('id_expense',$expense->id)
+                        ->update(['status' => 'X']);
+
+        $expense->status = 'X';
+        $expense->save();
+        
+        return redirect('expensesandpurchases/indexhistorial')->withSuccess('Reverso de Compra Exitosa!');
+
+    }
+
+ /*   public function reversar_quotation_multipayment($id_quotation,$id_header){
+
+        
+        if(isset($id_header)){
+            //aqui reversamos todo el movimiento del multipago
+            DB::connection(Auth::user()->database_name)->table('detail_vouchers')
+            ->join('header_vouchers', 'header_vouchers.id','=','detail_vouchers.id_header_voucher')
+            ->where('header_vouchers.id','=',$id_header)
+            ->update(['detail_vouchers.status' => 'X' , 'header_vouchers.status' => 'X']);
+
+            //aqui se cambia el status de los pagos
+            DB::connection(Auth::user()->database_name)->table('multipayments')
+            ->join('quotation_payments', 'quotation_payments.id_quotation','=','multipayments.id_quotation')
+            ->where('multipayments.id_header','=',$id_header)
+            ->update(['quotation_payments.status' => 'X']);
+
+            //aqui aumentamos el inventario y cambiamos el status de los productos que se reversaron
+            DB::connection(Auth::user()->database_name)->table('multipayments')
+                ->join('quotation_products', 'quotation_products.id_quotation','=','multipayments.id_quotation')
+                ->join('inventories','inventories.id','quotation_products.id_inventory')
+                ->join('products','products.id','inventories.product_id')
+                ->where(function ($query){
+                    $query->where('products.type','MERCANCIA')
+                        ->orWhere('products.type','COMBO');
+                })
+                ->where('multipayments.id_header','=',$id_header)
+                ->update(['inventories.amount' => DB::raw('inventories.amount+quotation_products.amount') ,
+                        'quotation_products.status' => 'X']);
+    
+
+            //aqui le cambiamos el status a todas las facturas a X de reversado
+            Multipayment::on(Auth::user()->database_name)
+            ->join('quotations', 'quotations.id','=','multipayments.id_quotation')
+            ->where('id_header',$id_header)->update(['quotations.status' => 'X']);
+
+            Multipayment::on(Auth::user()->database_name)->where('id_header',$id_header)->delete();
+
+            return redirect('invoices')->withSuccess('Reverso de Facturas Multipago Exitosa!');
+        }else{
+            return redirect('invoices')->withDanger('No se pudo reversar las facturas');
+        }
+        
+    }*/
 
     public function deleteDetail(Request $request)
     {
@@ -2427,8 +2500,19 @@ class ExpensesAndPurchaseController extends Controller
         
         $detail_old = ExpensesDetail::on(Auth::user()->database_name)->find($id_detail); 
         
-
-        ExpensesDetail::on(Auth::user()->database_name)->where('id',$id_detail)->delete();
+        if(isset($detail_old) && $detail_old->status == "C"){
+            ExpensesDetail::on(Auth::user()->database_name)
+                ->join('inventories','inventories.id','expenses_details.id_inventory')
+                ->join('products','products.id','inventories.product_id')
+                ->where(function ($query){
+                    $query->where('products.type','MERCANCIA')
+                        ->orWhere('products.type','COMBO');
+                })
+                ->where('expenses_details.id',$detail_old->id)
+                ->update(['inventories.amount' => DB::raw('inventories.amount-expenses_details.amount'), 'expenses_details.status' => 'X']);
+        }else{
+            $detail_old->delete(); 
+        }
 
         return redirect('/expensesandpurchases/register/'.$detail_old->id_expense.'/'.$coin.'')->withDanger('Eliminacion exitosa!!');
     }
