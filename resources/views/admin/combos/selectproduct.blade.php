@@ -49,7 +49,7 @@
                 </div>   
             @endif
             <div class="form-group row">
-                <label for="price" class="col-md-2 col-form-label text-md-right">Precio de Venta aaaa:</label>
+                <label for="price" class="col-md-2 col-form-label text-md-right">Precio de Venta:</label>
 
                 <div class="col-md-2">
                     <input id="price" type="text" class="form-control @error('price') is-invalid @enderror" name="price" value="{{ old('price') }}" required autocomplete="price">
