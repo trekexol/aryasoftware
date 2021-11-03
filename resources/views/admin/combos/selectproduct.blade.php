@@ -11,7 +11,7 @@
             <h2>Seleccione los Productos para el Combo</h2>
         </div>
         <div class="col-sm-3">
-           <input type="button" title="Agregar" value="Asignar Productos" class="btn btn-primary float-md-right" role="button" aria-pressed="true"  onclick="formSend();" >
+           <input type="button" title="Agregar" value="Guardar Cambios" class="btn btn-primary float-md-right" role="button" aria-pressed="true"  onclick="formSend();" >
         </div>
         <div class="col-sm-2">
             <a href="{{ route('combos') }}" class="btn btn-danger">
@@ -51,7 +51,7 @@
             <div class="form-group row">
                 <label for="price" class="col-md-2 col-form-label text-md-right">Precio de Venta:</label>
 
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <input id="price" type="text" class="form-control @error('price') is-invalid @enderror" name="price" value="{{ old('price') }}" required autocomplete="price">
 
                     @error('price')
@@ -62,7 +62,7 @@
                 </div>
                 <label for="price_buy" class="col-md-2 col-form-label text-md-right">Precio de Compra:</label>
 
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <input id="price_buy" type="text" class="form-control @error('price_buy') is-invalid @enderror" name="price_buy" value="{{ old('price_buy') }}" required autocomplete="price_buy">
 
                     @error('price_buy')
@@ -70,6 +70,11 @@
                             <strong>{{ $message }}</strong>
                         </span>
                     @enderror
+                </div>
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" checked id="customSwitches" name="updatePrices">
+                    <label class="custom-control-label" for="customSwitches">Actualizar Precios</label>
+                    
                 </div>
             </div>
         </div>
@@ -150,37 +155,54 @@
         function formSend(){
             document.getElementById("formSend").submit();       
         }
+
         
         let products = [];
         var controller_add = true;
 
+        var bcv = "{{$bcv ?? 1}}";
+
         function selectProduct(product){
 
             var isChecked = document.getElementById('flexCheckChecked'+product.id).checked;
+
+            if(product.money == 'Bs'){
+                product.price = product.price / bcv;
+                product.price_buy = product.price_buy / bcv;
+            }
+
+            if(isChecked){
+                document.getElementById('amount'+product.id).value = "1,00";
+            }else{
+                document.getElementById('amount'+product.id).value = "0,00";
+            }
             
             updateValuePrice(isChecked,product.price,product.price_buy);
             
-            //addProduct(product.id);
+            addProduct(product.id);
         }
+
+
 
         function updateValuePrice(isChecked,price,price_buy){
             
-            let form = document.getElementById("price").value; 
+           
+            var price_form = newFormat(document.getElementById("price").value);
 
-            var montoFormat = form.replace(/[$.]/g,'');
-
-            var price_form = montoFormat.replace(/[,]/g,'.');    
-            alert(price);
-/*
+            var price_buy_form = newFormat(document.getElementById("price_buy").value); 
+            
             if(isChecked){
-                document.getElementById("price").value = (parseFloat(price_form) + price).toLocaleString('de-DE', {minimumFractionDigits: 2,maximumFractionDigits: 2});
+                document.getElementById("price").value = (parseFloat(price_form) + parseFloat(price)).toLocaleString('de-DE', {minimumFractionDigits: 2,maximumFractionDigits: 2});
+                document.getElementById("price_buy").value = (parseFloat(price_buy_form) + parseFloat(price_buy)).toLocaleString('de-DE', {minimumFractionDigits: 2,maximumFractionDigits: 2});
             }else{
-                document.getElementById("price").value = ((parseFloat(price_form)*-1) + price).toLocaleString('de-DE', {minimumFractionDigits: 2,maximumFractionDigits: 2});   
+                document.getElementById("price").value = (parseFloat(price_form) + (parseFloat(price)*-1)).toLocaleString('de-DE', {minimumFractionDigits: 2,maximumFractionDigits: 2});   
+                document.getElementById("price_buy").value = (parseFloat(price_buy_form) + (parseFloat(price_buy)*-1)).toLocaleString('de-DE', {minimumFractionDigits: 2,maximumFractionDigits: 2});   
             }
-           */
+           
         }
         
 
+        
         //esta funcion agrega y elimina productos de la lista que se anadiran al combo
         function addProduct(id_product){
             
@@ -201,6 +223,13 @@
             
             document.getElementById("id_products").value = products;
         }
+
+        function newFormat(old_format){
+            var montoFormat = old_format.replace(/[$.]/g,'');
+
+            return montoFormat.replace(/[,]/g,'.');       
+        }
+
     </script> 
         
 

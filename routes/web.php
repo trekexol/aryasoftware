@@ -918,6 +918,8 @@ Route::group(["prefix"=>'export'],function(){
 
     Route::get('assign/{id_combo}','ComboController@create_assign')->name('combos.create_assign');
     Route::post('storeassign','ComboController@store_assign')->name('combos.store_assign');
+
+    Route::get('updateprice/{id_combo}/{price}/{price_buy}','ComboController@updatePrice')->name('combos.update_price');
   });
 
 Route::group(["prefix"=>'imports'],function(){
