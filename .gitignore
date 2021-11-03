@@ -1,6 +1,7 @@
 /node_modules
 /storage
 storage/*.key
+public
 vendor
 .env
 /.env.backup
