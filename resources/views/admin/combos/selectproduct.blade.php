@@ -104,7 +104,7 @@
                                 <input onclick="selectProduct({{ $product }});" type="checkbox" id="flexCheckChecked{{$product->id}}">                        
                             </td>
                             <td>
-                                <input id="amount{{ $product->id }}" type="text" class="form-control @error('amount{{ $product->id }}') is-invalid @enderror" name="amount{{ $product->id }}" placeholder="0,00" autocomplete="amount{{ $product->id }}">
+                                <input id="amount{{ $product->id }}" onblur="updateAmount({{$product}})" onclick="valueOld({{$product}})" type="text" class="form-control @error('amount{{ $product->id }}') is-invalid @enderror" name="amount{{ $product->id }}" placeholder="0,00" autocomplete="amount{{ $product->id }}">
                             </td>
                             <td>{{$product->code_comercial ?? ''}}</td>
                             <td>{{$product->description ?? ''}}</td>
@@ -159,6 +159,7 @@
         
         let products = [];
         var controller_add = true;
+        var value_old = 0;
 
         var bcv = "{{$bcv ?? 1}}";
 
@@ -170,7 +171,7 @@
                 product.price = product.price / bcv;
                 product.price_buy = product.price_buy / bcv;
             }
-
+            
             if(isChecked){
                 document.getElementById('amount'+product.id).value = "1,00";
             }else{
@@ -182,6 +183,25 @@
             addProduct(product.id);
         }
 
+        function valueOld(product){
+            value_old = parseFloat(newFormat(document.getElementById('amount'+product.id).value));
+        }
+
+        function updateAmount(product){
+           
+            if(product.money == 'Bs'){
+                product.price = product.price / bcv;
+                product.price_buy = product.price_buy / bcv;
+            }
+
+            var isChecked = document.getElementById('flexCheckChecked'+product.id).checked;
+
+            var amount = parseFloat(newFormat(document.getElementById('amount'+product.id).value));
+
+            amount = amount - value_old;
+
+            updateValuePrice(isChecked,product.price * amount,product.price_buy * amount);
+        }
 
 
         function updateValuePrice(isChecked,price,price_buy){
