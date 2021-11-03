@@ -46,7 +46,7 @@ class ReportPaymentController extends Controller
 
     public function store_payment(Request $request)
     {
-        
+        $date_begin = request('date_begin');
         $date_end = request('date_end');
         $type = request('type');
         $id_client = request('id_client');
@@ -55,6 +55,9 @@ class ReportPaymentController extends Controller
         $client = null;
         $provider = null;
         $typeperson = 'ninguno';
+
+        $date = Carbon::now();
+        $datenow = $date->format('Y-m-d');   
 
         if($type != 'todo'){
             if(isset($id_client)){
@@ -67,7 +70,7 @@ class ReportPaymentController extends Controller
             }
         }
 
-        return view('admin.reports_payment.index_payment',compact('coin','typeinvoice','date_end','client','provider','typeperson'));
+        return view('admin.reports_payment.index_payment',compact('datenow','coin','date_begin','date_end','client','provider','typeperson'));
     }
 
     function payment_pdf($coin,$date_begin,$date_end,$typeperson,$id_client_or_provider = null)
@@ -84,26 +87,36 @@ class ReportPaymentController extends Controller
         if(empty($date_end)){
             $date_end = $datenow;
 
-            $date_consult = $date->format('Y-m-d'); 
+            $date_end_consult = $date->format('Y-m-d'); 
         }else{
             $date_end = Carbon::parse($date_end)->format('d-m-Y');
 
-            $date_consult = Carbon::parse($date_end)->format('Y-m-d');
+            $date_end_consult = Carbon::parse($date_end)->format('Y-m-d');
+        }
+
+        if(isset($date_begin)){
+            $date_begin = Carbon::parse($date_begin)->format('Y-m-d');
         }
         
         $period = $date->format('Y'); 
+
+        $client = null;
+        $provider = null;
         
 
         if(isset($typeperson) && ($typeperson == 'Cliente')){
-            
+           
             $quotations = DB::connection(Auth::user()->database_name)->table('quotations')
             ->join('clients', 'clients.id','=','quotations.id_client')
             ->join('quotation_payments', 'quotation_payments.id_quotation','=','quotations.id')
             ->where('quotations.status','C')
-            ->where('quotations.date_quotation','<=',$date_consult)
+            ->whereRaw("(DATE_FORMAT(quotation_payments.created_at, '%Y-%m-%d') >= ? AND DATE_FORMAT(quotation_payments.created_at, '%Y-%m-%d') <= ?)", 
+                [$date_begin, $date_end_consult])
             ->where('quotations.id_client',$id_client_or_provider)
             ->select('quotation_payments.*')
             ->get();
+
+            $client = Client::on(Auth::user()->database_name)->find($id_client_or_provider);
             
         }if(isset($typeperson) && ($typeperson == 'Proveedor')){
             
@@ -111,11 +124,14 @@ class ReportPaymentController extends Controller
             ->join('providers', 'providers.id','=','expenses_and_purchases.id_provider')
             ->join('expense_payments', 'expense_payments.id_expense','=','expenses_and_purchases.id')
             ->where('expenses_and_purchases.status','C')
-            ->where('expenses_and_purchases.date','<=',$date_consult)
+            ->whereRaw("(DATE_FORMAT(expense_payments.created_at, '%Y-%m-%d') >= ? AND DATE_FORMAT(expense_payments.created_at, '%Y-%m-%d') <= ?)", 
+                [$date_begin, $date_end_consult])
             ->where('expenses_and_purchases.id_provider',$id_client_or_provider)
             ->select('expense_payments.*')
             ->get();
             
+            $provider = Provider::on(Auth::user()->database_name)->find($id_client_or_provider);
+
         }else{
             
             $quotations = DB::connection(Auth::user()->database_name)->table('quotations')
@@ -124,9 +140,12 @@ class ReportPaymentController extends Controller
             ->leftJoin('accounts', 'accounts.id','=','quotation_payments.id_account')
             ->where('quotations.status','C')
             ->where('quotation_payments.status','1')
-            ->where('quotations.date_quotation','<=',$date_consult)
+            ->whereRaw("(DATE_FORMAT(quotation_payments.created_at, '%Y-%m-%d') >= ? AND DATE_FORMAT(quotation_payments.created_at, '%Y-%m-%d') <= ?)", 
+                [$date_begin, $date_end_consult])
             ->select('quotation_payments.*','accounts.description as account_description')
             ->get();
+
+            $client = Client::on(Auth::user()->database_name)->find($id_client_or_provider);
         }
        
         foreach($quotations as $quotation){
@@ -135,7 +154,8 @@ class ReportPaymentController extends Controller
 
         }
 
-        $pdf = $pdf->loadView('admin.reports_payment.payment',compact('coin','quotations','datenow','date_end'));
+
+        $pdf = $pdf->loadView('admin.reports_payment.payment',compact('coin','quotations','datenow','date_end','client','provider'));
         return $pdf->stream();
                  
     }

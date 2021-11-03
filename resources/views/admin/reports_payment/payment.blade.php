@@ -28,6 +28,12 @@
 
   <br>
   <h4 style="color: black; text-align: center">Pagos Realizados</h4>
+  @if (isset($client))
+    <h4 style="color: black; text-align: center">Cliente: {{ $client->name ?? '' }}</h4>
+  @elseif(isset($provider))
+    <h4 style="color: black; text-align: center">Proveedor: {{ $provider->razon_social ?? '' }}</h4>
+  @endif
+  
   <h5 style="color: black; text-align: center">Fecha de Emisión: {{ $date_end ?? $datenow ?? '' }}</h5>
    
   <?php 
