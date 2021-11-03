@@ -41,13 +41,37 @@
     <div class="card-body">
         <div class="container">
             @if (session('flash'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{session('flash')}}
-                <button type="button" class="close" data-dismiss="alert" aria-label="close">
-                    <span aria-hidden="true">&times; </span>
-                </button>
-            </div>   
-        @endif
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{session('flash')}}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="close">
+                        <span aria-hidden="true">&times; </span>
+                    </button>
+                </div>   
+            @endif
+            <div class="form-group row">
+                <label for="price" class="col-md-2 col-form-label text-md-right">Precio de Venta:</label>
+
+                <div class="col-md-3">
+                    <input id="price" type="text" class="form-control @error('price') is-invalid @enderror" name="price" value="{{ old('price') }}" required autocomplete="price">
+
+                    @error('price')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
+                </div>
+                <label for="price_buy" class="col-md-2 col-form-label text-md-right">Precio de Compra:</label>
+
+                <div class="col-md-3">
+                    <input id="price_buy" type="text" class="form-control @error('price_buy') is-invalid @enderror" name="price_buy" value="{{ old('price_buy') }}" required autocomplete="price_buy">
+
+                    @error('price_buy')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
+                </div>
+            </div>
         </div>
         <div class="table-responsive">
         <table class="table table-light2 table-bordered" id="dataTable" width="100%" cellspacing="0">
@@ -72,7 +96,7 @@
                     @foreach ($products as $product)
                         <tr>
                             <td>
-                                <input onclick="addProduct({{ $product->id }});" type="checkbox" id="flexCheckChecked{{$product->id}}">                        
+                                <input onclick="selectProduct({{ $product }});" type="checkbox" id="flexCheckChecked{{$product->id}}">                        
                             </td>
                             <td>
                                 <input id="amount{{ $product->id }}" type="text" class="form-control @error('amount{{ $product->id }}') is-invalid @enderror" name="amount{{ $product->id }}" placeholder="0,00" autocomplete="amount{{ $product->id }}">
@@ -87,10 +111,6 @@
                             @endif
                             <td>{{$product->segments['description'] ?? ''}}</td>
                             <td>{{$product->subsegments['description'] ?? ''}}</td> 
-                           
-                            
-                           
-                         
                         </tr>     
                     @endforeach   
                 @endif
@@ -109,10 +129,18 @@
         $(document).ready(function () {
             $("#amount{{ $product->id }}").mask('000.000.000.000.000.000.000,00', { reverse: true });
         });
+        
     </script>
     @endforeach
     
     <script>
+        $(document).ready(function () {
+            $("#price").mask('000.000.000.000.000.000.000,00', { reverse: true });
+        });
+        $(document).ready(function () {
+            $("#price_buy").mask('000.000.000.000.000.000.000,00', { reverse: true });
+        });
+        
         $('#dataTable').DataTable({
             "ordering": false,
             "order": [],
@@ -125,6 +153,32 @@
         
         let products = [];
         var controller_add = true;
+
+        function selectProduct(product){
+
+            var isChecked = document.getElementById('flexCheckChecked'+product.id).checked;
+            
+            updateValuePrice(isChecked,product.price,product.price_buy);
+            
+            //addProduct(product.id);
+        }
+
+        function updateValuePrice(isChecked,price,price_buy){
+            
+            let form = document.getElementById("price").value; 
+
+            var montoFormat = form.replace(/[$.]/g,'');
+
+            var price_form = montoFormat.replace(/[,]/g,'.');    
+            alert(price);
+/*
+            if(isChecked){
+                document.getElementById("price").value = (parseFloat(price_form) + price).toLocaleString('de-DE', {minimumFractionDigits: 2,maximumFractionDigits: 2});
+            }else{
+                document.getElementById("price").value = ((parseFloat(price_form)*-1) + price).toLocaleString('de-DE', {minimumFractionDigits: 2,maximumFractionDigits: 2});   
+            }
+           */
+        }
         
 
         //esta funcion agrega y elimina productos de la lista que se anadiran al combo
@@ -148,10 +202,25 @@
             document.getElementById("id_products").value = products;
         }
     </script> 
-
+        
 
     @if (isset($combo_products))
+        <?php
+            //Aqui se inicializa los precios y toda la pagina
+            $total_price = 0;  
+            $total_price_buy = 0;        
+        ?>
         @foreach ($combo_products as $combo)
+            <?php
+                if((isset($combo->products['money'])) && ($combo->products['money'] == 'D')){
+                    $total_price += $combo->products['price'] ?? 0;  
+                    $total_price_buy += $combo->products['price_buy'] ?? 0; 
+                }else{
+                    $total_price += ($combo->products['price'] ?? 0) / ($bcv ?? 1);  
+                    $total_price_buy += ($combo->products['price_buy'] ?? 0) / ($bcv ?? 1); 
+                }
+                    
+            ?>
             <script>
                 //aqui seleccionamos los productos que ya tenga el combo y los asignamos a la lista de productos
                 products.push("{{ $combo->id_product }}");
@@ -161,5 +230,10 @@
                 document.getElementById("id_products").value = products;
             </script> 
         @endforeach
+        <script>
+            //aqui asignamos los precios
+            document.getElementById("price").value = "{{ number_format($total_price, 2, ',', '.') }}";
+            document.getElementById("price_buy").value = "{{ number_format($total_price_buy, 2, ',', '.') }}";
+        </script> 
     @endif
 @endsection

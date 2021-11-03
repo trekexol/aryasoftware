@@ -38,17 +38,18 @@
   @if (isset($company->franqueo_postal))
   <tr>
     <th style="font-weight: normal; width: 10%;">Concesión Postal:</th>
-    <th style="font-weight: normal; width: 10%;">Nº {{ $company->franqueo_postal ?? ''}}</th>
+    <th style="font-weight: normal; width: 10%; border: rgb(17, 9, 9);">Nº {{ $company->franqueo_postal ?? ''}}</th>
+    <th style="font-weight: normal; width: 10%; border: rgb(255, 255, 255);"></th>
   </tr>
   @endif
     <tr>
      @if (isset($quotation->credit_days))
       <td style="width: 10%;">Fecha de Emisión:</td>
-      <td style="width: 10%;">{{ $quotation->date_billing }} | Dias de Crédito: {{ $quotation->credit_days }}</td>
+      <td style="width: 10%;">{{ date_format(date_create($quotation->date_billing),"d-m-Y") }} | Dias de Crédito: {{ $quotation->credit_days }}</td>
     
     @else
       <td style="width: 10%;">Fecha de Emisión:</td>
-      <td style="width: 10%;">{{ $quotation->date_billing }}</td>
+      <td style="width: 10%;">{{ date_format(date_create($quotation->date_billing),"d-m-Y") }}</td>
     @endif
       <td  style="font-size: 11pt; width: 40%; color: black; font-weight: bold; text-align: right; border-top-color: white; border-right-color: white;">FACTURA NRO: {{ str_pad($quotation->number_invoice ?? $quotation->id, 6, "0", STR_PAD_LEFT)}}</td>
      
@@ -81,7 +82,7 @@
   </tr>
   <tr>
     <td style="text-align: center; ">{{ $quotation->clients['phone1'] }}</td>
-    <td style="text-align: center; ">{{ $quotation->clients['cedula_rif'] }}</td>
+    <td style="text-align: center; ">{{ $quotation->clients['type_code'] ?? ''}} {{ $quotation->clients['cedula_rif'] ?? '' }}</td>
     <td style="text-align: center; ">{{ $quotation->serie }}</td>
     <td style="text-align: center; ">{{ $quotation->number_delivery_note }}</td>
     <td style="text-align: center; ">{{ $quotation->transports['placa'] ?? '' }}</td>

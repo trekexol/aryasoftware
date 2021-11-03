@@ -40,13 +40,14 @@
   </tr>
   <tr>
     <td style="width: 40%;">Fecha de Emisión:</td>
-    <td>{{ $quotation->date_delivery_note ?? ''}}</td>
-    
+    @if (isset($quotation->date_delivery_note))
+      <td>{{date_format(date_create($quotation->date_delivery_note),"d-m-Y")}}</td>
+    @else
+      <td></td>
+    @endif
   </tr>
   
 </table>
-
-
 
 
 <table style="width: 100%;">
@@ -78,7 +79,7 @@
   </tr>
   <tr>
     <td style="text-align: center;">{{ $quotation->clients['phone1'] ?? ''}}</td>
-    <td style="text-align: center;">{{ $quotation->clients['cedula_rif'] ?? ''}}</td>
+    <td style="text-align: center;">{{ $quotation->clients['type_code'] ?? ''}} {{ $quotation->clients['cedula_rif'] ?? '' }}</td>
     <td style="text-align: center;">{{ $quotation->serie }}</td>
     <td style="text-align: center;">Nota de Entrega</td>
     <td style="text-align: center;">{{ $quotation->transports['placa'] ?? '' }}</td>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Combo;
 use App\ComboProduct;
+use App\Company;
 use App\Inventory;
 use App\Product;
 
@@ -61,8 +62,17 @@ class ComboController extends Controller
             $products = Product::on(Auth::user()->database_name)->orderBy('description' ,'asc')->where('type','not like','COMBO')->where('type','not like','SERVICIO')->get();
 
             $combo_products = ComboProduct::on(Auth::user()->database_name)->where('id_combo',$id_combo)->get();
+
+            $company = Company::on(Auth::user()->database_name)->find(1);
+            //Si la taza es automatica
+            if($company->tiporate_id == 1){
+                $bcv = $this->search_bcv();
+            }else{
+                //si la tasa es fija
+                $bcv = $company->rate;
+            }
             
-            return view('admin.combos.selectproduct',compact('products','id_combo','combo_products'));
+            return view('admin.combos.selectproduct',compact('products','id_combo','combo_products','bcv'));
         }else{
             return redirect('combos')->withDanger('Debe seleccionar un Combo!');
         }

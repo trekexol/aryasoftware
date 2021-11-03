@@ -2428,25 +2428,28 @@ class ExpensesAndPurchaseController extends Controller
     }
     public function reversar_expense($id_expense)
     { 
-        
-        $expense = ExpensesAndPurchase::on(Auth::user()->database_name)->find(request('id_expense_modal')); 
-        
-        $detail = DetailVoucher::on(Auth::user()->database_name)->where('id_invoice',$expense->id)
-        ->update(['status' => 'X']);
+        if(isset($id_expense)){
 
-        
-        $global = new GlobalController();
-        $global->deleteAllProductsExpense($expense->id);
+            $expense = ExpensesAndPurchase::on(Auth::user()->database_name)->find($id_expense); 
+            
+            $detail = DetailVoucher::on(Auth::user()->database_name)->where('id_invoice',$expense->id)
+            ->update(['status' => 'X']);
 
-        ExpensePayment::on(Auth::user()->database_name)
-                        ->where('id_expense',$expense->id)
-                        ->update(['status' => 'X']);
+            
+            $global = new GlobalController();
+            $global->deleteAllProductsExpense($expense->id);
 
-        $expense->status = 'X';
-        $expense->save();
-        
-        return redirect('expensesandpurchases/indexhistorial')->withSuccess('Reverso de Compra Exitosa!');
+            ExpensePayment::on(Auth::user()->database_name)
+                            ->where('id_expense',$expense->id)
+                            ->update(['status' => 'X']);
 
+            $expense->status = 'X';
+            $expense->save();
+            
+            return redirect('expensesandpurchases/indexhistorial')->withSuccess('Reverso de Compra Exitosa!');
+        }else{
+            return redirect('expensesandpurchases/indexhistorial')->withDanger('No se pudo reversar la Compra');
+        }
     }
 
  /*   public function reversar_quotation_multipayment($id_quotation,$id_header){
