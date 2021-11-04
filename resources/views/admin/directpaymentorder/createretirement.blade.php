@@ -128,37 +128,36 @@
                             </div>
                         </div>  
                         <div class="form-group row">
-                            @if (isset($contrapartidas))      
+                           
                             <label for="contrapartida" class="col-md-2 col-form-label text-md-right">Contrapartida:</label>
-                        
                             <div class="col-md-4">
-                            <select id="contrapartida"  name="contrapartida" class="form-control" required>
-                                <option value="">Seleccione una Contrapartida</option>
-                                @foreach($contrapartidas as $index => $value)
-                                    <option value="{{ $index }}" {{ old('Contrapartida') == $index ? 'selected' : '' }}>
-                                        {{ $value }}
-                                    </option>
-                                @endforeach
+                                <select id="type_form"  name="type_form" class="form-control" required>
+                                    <option value="-1">Seleccionar</option>
+                                    <option value="1">Inventario de Mercancia</option>
+                                    <option value="2">Propiedad, Planta y Equipo</option>
+                                    <option value="3">Costos de Ventas</option>
+                                    <option value="4">Gastos - Personal</option>
+                                    <option value="5">Gastos - Tributos</option>
+                                    <option value="6">Gastos - Municipales</option>
+                                    <option value="7">Gastos - Administración</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <select  id="account_counterpart"  name="Account_counterpart" class="form-control" required>
+                                    <option value="">Seleccionar</option>
+                                    @if (isset($accounts_inventory))
+                                        @foreach ($accounts_inventory as $var)
+                                            <option value="{{ $var->id }}">{{ $var->description }}</option>
+                                        @endforeach
+                                    @endif
                                 </select>
 
-                                @if ($errors->has('contrapartida_id'))
+                                @if ($errors->has('account'))
                                     <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $errors->first('contrapartida_id') }}</strong>
+                                        <strong>{{ $errors->first('account') }}</strong>
                                     </span>
                                 @endif
                             </div>
-                            @endif
-                            <div class="col-md-4">
-                                    <select  id="subcontrapartida"  name="Subcontrapartida" class="form-control" required>
-                                        <option value="">Seleccionar</option>
-                                    </select>
-
-                                    @if ($errors->has('subcontrapartida_id'))
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $errors->first('subcontrapartida_id') }}</strong>
-                                        </span>
-                                    @endif
-                                </div>
                         </div>  
                         <div class="form-group row">
                             
@@ -333,7 +332,43 @@
 
 @section('consultadeposito')
     <script>
-            
+         $("#type_form").on('change',function(){
+            type_var = $(this).val();
+           
+            searchCode(type_var);
+        });
+        function searchCode(type_var){
+
+            $.ajax({
+                
+                url:"{{ route('expensesandpurchases.listaccount') }}" + '/' + type_var,
+                beforSend:()=>{
+                    alert('consultando datos');
+                },
+                success:(response)=>{
+                
+                    let account = $("#account_counterpart");
+                    let htmlOptions = `<option value='' >Seleccione..</option>`;
+                    // console.clear();
+                    if(response.length > 0){
+                        
+                        response.forEach((item, index, object)=>{
+                            let {id,description} = item;
+                            htmlOptions += `<option value='${id}' {{ old('Account') == '${id}' ? 'selected' : '' }}>${description}</option>`
+
+                        });
+                    }
+                    account.html('');
+                    account.html(htmlOptions);
+                
+                    
+                
+                },
+                error:(xhr)=>{
+                }
+            })
+        }
+
         $("#contrapartida").on('change',function(){
             var contrapartida_id = $(this).val();
             $("#subcontrapartida").val("");

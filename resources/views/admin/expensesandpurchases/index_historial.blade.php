@@ -23,17 +23,31 @@
 
     <!-- Page Heading -->
     <div class="row py-lg-2">
-      <div class="col-md-6">
-          <h2>Historial de Gastos y Compras</h2>
-      </div>
-      <div class="col-md-2">
-        <a href="{{ route('payment_expenses')}}" class="btn btn-info btn-icon-split">
-            <span class="icon text-white-50">
-                <i class="fas fa-hand-holding-usd"></i>
-            </span>
-            <span class="text">Pagos</span>
-        </a>
-    </div>
+        <div class="col-md-6">
+            <h2>Historial de Gastos y Compras</h2>
+        </div>
+        <div class="col-md-2">
+            <a href="{{ route('payment_expenses')}}" class="btn btn-info btn-icon-split">
+                <span class="icon text-white-50">
+                    <i class="fas fa-hand-holding-usd"></i>
+                </span>
+                <span class="text">Pagos</span>
+            </a>
+        </div>
+        <div class="col-sm-3  dropdown mb-4">
+            <button class="btn btn-success" type="button"
+                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="false"
+                aria-expanded="false">
+                <i class="fas fa-bars"></i>
+                Exportaciones
+            </button>
+            <div class="dropdown-menu animated--fade-in"
+                aria-labelledby="dropdownMenuButton">
+                <a onclick="export_retencion_iva();" href="#" class="dropdown-item">Retención de Iva a .txt</a> 
+                <a onclick="pdf_retencion_islr();" href="#" class="dropdown-item">Retención de ISLR a XML</a> 
+                <a onclick="pdf_media();" href="#" class="dropdown-item">Retención de Iva a Excel</a> 
+            </div>
+        </div> 
       <div class="col-md-4">
         <button type="submit" title="Agregar" id="btncobrar" class="btn btn-primary  float-md-right" >Cobrar Gastos o Compras</a>
       </div>
@@ -147,6 +161,12 @@
     function buttom(){
         
         $("#btncobrar").show();
+    }
+
+    function export_retencion_iva() 
+    {
+        window.location = "{{ route('exportexpense.ivaTxt') }}";
+            
     }
 </script>
     

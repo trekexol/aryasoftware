@@ -28,7 +28,12 @@ class DirectPaymentOrderController extends Controller
                                         ->where('code_five','<>',0)
                                         ->orderBY('description','asc')->pluck('description','id')->toArray();
 
-
+        $accounts_inventory = Account::on(Auth::user()->database_name)->select('id','description')->where('code_one',1)
+                        ->where('code_two', 1)
+                        ->where('code_three', 3)
+                        ->where('code_four',1)
+                        ->where('code_five', '<>',0)
+                        ->get();
         if(isset($accounts)){   
 
             $contrapartidas     = Account::on(Auth::user()->database_name)->where('code_one', '<>',0)
@@ -54,7 +59,7 @@ class DirectPaymentOrderController extends Controller
                 $bcv = $company->rate;
             }
 
-           return view('admin.directpaymentorder.createretirement',compact('accounts','datenow','contrapartidas','branches','bcv','coin'));
+           return view('admin.directpaymentorder.createretirement',compact('accounts_inventory','accounts','datenow','contrapartidas','branches','bcv','coin'));
 
         }else{
             return redirect('/directpaymentorders')->withDanger('No hay Cuentas!');

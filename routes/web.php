@@ -898,6 +898,7 @@ Route::group(["prefix"=>'export'],function(){
     Route::get('expenseguideinventory','ExcelController@export_guide_inventory')->name('export.guideinventory');
 
     Route::post('expenseimport','ExcelController@import')->name('import');
+
   });
 
   Route::group(["prefix"=>'orders'],function(){
@@ -942,3 +943,8 @@ Route::group(["prefix"=>'reportspayment'],function(){
     Route::get('selectclient','ReportPaymentController@select_client')->name('reportspayment.select_client');
     Route::get('selectprovider','ReportPaymentController@select_provider')->name('reportspayment.select_provider');
 });
+
+
+Route::group(["prefix"=>'exportexpense'],function(){
+    Route::get('retencionivatxt','ExportExpenseController@ivaTxt')->name('exportexpense.ivaTxt');
+  });
