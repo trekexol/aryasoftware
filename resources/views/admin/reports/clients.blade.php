@@ -36,25 +36,42 @@
   <h5 style="color: black; text-align: center">Fecha de Emisión: {{ $datenow ?? '' }} / Fecha desde: {{ $date_begin ?? '' }} Fecha Hasta: {{ $date_end ?? '' }}</h5>
    
  
-<table style="width: 100%;">
-  <tr>
-    <th style="text-align: center; ">Código</th>
-    <th style="text-align: center; ">Nombre</th>
-    <th style="text-align: center; ">Dirección</th>
-    <th style="text-align: center; ">teléfono</th>
-  </tr> 
-  @foreach ($clients as $client)
-    <tr>
-      
-      <td style="text-align: center; ">{{ $client->id ?? ''}}</td>
-      <td style="text-align: center; ">{{ $client->name ?? ''}}</td>=
-      <td style="text-align: center; ">{{ $client->direction ?? '' }}</td>
-      <td style="text-align: center; ">{{ $client->phone1 ?? '' }}</td>
-     
-    </tr> 
-  @endforeach 
-
-  
+  <table class="table table-light2 table-bordered" id="dataTable" width="100%" cellspacing="0">
+    <thead>
+    <tr> 
+       
+       <th style="text-align: center; align: center;">N</th>  
+       <th style="text-align: center; align: center;">Nombre</th>
+        <th style="text-align: center; align: center;">Cedula o Rif</th>
+        <th style="text-align: left; align: left;">Dirección</th>
+        <th style="text-align: center; align: center;">Telefono</th>
+        <th style="text-align: center; align: center;">D.Crédito</th>
+        <th style="text-align: center; align: center;">Vendedor</th>
+    </tr>
+    </thead>
+    
+    <tbody>
+        @if (empty($clients))
+        @else  
+        <?php $cont =1; ?>
+            @foreach ($clients as $client)
+                <tr>
+                  <td style="text-align: center; align: center;">{{$cont}}</td>
+                    <td style="text-align: center; align: center;">{{$client->name}}</td>
+                    <td style="text-align: center; align: center;">{{$client->type_code}} {{$client->cedula_rif}}</td>
+                    <td style="text-align: left; align: left;">{{$client->direction}}</td>
+                    <td style="text-align: center; align: center;">{{$client->phone1}}</td>
+                    <td style="text-align: center; align: center;">{{$client->days_credit}}</td>
+                    @if (isset($client->vendors['name']))
+                        <td style="text-align: center; align: center;">{{$client->vendors['name']}} {{$client->vendors['surname']}}</td>
+                    @else
+                        <td style="text-align: center; align: center;"></td>
+                    @endif
+                </tr>     
+                <?php $cont ++;?> 
+            @endforeach   
+        @endif
+    </tbody>
 </table>
 
 </body>

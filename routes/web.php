@@ -794,6 +794,9 @@ Route::group(["prefix"=>'reports'],function(){
     Route::get('selectclient','ReportController@select_client')->name('reports.select_client');
     Route::get('selectvendor','ReportController@select_vendor')->name('reports.select_vendor');
 
+    Route::get('select_client_ne','ReportController@select_client_ne')->name('reports.select_client_ne'); //dacson nota de entrega
+    Route::get('selectvendor_ne','ReportController@select_vendor_ne')->name('reports.select_vendor_ne'); // dacson nota de entrega 
+
     Route::get('debtstopay/{id_provider?}','ReportController@index_debtstopay')->name('reports.debtstopay');
     Route::post('storedebtstopay','ReportController@store_debtstopay')->name('reports.store_debtstopay');
     Route::get('debtstopaypdf/{coin}/{date_end}/{id_provider?}','ReportController@debtstopay_pdf')->name('reports.debtstopay_pdf');
@@ -848,10 +851,9 @@ Route::group(["prefix"=>'reports'],function(){
     Route::post('storesales','ReportController@store_sales')->name('reports.store_sales');
     Route::get('salespdf/{coin}/{date_begin}/{date_end}/{name?}','ReportController@sales_pdf')->name('reports.sales_pdf');
 
-    Route::get('accountsreceivable_note/{id_client?}','ReportController@index_accounts_receivable_note')->name('reports.accounts_receivable_note'); // dacson (report note delivery)
+    Route::get('accounts_receivable_note/{typeperson}/{id_client?}','ReportController@index_accounts_receivable_note')->name('reports.accounts_receivable_note'); // dacson (report note delivery)
     Route::post('storeaccounts_receivable_note','ReportController@store_accounts_receivable_note')->name('reports.store_accounts_receivable_note'); // dacson (report note delivery)
-    //Route::get('accounts_receivable_note_pdf/{coin}/{date_end}/{typeinvoice}/{id_client?}','ReportController@accounts_receivable_note_pdf')->name('reports.accounts_receivable_note_pdf'); // dacson (report note delivery)
-    Route::get('accounts_receivable_note_pdf/{coin}/{date_end}/{typeinvoice}/{id_client?}','ReportController@accounts_receivable_note_pdf')->name('reports.accounts_receivable_note_pdf');
+    Route::get('accounts_receivable_note_pdf/{coin}/{date_end?}/{date_begin?}/{typeinvoice}/{typeperson}','ReportController@accounts_receivable_note_pdf')->name('reports.accounts_receivable_note_pdf');
 
 });
 
