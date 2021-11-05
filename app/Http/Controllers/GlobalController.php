@@ -406,7 +406,6 @@ class GlobalController extends Controller
 
     }
 
-<<<<<<< HEAD
     function asignar_payment_type($type){
       
         if($type == 1){
