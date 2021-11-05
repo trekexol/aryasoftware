@@ -215,8 +215,7 @@
 
                 <a  class="collapse-header text-danger" href="{{ route('accounts') }}">Contabilidad</a>                         
                 <a class="collapse-item" href="{{ route('reports.sales_books') }}" > <i class="fas fa-book fa-sm fa-fw mr-2 text-blue-400"></i><strong>Libro de Ventas</strong></a>                            
-                <a class="collapse-item" href="{{ route('reports.accountsreceivable_note') }}" > <i class="fas fa-book fa-sm fa-fw mr-2 text-blue-400"></i><strong>Notas de Entregas</strong></a>
-
+                <a class="collapse-item" href="{{ route('reports.accounts_receivable_note') }}" > <i class="fas fa-book fa-sm fa-fw mr-2 text-blue-400"></i><strong>Notas de Entregas</strong></a>
             </div>
 
         </div>

@@ -1,6 +1,4 @@
-
-  
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -52,7 +50,7 @@
   @endif
   <tr>
     <td style="width: 40%;">Fecha de Emisión:</td>
-    <td>{{ $quotation->date_delivery_note ?? ''}}</td>
+    <td>{{ date_format(date_create($quotation->date_delivery_note),"d-m-Y") }}</td>
     
   </tr>
   
@@ -80,7 +78,7 @@
   </tr>
   <tr>
     <td style="text-align: center;">{{ $quotation->clients['phone1'] ?? ''}}</td>
-    <td style="text-align: center;">{{ $quotation->clients['cedula_rif'] ?? ''}}</td>
+    <td style="text-align: center;">{{ $quotation->clients['type_code'] ?? ''}} {{ $quotation->clients['cedula_rif'] ?? '' }}</td>
     <td style="text-align: center;">{{ $quotation->serie }}</td>
     <td style="text-align: center;">Nota de Entrega</td>
     <td style="text-align: center;">{{ $quotation->transports['placa'] ?? '' }}</td>
@@ -117,7 +115,7 @@
 
       $total_less_percentage = (number_format(bcdiv($var->price, '1', 2),2,'.','') * $var->amount_quotation) - $percentage;
 
-      $total_less_percentage = bcdiv($total_less_percentage / ($bcv ?? 1), '1', 2);
+      $total_less_percentage = $total_less_percentage / ($bcv ?? 1);
       ?>
     <tr>
       <th style="text-align: center; font-weight: normal;">{{ $var->code_comercial }}</th>
@@ -188,7 +186,11 @@
   @endif
   <tr>
     <td style="width: 40%;">Fecha de Emisión:</td>
-    <td>{{ $quotation->date_delivery_note ?? ''}}</td>
+     @if (isset($quotation->date_delivery_note))
+    <td>{{ date_format(date_create($quotation->date_delivery_note),"d-m-Y")}}</td>
+     @else
+      <td></td>
+    @endif
     
   </tr>
   
@@ -216,7 +218,7 @@
   </tr>
   <tr>
     <td style="text-align: center;">{{ $quotation->clients['phone1'] ?? ''}}</td>
-    <td style="text-align: center;">{{ $quotation->clients['cedula_rif'] ?? ''}}</td>
+    <td style="text-align: center;">{{ $quotation->clients['type_code'] ?? ''}} {{ $quotation->clients['cedula_rif'] ?? '' }}</td>
     <td style="text-align: center;">{{ $quotation->serie }}</td>
     <td style="text-align: center;">Nota de Entrega</td>
     <td style="text-align: center;">{{ $quotation->transports['placa'] ?? '' }}</td>
@@ -253,8 +255,8 @@
 
       $total_less_percentage = (number_format($var->price,2,'.','') * $var->amount_quotation) - $percentage;
 
-      $total_less_percentage = bcdiv($total_less_percentage / ($bcv ?? 1),'1',2);
-      ?>
+      $total_less_percentage = $total_less_percentage / ($bcv ?? 1);
+            ?>
     <tr>
       <th style="text-align: center; font-weight: normal;">{{ $var->code_comercial }}</th>
       <th style="text-align: center; font-weight: normal;">{{ $var->description }}</th>
@@ -323,7 +325,11 @@
   
   <tr>
     <td style="width: 40%;">Fecha de Emisión:</td>
-    <td>{{ $quotation->date_delivery_note ?? ''}}</td>
+     @if (isset($quotation->date_delivery_note))
+    <td>{{ date_format(date_create($quotation->date_delivery_note),"d-m-Y")}}</td>
+     @else
+      <td></td>
+    @endif
     
   </tr>
   
@@ -351,7 +357,7 @@
   </tr>
   <tr>
     <td style="text-align: center;">{{ $quotation->clients['phone1'] ?? ''}}</td>
-    <td style="text-align: center;">{{ $quotation->clients['cedula_rif'] ?? ''}}</td>
+    <td style="text-align: center;">{{ $quotation->clients['type_code'] ?? ''}} {{ $quotation->clients['cedula_rif'] ?? '' }}</td>
     <td style="text-align: center;">{{ $quotation->serie }}</td>
     <td style="text-align: center;">Nota de Entrega</td>
     <td style="text-align: center;">{{ $quotation->transports['placa'] ?? '' }}</td>
@@ -388,8 +394,8 @@
 
       $total_less_percentage = (number_format($var->price,2,'.','') * $var->amount_quotation) - $percentage;
 
-      $total_less_percentage = bcdiv($total_less_percentage / ($bcv ?? 1),'1',2);
-      ?>
+      $total_less_percentage = $total_less_percentage / ($bcv ?? 1);
+            ?>
     <tr>
       <th style="text-align: center; font-weight: normal;">{{ $var->code_comercial }}</th>
       <th style="text-align: center; font-weight: normal;">{{ $var->description }}</th>
