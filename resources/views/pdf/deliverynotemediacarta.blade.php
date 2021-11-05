@@ -135,9 +135,9 @@
 
   $total_petro = $total / ($bcv ?? 1) / $company->rate_petro;
 
-  $iva = bcdiv($iva / ($bcv ?? 1),'1',2);
+  $iva = $iva / ($bcv ?? 1);
 
-  $total = bcdiv($total / ($bcv ?? 1),'1',2);
+  $total = $total / ($bcv ?? 1);
 ?>
 
 <table style="width: 100%;">
@@ -275,9 +275,9 @@
 
   $total_petro = $total / ($bcv ?? 1) / $company->rate_petro;
 
-  $iva = bcdiv($iva / ($bcv ?? 1),'1',2);
+  $iva = $iva / ($bcv ?? 1);
 
-  $total = bcdiv($total / ($bcv ?? 1),'1',2);
+  $total = $total / ($bcv ?? 1);
 ?>
 
 <table style="width: 100%;">
@@ -414,9 +414,9 @@
 
   $total_petro = $total / ($bcv ?? 1) / $company->rate_petro;
 
-  $iva = bcdiv($iva / ($bcv ?? 1),'1',2);
+  $iva = $iva / ($bcv ?? 1);
 
-  $total = bcdiv($total / ($bcv ?? 1),'1',2);
+  $total = $total / ($bcv ?? 1);
 ?>
 
 <table style="width: 100%;">
