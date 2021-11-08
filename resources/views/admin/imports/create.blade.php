@@ -15,7 +15,7 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header text-center font-weight-bold h3">Debito Fiscal IVA por Pagar</div>
+                <div class="card-header text-center font-weight-bold h3">Registro Factura Principal</div>
                 <div class="card-body">
                     <form method="POST" action="{{ route('imports.store') }}">
                         @csrf

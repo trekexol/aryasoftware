@@ -19,16 +19,16 @@
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
     <link href="{{asset('vendor/sb-admin/css/sb-admin-2.css')}}" rel="stylesheet">
-    <!--End INDEX--> 
+    <!--End INDEX-->
 
     <link href="{{asset('vendor/sb-admin/css/carlos.css')}}" rel="stylesheet">
-    
+
     <link href="{{asset('css/watch.css')}}" rel="stylesheet">
-      <!-- Custom fonts for this template TABLES-->   
-   
+      <!-- Custom fonts for this template TABLES-->
+
     <link href="{{asset('vendor/sb-admin/vendor/datatables/dataTables.bootstrap4.min.css')}}" rel="stylesheet">
-    <!--End TABLES-->   
-    
+    <!--End TABLES-->
+
 </head>
 
 <body id="page-top">
@@ -53,14 +53,14 @@
                 <!-- Begin Page Content -->
 
                 @yield('content')
-               
+
                 <!-- /.container-fluid -->
 
             </div>
             <!-- End of Main Content -->
 
             <!-- Footer -->
-            
+
             <!-- End of Footer -->
 
         </div>
@@ -99,7 +99,7 @@
          </div>
      </div>
  </div>
- 
+
 
    <!-- END SCRIPTS INDEX -->
         <!-- Bootstrap core JavaScript-->
@@ -135,16 +135,16 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js" integrity="sha512-pHVGpX7F/27yZ0ISY+VVjyULApbDlD0/X0rgGbTqCE7WFW5MezNTWG/dnhtbBuICzsd0WQPgpE4REBLv+UqChw==" crossorigin="anonymous"></script>
 
 
-  @yield('javascript1') 
-  @yield('javascript2') 
-  @yield('javascript')  
+  @yield('javascript1')
+  @yield('javascript2')
+  @yield('javascript')
   @yield('validacionbtn')
   @yield('validacionbtn2')
-  @yield('consulta')  
+  @yield('consulta')
   @yield('javascript_edit')
   @yield('js_charts')
-  
-  @yield('consultadeposito')  
+
+  @yield('consultadeposito')
 
   @yield('validacion_usuario')
 
@@ -161,38 +161,39 @@
   @yield('validacion_transport')
   @yield('validacion_vendor')
   @yield('javascript_iva_payment')
-  
+  @yield('imports')
+
   <script>
     function soloNumeros(idCampo){
     $('#'+idCampo).keyup(function (){
           this.value = (this.value + '').replace(/[^0-9]/g, '');
-      });  
+      });
     }
   </script>
   <script>
     function soloLetras(idCampo){
     $('#'+idCampo).keyup(function (){
           this.value = (this.value + '').replace(/[^a-zA-Z\s]/g, '');
-      });  
+      });
     }
   </script>
     <script>
         function soloAlfaNumerico(idCampo){
         $('#'+idCampo).keyup(function (){
               this.value = (this.value + '').replace(/[^a-zA-Z0-9\s]/g, '');
-          });  
+          });
         }
       </script>
       <script>
         function soloNumeroPunto(idCampo){
         $('#'+idCampo).keyup(function (){
               this.value = (this.value + '').replace(/[^0-9.]/g, '');
-          });  
+          });
         }
       </script>
 
 
-   
+
 </body>
 
 </html>
