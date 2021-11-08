@@ -44,8 +44,8 @@
             <div class="dropdown-menu animated--fade-in"
                 aria-labelledby="dropdownMenuButton">
                 <a onclick="export_retencion_iva();" href="#" class="dropdown-item">Retención de Iva a .txt</a> 
-                <a onclick="export_retencion_islr();"href="#" data-toggle="modal" data-target="#reportIslrModal" class="dropdown-item">Retención de ISLR a XML</a> 
-                <a onclick="pdf_media();" href="#" class="dropdown-item">Retención de Iva a Excel</a> 
+                <a href="#" data-toggle="modal" data-target="#reportIslrModal" class="dropdown-item">Retención de ISLR a XML</a> 
+                <a href="#" data-toggle="modal" data-target="#reportIvaExcelModal" class="dropdown-item">Retención de Iva a Excel</a> 
             </div>
         </div> 
       <div class="col-md-4">
@@ -139,6 +139,7 @@
     </div>
 </div>
 </form>
+
 <div class="modal fade" id="reportIslrModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -177,6 +178,60 @@
             </div>
         </div>
     </div>
+</div>
+<div class="modal fade" id="reportIvaExcelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Seleccione el periodo</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <form method="POST" action="{{ route('exportexpense.ivaExcel') }}"  >
+                @csrf
+            <div class="modal-body">
+                <div class="form-group row">
+                    <label for="date_end" class="col-sm-2 col-form-label text-md-right">Desde</label>
+    
+                    <div class="col-sm-6">
+                        <input id="date_begin" type="date" class="form-control @error('date_begin') is-invalid @enderror" name="date_begin" value="{{  $date_begin ?? $datenow ?? '' }}" required autocomplete="date_begin">
+    
+                        @error('date_begin')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="date_end" class="col-sm-2 col-form-label text-md-right">hasta </label>
+    
+                    <div class="col-sm-6">
+                        <input id="date_begin" type="date" class="form-control @error('date_end') is-invalid @enderror" name="date_end" value="{{ $date_end ?? $datenow ?? '' }}" required autocomplete="date_end">
+    
+                        @error('date_end')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div>
+                </div>
+               
+                <div class="modal-footer">
+                    <div class="form-group col-sm-2">
+                        <button type="submit" class="btn btn-info" title="Buscar">Enviar</button>  
+                    </div>
+            </form>
+                    <div class="offset-sm-2 col-sm-3">
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+   
 @endsection
 
 @section('javascript')
@@ -207,11 +262,6 @@
             
     }
 
-   /* function export_retencion_islr() 
-    {
-        window.location = "{{ route('exportexpense.islrXml') }}";
-            
-    }*/
 </script>
     
 @endsection

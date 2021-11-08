@@ -663,7 +663,7 @@ Route::group(["prefix"=>'expensesandpurchases'],function(){
 
     Route::get('reversarcompra/{id_expense}','ExpensesAndPurchaseController@reversar_expense')->name('expensesandpurchases.reversar_expense');
 
-    Route::get('notadeentrega/{id_expense}/{coin}','ExpensesAndPurchaseController@createdeliverynote')->name('expensesandpurchases.createdeliverynote');
+    Route::get('notadeentregaexpense/{id_expense}/{coin}','ExpensesAndPurchaseController@createdeliverynote')->name('expensesandpurchases.createdeliverynote');
     Route::get('indexnotasdeentrega/','ExpensesAndPurchaseController@index_delivery_note')->name('expensesandpurchases.indexdeliverynote');
 
    });
@@ -947,5 +947,6 @@ Route::group(["prefix"=>'reportspayment'],function(){
 
 Route::group(["prefix"=>'exportexpense'],function(){
     Route::get('retencionivatxt','ExportExpenseController@ivaTxt')->name('exportexpense.ivaTxt');
-    Route::get('retencionislrxml','ExportExpenseController@islrXml')->name('exportexpense.islrXml');
+    Route::post('retencionislrxml','ExportExpenseController@islrXml')->name('exportexpense.islrXml');
+    Route::post('retencionivaexcel','ExportExpenseController@ivaExcel')->name('exportexpense.ivaExcel');
 });
