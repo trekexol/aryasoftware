@@ -29,8 +29,8 @@ class ExportExpenseController extends Controller
                 $total_retiene_iva = $this->calculatarTotalProductosSinIva($expense);
                 
                 $content .= $company->code_rif.'	'.$expense->date->format('Ym').'  '.$expense->date->format('Y-m-d').'	C	01	'
-                .$expense->providers['code_provider'].'	'.$expense->invoice.'	'.$expense->serie.'	 '.$expense->amount_with_iva.'	 '.$expense->base_imponible
-                .'	 '.$expense->retencion_iva.'	 0'.$expense->id.'  '.$total_retiene_iva.'	 '.$expense->iva_percentage.'    0';
+                .$expense->providers['code_provider'].'	'.$expense->invoice.'  '.$expense->serie.'  '.$expense->amount_with_iva.'  '.$expense->base_imponible
+                .'  '.$expense->retencion_iva.'	 0	'.$expense->date->format('Ym').str_pad($expense->id, 8, "0", STR_PAD_LEFT).'  '.$total_retiene_iva.'  '.$expense->iva_percentage.'  0';
                 $content .= "\n";
             }    
         }else{
@@ -47,6 +47,50 @@ class ExportExpenseController extends Controller
         'Content-Disposition' => sprintf('attachment; filename="%s"', $fileName),
         'Content-Length' => strlen($content)]);
    }
+
+
+   public function islrXml() 
+   {
+        $content = "";
+        $total_retiene_iva = 0;
+        $date = Carbon::now();
+        $company = Company::on(Auth::user()->database_name)->first();
+        $expenses = ExpensesAndPurchase::on(Auth::user()->database_name)->where('retencion_iva','<>',0)->get();
+        if(isset($expenses)){
+            foreach ($expenses as  $expense) {
+                $expense->date = Carbon::parse($expense->date);
+                $total_retiene_iva = $this->calculatarTotalProductosSinIva($expense);
+                
+                $content .= '<?xml version="1.0" encoding="UTF-8"?>
+                <RelacionRetencionesISLR RifAgente="'.$company->code_rif.'" Periodo="'.$expense->date->format('Ym').'">
+                 <DetalleRetencion>
+                  <RifRetenido>'.$expense->providers['code_provider'].'</RifRetenido>
+                  <NumeroFactura>'.$expense->invoice.'</NumeroFactura>
+                  <NumeroControl>'.$expense->serie.'</NumeroControl>
+                  <FechaOperacion>'.$expense->date->format('d/m/Y').'</FechaOperacion>
+                  <CodigoConcepto>'.$expense->id_islr_concept.'</CodigoConcepto>
+                  <MontoOperacion>'.$expense->base_imponible.'</MontoOperacion>
+                  <PorcentajeRetencion>'.$expense->islr_concepts['value'].'</PorcentajeRetencion>
+                 </DetalleRetencion>
+                </RelacionRetencionesISLR>';
+
+            }    
+        }else{
+            $content = "No hay Compras con Retencion de ISLR";
+        }
+        
+        // file name to download
+        $fileName = "retencionislr.xml";
+
+      
+        // make a response, with the content, a 200 response code and the headers
+        return Response::make($content, 200, [
+        'Content-type' => 'text/plain', 
+        'Content-Disposition' => sprintf('attachment; filename="%s"', $fileName),
+        'Content-Length' => strlen($content)]);
+   }
+
+   
 
 
    public function calculatarTotalProductosSinIva($expense)

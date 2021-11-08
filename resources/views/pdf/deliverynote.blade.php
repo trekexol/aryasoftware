@@ -133,13 +133,13 @@
 <?php
   $iva = ($quotation->base_imponible * $quotation->iva_percentage)/100;
 
-  $total = $quotation->total_factura + $iva;
+  $total_bs = $quotation->total_factura + $iva;
 
-  $total_petro = $total / ($bcv ?? 1) / $company->rate_petro;
+  $total_petro = $total_bs / ($bcv ?? 1) / $company->rate_petro;
 
   $iva = $iva / ($bcv ?? 1);
 
-  $total = $total / ($bcv ?? 1);
+  $total = $total_bs / ($bcv ?? 1);
 ?>
 
 <table style="width: 100%;">
@@ -159,13 +159,28 @@
     <th style="text-align: right; font-weight: normal; width: 79%; border-bottom-color: white;">I.V.A.{{ $quotation->iva_percentage }}%</th>
     <th style="text-align: right; font-weight: normal; width: 21%;">{{ number_format($iva, 2, ',', '.') }}</th>
   </tr> 
-  <tr>
-    <th style="text-align: right; font-weight: normal; width: 79%; border-bottom-color: white;">MONTO TOTAL</th>
-    <th style="text-align: right; font-weight: normal; width: 21%;">{{ number_format($total, 2, ',', '.') }}</th>
-  </tr> 
-  <tr>
-    <th style="text-align: right; font-weight: normal; width: 79%; border-bottom-color: white; font-size: small;">MONTO TOTAL Petro</th>
-    <th style="text-align: right; font-weight: normal; width: 21%;">{{ number_format($total_petro, 6, ',', '.') }}</th>
+ 
+  
+    @if (isset($coin) && ($coin == 'bolivares'))
+      <tr>
+        <th style="text-align: right; font-weight: normal; width: 79%; border-bottom-color: white;">TOTAL Bs</th>
+        <th style="text-align: right; font-weight: normal; width: 21%;">{{ number_format($total, 2, ',', '.') }}</th>
+      </tr> 
+      <tr>
+        <th style="text-align: right; font-weight: normal; width: 79%; border-bottom-color: white; font-size: small;">TOTAL $</th>
+        <th style="text-align: right; font-weight: normal; width: 21%;">{{ number_format($total / $quotation->bcv, 2, ',', '.') }}</th>
+      </tr> 
+    @else
+      <tr>
+        <th style="text-align: right; font-weight: normal; width: 79%; border-bottom-color: white;">TOTAL $</th>
+        <th style="text-align: right; font-weight: normal; width: 21%;">{{ number_format($total, 2, ',', '.') }}</th>
+      </tr> 
+      <tr>
+        <th style="text-align: right; font-weight: normal; width: 79%; border-bottom-color: white;">TOTAL Bs</th>
+        <th style="text-align: right; font-weight: normal; width: 21%;">{{ number_format($total_bs, 2, ',', '.') }}</th>
+      </tr> 
+    @endif
+    
   </tr> 
   <tr>
     <th style="text-align: left; font-weight: normal; width: 79%; border-top-color: rgb(17, 9, 9); border-right-color: white; font-size: small;"><pre>NOTA DE ENTREGA        </pre></th>

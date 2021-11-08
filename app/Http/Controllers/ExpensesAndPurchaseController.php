@@ -57,10 +57,12 @@ class ExpensesAndPurchaseController extends Controller
         $expensesandpurchases = ExpensesAndPurchase::on(Auth::user()->database_name)->orderBy('id' ,'DESC')
                                                     ->where('amount_with_iva','<>',null)
                                                     ->get();
+        
+        $date = Carbon::now();
+        $datenow = $date->format('Y-m-d');  
 
-       
 
-       return view('admin.expensesandpurchases.index_historial',compact('expensesandpurchases'));
+       return view('admin.expensesandpurchases.index_historial',compact('expensesandpurchases','datenow'));
    }
 
 
