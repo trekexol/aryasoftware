@@ -14,6 +14,7 @@ use App\Quotation;
 use App\QuotationPayment;
 use App\QuotationProduct;
 use App\Transport;
+use App\UserAccess;
 use App\Vendor;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -23,26 +24,32 @@ use Illuminate\Support\Facades\Auth;
 
 class QuotationController extends Controller
 {
+    public $global;
+    public $modulo = 'Cotizacion';
+
  
     public function __construct(){
 
        $this->middleware('auth');
+       $this->global = new GlobalController();
    }
-
-   
 
    public function index()
    {
-       $user       =   auth()->user();
-       $users_role =   $user->role_id;
-       
-        $quotations = Quotation::on(Auth::user()->database_name)->orderBy('id' ,'DESC')
-                                ->where('date_billing','=',null)
-                                ->where('date_delivery_note','=',null)
-                                ->where('date_order','=',null)
-                                ->get();
         
-       return view('admin.quotations.index',compact('quotations'));
+        if($this->global->validate_user_access($this->modulo)){
+            $quotations = Quotation::on(Auth::user()->database_name)->orderBy('id' ,'DESC')
+            ->where('date_billing','=',null)
+            ->where('date_delivery_note','=',null)
+            ->where('date_order','=',null)
+            ->get();
+
+            return view('admin.quotations.index',compact('quotations'));
+        }else{
+            return redirect('/home')->withDanger('No tiene Acceso al modulo de '.$this->modulo);
+        }
+
+      
    }
 
    /**

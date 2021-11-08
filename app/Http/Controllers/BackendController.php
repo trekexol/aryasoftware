@@ -96,7 +96,7 @@ class BackendController extends Controller
 
             //return view('admin/home');
         }else{
-            return view('admin.quotations.index');
+            return view('admin.page_home');
         }
     }
 

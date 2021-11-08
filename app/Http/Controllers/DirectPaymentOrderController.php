@@ -75,7 +75,7 @@ class DirectPaymentOrderController extends Controller
             
         
             'account'        =>'required',
-            'Subcontrapartida'  =>'required',
+            'Account_counterpart'  =>'required',
 
             'beneficiario'      =>'required',
             'Subbeneficiario'      =>'required',
@@ -89,7 +89,7 @@ class DirectPaymentOrderController extends Controller
         ]);
         //dd($request);
         $account = request('account');
-        $contrapartida = request('Subcontrapartida');
+        $contrapartida = request('Account_counterpart');
         $coin = request('coin');
 
         if($account != $contrapartida){
