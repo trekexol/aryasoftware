@@ -269,7 +269,7 @@ class PDFController extends Controller
                 $company = Company::on(Auth::user()->database_name)->find(1);
                 
                 $pdf = $pdf->loadView('pdf.deliverynote',compact('quotation','inventories_quotations','bcv','company'
-                                                                ,'total_retiene_iva','total_retiene_islr'));
+                                                                ,'total_retiene_iva','total_retiene_islr','coin'));
                 return $pdf->stream();
          
             }else{
