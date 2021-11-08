@@ -18,13 +18,21 @@ use Illuminate\Support\Facades\Auth;
 
 class ExportExpenseController extends Controller
 {
-    public function ivaTxt() 
-   {
+    public function ivaTxt(Request $request) 
+    {
+        $date_begin = Carbon::parse(request('date_begin'))->format('Y-m-d');
+        $date_end = Carbon::parse(request('date_end'))->format('Y-m-d');
+
         $content = "";
         $total_retiene_iva = 0;
         $date = Carbon::now();
         $company = Company::on(Auth::user()->database_name)->first();
-        $expenses = ExpensesAndPurchase::on(Auth::user()->database_name)->where('retencion_iva','<>',0)->get();
+        $expenses = ExpensesAndPurchase::on(Auth::user()->database_name)
+                                        ->where('retencion_iva','<>',0)
+                                        ->whereRaw(
+                                            "(DATE_FORMAT(date, '%Y-%m-%d') >= ? AND DATE_FORMAT(date, '%Y-%m-%d') <= ?)", 
+                                            [$date_begin, $date_end])
+                                            ->get();
         if(isset($expenses)){
             foreach ($expenses as  $expense) {
                 $expense->date = Carbon::parse($expense->date);

@@ -946,7 +946,7 @@ Route::group(["prefix"=>'reportspayment'],function(){
 
 
 Route::group(["prefix"=>'exportexpense'],function(){
-    Route::get('retencionivatxt','ExportExpenseController@ivaTxt')->name('exportexpense.ivaTxt');
+    Route::post('retencionivatxt','ExportExpenseController@ivaTxt')->name('exportexpense.ivaTxt');
     Route::post('retencionislrxml','ExportExpenseController@islrXml')->name('exportexpense.islrXml');
     Route::post('retencionivaexcel','ExportExpenseController@ivaExcel')->name('exportexpense.ivaExcel');
 });
