@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Company;
 use App\ExpensesAndPurchase;
 use App\ExpensesDetail;
+use App\Exports\ExpensesExport;
+use App\Exports\ExpensesExportFromView;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
@@ -16,13 +18,21 @@ use Illuminate\Support\Facades\Auth;
 
 class ExportExpenseController extends Controller
 {
-    public function ivaTxt() 
-   {
+    public function ivaTxt(Request $request) 
+    {
+        $date_begin = Carbon::parse(request('date_begin'))->format('Y-m-d');
+        $date_end = Carbon::parse(request('date_end'))->format('Y-m-d');
+
         $content = "";
         $total_retiene_iva = 0;
         $date = Carbon::now();
         $company = Company::on(Auth::user()->database_name)->first();
-        $expenses = ExpensesAndPurchase::on(Auth::user()->database_name)->where('retencion_iva','<>',0)->get();
+        $expenses = ExpensesAndPurchase::on(Auth::user()->database_name)
+                                        ->where('retencion_iva','<>',0)
+                                        ->whereRaw(
+                                            "(DATE_FORMAT(date, '%Y-%m-%d') >= ? AND DATE_FORMAT(date, '%Y-%m-%d') <= ?)", 
+                                            [$date_begin, $date_end])
+                                            ->get();
         if(isset($expenses)){
             foreach ($expenses as  $expense) {
                 $expense->date = Carbon::parse($expense->date);
@@ -49,13 +59,26 @@ class ExportExpenseController extends Controller
    }
 
 
-   public function islrXml() 
+   public function islrXml(Request $request) 
    {
+        $date = request('date_begin');
+       
+        $date_new_begin = Carbon::parse($date)->startOfMonth()->format('Y-m-d');
+
+        $date_new_end = Carbon::parse($date)->endOfMonth()->format('Y-m-d');
+
+        
         $content = "";
         $total_retiene_iva = 0;
         $date = Carbon::now();
         $company = Company::on(Auth::user()->database_name)->first();
-        $expenses = ExpensesAndPurchase::on(Auth::user()->database_name)->where('retencion_iva','<>',0)->get();
+        
+        $expenses = ExpensesAndPurchase::on(Auth::user()->database_name)
+                                        ->where('retencion_iva','<>',0)
+                                        ->whereRaw(
+                                            "(DATE_FORMAT(date, '%Y-%m-%d') >= ? AND DATE_FORMAT(date, '%Y-%m-%d') <= ?)", 
+                                            [$date_new_begin, $date_new_end])
+                                        ->get();
         if(isset($expenses)){
             foreach ($expenses as  $expense) {
                 $expense->date = Carbon::parse($expense->date);
@@ -90,7 +113,18 @@ class ExportExpenseController extends Controller
         'Content-Length' => strlen($content)]);
    }
 
-   
+   public function ivaExcel(Request $request) 
+   {
+        $date_begin = Carbon::parse(request('date_begin'));
+        $date_end = Carbon::parse(request('date_end'));
+
+        
+        $export = new ExpensesExportFromView($date_begin,$date_end);
+
+        $export->view();       
+        
+        return Excel::download($export, 'plantilla_compras.xlsx');
+   }
 
 
    public function calculatarTotalProductosSinIva($expense)
@@ -103,4 +137,6 @@ class ExportExpenseController extends Controller
 
         return bcdiv($request->total, '1', 2);
    }
+
+   
 }

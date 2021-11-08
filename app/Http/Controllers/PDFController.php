@@ -259,6 +259,7 @@ class PDFController extends Controller
                     }
                 }else{
                     $bcv = null;
+                    $coin = 'bolivares';
                 }
 
 
