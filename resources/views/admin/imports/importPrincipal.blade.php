@@ -106,7 +106,8 @@
                                     </div>
                                     <button type="submit" class="btn btn-primary ">Calcular</button>
                                 </div>
-
+                                <input type="text" name="total_1" value="{{ $total }}" >
+                                <input  type="text"name="total_2" value="{{$resultado}}" >
                             </div>
                         </form>
                 </div>
@@ -145,17 +146,19 @@
 
                             @if (empty($expenses_imports))
                             @else
-                                @foreach($expenses_imports as $expenses_import)
 
-                                    <tr>
-                                        <td class="text-center">{{$expenses_import->description}}</td>
-                                        <td class="text-center">{{$expenses_import->price}}</td>
-                                        <td class="text-center">{{$expenses_import->amount}}</td>
-                                        <td class="text-center">{{$expenses_import->amount * $expenses_import->price }}</td>
-                                        <td class="text-center">{{( $resultado / $total_import )  * $expenses_import->amount * $expenses_import->price  / $expenses_import->amount}} </td>
-                                        <td> <input type="text" id="ope_id" name="ope_id" value="{{  (( $resultado / $total_import )  * $expenses_import->amount * $expenses_import->price  / $expenses_import->amount) +(($resultado / $total_import )  * $expenses_import->amount * $expenses_import->price  / $expenses_import->amount * $import->porcentaje_general   / 100) }}"></td>
-                                    </tr>
-                                @endforeach
+
+                            @foreach($expenses_imports as $expenses_import)
+
+                                <tr>
+                                    <td class="text-center">{{$expenses_import->description}}</td>
+                                    <td class="text-center">{{$expenses_import->price}}</td>
+                                    <td class="text-center">{{$expenses_import->amount}}</td>
+                                    <td class="text-center">{{$expenses_import->amount * $expenses_import->price }}</td>
+                                    <td class="text-center">{{ ($resultado / $total) * $expenses_import->price    }} </td>
+                                    <td> <input type="text" id="ope_id" name="ope_id" value="{{  ($resultado / $total)  * $expenses_import->price  * $import->porcentaje_general / 100      }}"></td>
+                                </tr>
+                            @endforeach
                             @endif
                             </tbody>
                         </table>

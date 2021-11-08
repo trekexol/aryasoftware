@@ -170,7 +170,6 @@ class ImportController extends Controller
 
         $import_quotation   =$import->id;
         $import_details     =   ImportDetail::on(Auth::user()->database_name)->where('id_import',$id)->get();
-
         $import_expense    =   ExpensesAndPurchase::on(Auth::user()->database_name)->where('id', $import->id_purchases)->get()->first();
         $expenses_imports           =   ExpensesDetail::on(Auth::user()->database_name)->where('id_expense', $import_expense->id)->get();
         foreach ($import_details as $import_detail ){
@@ -187,10 +186,9 @@ class ImportController extends Controller
 
         }
 
-        $total_import = 0;
+        $total = 0;
         foreach ($expenses_imports as $expenses_import ){
-            $total_import += ($expenses_import->price * $expenses_import->amount);
-
+            $total += ($expenses_import->price * $expenses_import->amount);
             $inventories_import_expenses = DB::connection(Auth::user()->database_name)->table('products')->join('inventories', 'products.id', '=', 'inventories.product_id')
                 ->join('expenses_details', 'inventories.id', '=', 'expenses_details.id_inventory')
                 ->where('expenses_details.id_expense',$expenses_import->id)
@@ -201,51 +199,20 @@ class ImportController extends Controller
         }
 
 
-
-        $total= 0;
-        $base_imponible= 0;
-
-        //este es el total que se usa para guardar el monto de todos los productos que estan exentos de iva, osea retienen iva
-        $total_retiene_iva = 0;
-        $retiene_iva = 0;
-
-        $total_retiene_islr = 0;
-        $retiene_islr = 0;
-
-        foreach($inventories_expenses as $var){
+        $total_gasto = 0;
+        foreach($expenses as $var){
             //Se calcula restandole el porcentaje de descuento (discount)
 
-            $total += ($var->price * $var->amount_expense);
+            $total_gasto += ($var->price * $var->amount);
             //-----------------------------
-
-            if($var->retiene_iva_expense == 0){
-
-                $base_imponible += ($var->price * $var->amount_expense);
-
-            }else{
-                $retiene_iva += ($var->price * $var->amount_expense);
-            }
-
-            if($var->retiene_islr_expense == 1){
-
-                $retiene_islr += ($var->price * $var->amount_expense);
-
-            }
-
-
 
         }
 
-        $expenses->total_factura = $total;
-        $expenses->base_imponible = $base_imponible;
-
-
-        $resultado = $total + $total_import;
-
+        $resultado = $total + $total_gasto;
             $date = Carbon::now();
             $datenow = $date->format('Y-m-d');
 
-            return view('admin.imports.importPrincipal',compact('import_quotation','import','import_details','inventories_import_expenses','expenses','expenses_imports','import_expense','resultado','total_import'));
+            return view('admin.imports.importPrincipal',compact('import_quotation','import','import_details','inventories_import_expenses','expenses','expenses_imports','import_expense','resultado','total_gasto','total'));
 
         //  return view('admin.imports.importdetails',compact('quotations','imports','importDetails'));
     }
@@ -286,6 +253,12 @@ class ImportController extends Controller
     public function calcularfiltro(Request $request, $id)
     {
 
+        $total_pricipal =  request('total_1');
+        $resultado_total =  request('total_2');
+
+
+
+
         $imports = Import::on(Auth::user()->database_name)->findOrFail($id);
         $imports->porcentaje_general = request('Precio');
         $imports->save();
@@ -314,10 +287,6 @@ class ImportController extends Controller
                 ->get();
 
         }
-
-
-
-
 
         $total= 0;
         $base_imponible= 0;
@@ -370,32 +339,28 @@ class ImportController extends Controller
         }
 
         $resultado = $total + $total_import;
-
         foreach ($expenses_imports2 as $expenses_import2 ){
+
 
             $inventories_import_expenses2 = DB::connection(Auth::user()->database_name)->table('products')->join('inventories', 'products.id', '=', 'inventories.product_id')
                 ->join('expenses_details', 'inventories.id', '=', 'expenses_details.id_inventory')
-                ->where('expenses_details.id_expense',$expenses_import2->id)
+                ->where('expenses_details.id_expense',$expenses_import2->id_expense)
                 ->select('products.*','expenses_details.price as price','expenses_details.rate as rate',
                     'expenses_details.amount as amount_expense','expenses_details.exento as retiene_iva_expense'
                     ,'expenses_details.islr as retiene_islr_expense')
                 ->get();
-
-
            foreach ($inventories_import_expenses2 as $inventories_import_expenses){
-               $venta =  (( $resultado / $total_import )  * $expenses_import2->amount * $expenses_import2->price  / $expenses_import2->amount) +(($resultado / $total_import )  * $expenses_import2->amount * $expenses_import2->price  / $expenses_import2->amount * $import->porcentaje_general   / 100);
-               $compra  = ( $resultado / $total_import )  * $expenses_import2->amount * $expenses_import2->price  / $expenses_import2->amount;
+
+
+
+               $venta =  ( $resultado_total/ $total_pricipal )  * $inventories_import_expenses->price * $import->porcentaje_general / 100  ;
+               $compra  = ( $resultado_total / $total_pricipal )  * $expenses_import2->amount * $inventories_import_expenses->price  / $expenses_import2->amount;
                $var = Product::on(Auth::user()->database_name)->findOrFail($inventories_import_expenses->id);
                $var->price =   $venta;
                $var->price_buy = $compra;
                $var->save();
            }
         }
-
-
-        $expenses->total_factura = $total;
-        $expenses->base_imponible = $base_imponible;
-
         return redirect()->route('imports.calcular',$id);
     }
 
