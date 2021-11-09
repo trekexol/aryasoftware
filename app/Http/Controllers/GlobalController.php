@@ -526,20 +526,5 @@ class GlobalController extends Controller
         return date('Y-m-').'01';
     }  
 
-    public function validate_user_access($modulo_verification){
-
-        $user       =   auth()->user();
-
-        if(isset($user->role_id) && ($user->role_id != '1')){
-            $validate_user_access = UserAccess::on('logins')
-            ->where('modulo',$modulo_verification)
-            ->where('id_user',$user->id)
-            ->first();
-        }else{
-            return true;
-        }
-
-        return false;
-    }
-
+   
 }

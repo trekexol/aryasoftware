@@ -94,7 +94,7 @@ class BackendController extends Controller
             ,'account_costos','account_gastos','account_cuentas_por_pagar','account_cuentas_por_cobrar','account_prestamos'
             ,'account_banco1','account_banco1_name','account_banco2','account_banco2_name','account_banco3','account_banco3_name'));
 
-            //return view('admin/home');
+           
         }else{
             return view('admin.page_home');
         }

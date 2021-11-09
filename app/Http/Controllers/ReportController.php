@@ -27,6 +27,7 @@ class ReportController extends Controller
     public function index()
     {
         
+        
         $user       =   auth()->user();
         $users_role =   $user->role_id;
         if($users_role == '1'){
@@ -69,6 +70,8 @@ class ReportController extends Controller
     
     public function index_accounts_receivable($typeperson,$id_client_or_vendor = null)
     {
+
+        
         
         $user       =   auth()->user();
         $users_role =   $user->role_id;
@@ -314,7 +317,6 @@ class ReportController extends Controller
     }
      
     public function index_accounts_receivable_note($typeperson,$id_client_or_vendor = null,$date_end = null,$typeinvoice = 'notas')
-    //return view('admin.reports.index_accounts_receivable_note',compact('coin','date_end','date_begin','datenow','typeinvoice','vendor','typeperson'));
     {
         $global = new GlobalController();
         $fecha_frist = $global->data_first_month_day();            
@@ -415,6 +417,21 @@ class ReportController extends Controller
         }
 
         return view('admin.reports.index_debtstopay',compact('date_end','provider','coin'));
+    }
+
+    public function store_accounts(Request $request)
+    {
+        
+        $client = null;
+        $date_begin = request('date_begin');
+        $date_end = request('date_end');
+        $level = request('level');
+        
+        if(isset($request->id_client)){
+            $client = Client::on(Auth::user()->database_name)->find($request->id_client);
+        }
+        
+        return view('admin.reports.index_accounts',compact('client','date_begin','date_end','level'));
     }
 
     public function store_bankmovements(Request $request)

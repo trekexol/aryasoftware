@@ -7,6 +7,7 @@ use App\Client;
 use App\Company;
 use App\DetailVoucher;
 use App\Exports\ProductsExport;
+use App\Http\Controllers\UserAccess\UserAccessController;
 use App\Inventory;
 use App\Multipayment;
 use App\Product;
@@ -24,20 +25,20 @@ use Illuminate\Support\Facades\Auth;
 
 class QuotationController extends Controller
 {
-    public $global;
+    public $userAccess;
     public $modulo = 'Cotizacion';
 
  
     public function __construct(){
 
        $this->middleware('auth');
-       $this->global = new GlobalController();
+       $this->userAccess = new UserAccessController();
    }
 
    public function index()
    {
         
-        if($this->global->validate_user_access($this->modulo)){
+        //if($this->global->validate_user_access($this->modulo)){
             $quotations = Quotation::on(Auth::user()->database_name)->orderBy('id' ,'DESC')
             ->where('date_billing','=',null)
             ->where('date_delivery_note','=',null)
@@ -45,9 +46,9 @@ class QuotationController extends Controller
             ->get();
 
             return view('admin.quotations.index',compact('quotations'));
-        }else{
+       /* }else{
             return redirect('/home')->withDanger('No tiene Acceso al modulo de '.$this->modulo);
-        }
+        }*/
 
       
    }
