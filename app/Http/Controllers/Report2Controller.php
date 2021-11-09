@@ -13,6 +13,7 @@ use App\Company;
 use App\DetailVoucher;
 use App\Employee;
 use App\ExpensesAndPurchase;
+use App\Http\Controllers\UserAccess\UserAccessController;
 use App\Product;
 use App\Provider;
 use App\Quotation;
@@ -22,8 +23,18 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 
-class ReportController extends Controller
+class Report2Controller extends Controller
 {
+    public $userAccess;
+    public $modulo = 'Cotizacion';
+
+ 
+    public function __construct(){
+
+       $this->middleware('auth');
+       $this->userAccess = new UserAccessController();
+   }
+
     public function index()
     {
         
@@ -70,12 +81,7 @@ class ReportController extends Controller
     
     public function index_accounts_receivable($typeperson,$id_client_or_vendor = null)
     {
-
-        
-        
-        $user       =   auth()->user();
-        $users_role =   $user->role_id;
-        if($users_role == '1'){
+        if($this->userAccess->validate_user_access($this->modulo)){
             $date = Carbon::now();
             $datenow = $date->format('Y-m-d');   
             $client = null; 
@@ -92,22 +98,16 @@ class ReportController extends Controller
                 }
             }
             
-            
-
-        }elseif($users_role == '2'){
-            return view('admin.index');
+            return view('admin.reports.index_accounts_receivable',compact('client','datenow','typeperson','vendor'));
+        }else{
+            return redirect('/home')->withDanger('No tiene Acceso al modulo de '.$this->modulo);
         }
-
-        return view('admin.reports.index_accounts_receivable',compact('client','datenow','typeperson','vendor'));
-      
     }
 
     public function index_debtstopay($id_provider = null)
     {
         
-        $user       =   auth()->user();
-        $users_role =   $user->role_id;
-        if($users_role == '1'){
+        if($this->userAccess->validate_user_access($this->modulo)){
             $date = Carbon::now();
             $datenow = $date->format('Y-m-d');   
             $provider = null; 
@@ -115,10 +115,8 @@ class ReportController extends Controller
             if(isset($id_provider)){
                 $provider    = Provider::on(Auth::user()->database_name)->find($id_provider);
             }
-            
-
-        }elseif($users_role == '2'){
-            return view('admin.index');
+        }else{
+            return redirect('/home')->withDanger('No tiene Acceso al modulo de '.$this->modulo);
         }
 
         return view('admin.reports.index_debtstopay',compact('provider','datenow'));

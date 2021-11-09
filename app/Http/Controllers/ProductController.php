@@ -7,7 +7,7 @@ use App\Product;
 use App\Segment;
 use App\Subsegment;
 use App\ThreeSubsegment;
-use App\TwoSubSegment;
+use App\TwoSubsegment;
 use App\UnitOfMeasure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

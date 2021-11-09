@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Client;
+use App\Http\Controllers\UserAccess\UserAccessController;
 use App\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -10,18 +11,26 @@ use Illuminate\Support\Facades\Auth;
 class ClientController extends Controller
 {
  
+    public $userAccess;
+    public $modulo = 'Cotizacion';
+
     public function __construct(){
 
-       $this->middleware('auth');
-   }
+        $this->middleware('auth');
+        $this->userAccess = new UserAccessController();
+    }
 
    public function index()
    {
-       $user= auth()->user();
+        if($this->userAccess->validate_user_access($this->modulo)){
+            $user= auth()->user();
 
-       $clients = Client::on(Auth::user()->database_name)->orderBy('id' ,'DESC')->get();
-       
-       return view('admin.clients.index',compact('clients'));
+            $clients = Client::on(Auth::user()->database_name)->orderBy('id' ,'DESC')->get();
+            
+            return view('admin.clients.index',compact('clients'));
+        }else{
+            return redirect('/home')->withDanger('No tiene Acceso al modulo de '.$this->modulo);
+        }
    }
 
    /**

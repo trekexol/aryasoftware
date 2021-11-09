@@ -38,7 +38,7 @@ class QuotationController extends Controller
    public function index()
    {
         
-        //if($this->global->validate_user_access($this->modulo)){
+        if($this->userAccess->validate_user_access($this->modulo)){
             $quotations = Quotation::on(Auth::user()->database_name)->orderBy('id' ,'DESC')
             ->where('date_billing','=',null)
             ->where('date_delivery_note','=',null)
@@ -46,9 +46,9 @@ class QuotationController extends Controller
             ->get();
 
             return view('admin.quotations.index',compact('quotations'));
-       /* }else{
+        }else{
             return redirect('/home')->withDanger('No tiene Acceso al modulo de '.$this->modulo);
-        }*/
+        }
 
       
    }
@@ -130,6 +130,8 @@ class QuotationController extends Controller
 
     public function create($id_quotation,$coin)
     {
+        
+        if($this->userAccess->validate_user_access($this->modulo)){
             $quotation = null;
                 
             if(isset($id_quotation)){
@@ -179,7 +181,9 @@ class QuotationController extends Controller
                 return redirect('/quotations')->withDanger('No es posible ver esta cotizacion');
             } 
             
-
+        }else{
+            return redirect('/home')->withDanger('No tiene Acceso al modulo de '.$this->modulo);
+        }
 
     }
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\ComisionType;
 use App\Employee;
 use App\Estado;
+use App\Http\Controllers\UserAccess\UserAccessController;
 use App\Municipio;
 use App\Parroquia;
 use App\User;
@@ -15,19 +16,27 @@ use Illuminate\Support\Facades\Auth;
 class VendorController extends Controller
 {
  
+    public $userAccess;
+    public $modulo = 'Cotizacion';
+
     public function __construct(){
 
-       $this->middleware('auth');
-   }
+        $this->middleware('auth');
+        $this->userAccess = new UserAccessController();
+    }
 
    public function index()
    {
-       $user       =   auth()->user();
-       $users_role =   $user->role_id;
-       
-        $vendors = Vendor::on(Auth::user()->database_name)->orderBy('id' ,'DESC')->get();
-       
-       return view('admin.vendors.index',compact('vendors'));
+        if($this->userAccess->validate_user_access($this->modulo)){
+            $user       =   auth()->user();
+            $users_role =   $user->role_id;
+            
+                $vendors = Vendor::on(Auth::user()->database_name)->orderBy('id' ,'DESC')->get();
+            
+            return view('admin.vendors.index',compact('vendors'));
+        }else{
+            return redirect('/home')->withDanger('No tiene Acceso al modulo de '.$this->modulo);
+        }
    }
 
    /**

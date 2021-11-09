@@ -734,9 +734,9 @@ Route::group(["prefix"=>'pdfnomina'],function(){
  });
 
  Route::group(["prefix"=>'balancegenerals'],function(){
-    Route::get('balancegeneral','ReportController@index')->name('balancegenerals');
-    Route::post('store','ReportController@store')->name('balancegenerals.store');
-    Route::get('balancepdf/{date_begin?}/{date_end?}/{level?}/{coin?}','ReportController@balance_pdf')->name('balancegenerals.balance_pdf');
+    Route::get('balancegeneral','Report2Controller@index')->name('balancegenerals');
+    Route::post('store','Report2Controller@store')->name('balancegenerals.store');
+    Route::get('balancepdf/{date_begin?}/{date_end?}/{level?}/{coin?}','Report2Controller@balance_pdf')->name('balancegenerals.balance_pdf');
 
 });
 
@@ -769,9 +769,9 @@ Route::group(["prefix"=>'threesubsegments'],function(){
 });
 
 Route::group(["prefix"=>'balanceingresos'],function(){
-    Route::get('balance','ReportController@index_ingresos')->name('balanceingresos');
-    Route::post('store','ReportController@store_ingresos')->name('balanceingresos.store');
-    Route::get('balancepdf/{coin?}/{date_begin?}/{date_end?}/{level?}','ReportController@balance_ingresos_pdf')->name('balanceingresos.balance_pdf');
+    Route::get('balance','Report2Controller@index_ingresos')->name('balanceingresos');
+    Route::post('store','Report2Controller@store_ingresos')->name('balanceingresos.store');
+    Route::get('balancepdf/{coin?}/{date_begin?}/{date_end?}/{level?}','Report2Controller@balance_ingresos_pdf')->name('balanceingresos.balance_pdf');
 
 });
 
@@ -787,73 +787,73 @@ Route::group(["prefix"=>'daily_listing'],function(){
 
 
 Route::group(["prefix"=>'reports'],function(){
-    Route::get('accountsreceivable/{typeperson}/{id_client?}','ReportController@index_accounts_receivable')->name('reports.accounts_receivable');
-    Route::post('storeaccounts_receivable','ReportController@store_accounts_receivable')->name('reports.store_accounts_receivable');
-    Route::get('accounts_receivablepdf/{coin}/{date_end}/{typeinvoice}/{typeperson}/{id_client_or_vendor?}','ReportController@accounts_receivable_pdf')->name('reports.accounts_receivable_pdf');
+    Route::get('accountsreceivable/{typeperson}/{id_client?}','Report2Controller@index_accounts_receivable')->name('reports.accounts_receivable');
+    Route::post('storeaccounts_receivable','Report2Controller@store_accounts_receivable')->name('reports.store_accounts_receivable');
+    Route::get('accounts_receivablepdf/{coin}/{date_end}/{typeinvoice}/{typeperson}/{id_client_or_vendor?}','Report2Controller@accounts_receivable_pdf')->name('reports.accounts_receivable_pdf');
 
-    Route::get('selectclient','ReportController@select_client')->name('reports.select_client');
-    Route::get('selectvendor','ReportController@select_vendor')->name('reports.select_vendor');
+    Route::get('selectclient','Report2Controller@select_client')->name('reports.select_client');
+    Route::get('selectvendor','Report2Controller@select_vendor')->name('reports.select_vendor');
 
-    Route::get('select_client_ne','ReportController@select_client_ne')->name('reports.select_client_ne'); //dacson nota de entrega
-    Route::get('selectvendor_ne','ReportController@select_vendor_ne')->name('reports.select_vendor_ne'); // dacson nota de entrega 
+    Route::get('select_client_ne','Report2Controller@select_client_ne')->name('reports.select_client_ne'); //dacson nota de entrega
+    Route::get('selectvendor_ne','Report2Controller@select_vendor_ne')->name('reports.select_vendor_ne'); // dacson nota de entrega 
 
-    Route::get('debtstopay/{id_provider?}','ReportController@index_debtstopay')->name('reports.debtstopay');
-    Route::post('storedebtstopay','ReportController@store_debtstopay')->name('reports.store_debtstopay');
-    Route::get('debtstopaypdf/{coin}/{date_end}/{id_provider?}','ReportController@debtstopay_pdf')->name('reports.debtstopay_pdf');
+    Route::get('debtstopay/{id_provider?}','Report2Controller@index_debtstopay')->name('reports.debtstopay');
+    Route::post('storedebtstopay','Report2Controller@store_debtstopay')->name('reports.store_debtstopay');
+    Route::get('debtstopaypdf/{coin}/{date_end}/{id_provider?}','Report2Controller@debtstopay_pdf')->name('reports.debtstopay_pdf');
 
-    Route::get('selectprovider','ReportController@select_provider')->name('reports.select_provider');
+    Route::get('selectprovider','Report2Controller@select_provider')->name('reports.select_provider');
 
-    Route::get('ledger','ReportController@index_ledger')->name('reports.ledger');
-    Route::post('storeledger','ReportController@store_ledger')->name('reports.store_ledger');
-    Route::get('ledgerpdf/{date_begin}/{date_end}','ReportController@ledger_pdf')->name('reports.ledger_pdf');
+    Route::get('ledger','Report2Controller@index_ledger')->name('reports.ledger');
+    Route::post('storeledger','Report2Controller@store_ledger')->name('reports.store_ledger');
+    Route::get('ledgerpdf/{date_begin}/{date_end}','Report2Controller@ledger_pdf')->name('reports.ledger_pdf');
 
-    Route::get('accounts','ReportController@index_accounts')->name('reports.accounts');
-    Route::post('storeaccounts','ReportController@store_accounts')->name('reports.store_accounts');
-    Route::get('accountspdf/{coin?}/{level?}/{date_begin?}/{date_end?}','ReportController@accounts_pdf')->name('reports.accounts_pdf');
+    Route::get('accounts','Report2Controller@index_accounts')->name('reports.accounts');
+    Route::post('storeaccounts','Report2Controller@store_accounts')->name('reports.store_accounts');
+    Route::get('accountspdf/{coin?}/{level?}/{date_begin?}/{date_end?}','Report2Controller@accounts_pdf')->name('reports.accounts_pdf');
 
-    Route::get('bankmovements','ReportController@index_bankmovements')->name('reports.bankmovements');
-    Route::post('storebankmovements','ReportController@store_bankmovements')->name('reports.store_bankmovements');
-    Route::get('bankmovementspdf/{type}/{coin}/{date_begin}/{date_end}/{account_bank?}','ReportController@bankmovements_pdf')->name('reports.bankmovements_pdf');
+    Route::get('bankmovements','Report2Controller@index_bankmovements')->name('reports.bankmovements');
+    Route::post('storebankmovements','Report2Controller@store_bankmovements')->name('reports.store_bankmovements');
+    Route::get('bankmovementspdf/{type}/{coin}/{date_begin}/{date_end}/{account_bank?}','Report2Controller@bankmovements_pdf')->name('reports.bankmovements_pdf');
 
-    Route::get('sales_books','ReportController@index_sales_books')->name('reports.sales_books');
-    Route::post('storesales_books','ReportController@store_sales_books')->name('reports.store_sales_books');
-    Route::get('sales_bookspdf/{coin}/{date_begin}/{date_end}','ReportController@sales_books_pdf')->name('reports.sales_books_pdf');
+    Route::get('sales_books','Report2Controller@index_sales_books')->name('reports.sales_books');
+    Route::post('storesales_books','Report2Controller@store_sales_books')->name('reports.store_sales_books');
+    Route::get('sales_bookspdf/{coin}/{date_begin}/{date_end}','Report2Controller@sales_books_pdf')->name('reports.sales_books_pdf');
 
-    Route::get('purchases_book','ReportController@index_purchases_books')->name('reports.purchases_book');
-    Route::post('storepurchases_book','ReportController@store_purchases_books')->name('reports.store_purchases_books');
-    Route::get('purchases_bookpdf/{coin}/{date_begin}/{date_end}','ReportController@purchases_book_pdf')->name('reports.purchases_book_pdf');
+    Route::get('purchases_book','Report2Controller@index_purchases_books')->name('reports.purchases_book');
+    Route::post('storepurchases_book','Report2Controller@store_purchases_books')->name('reports.store_purchases_books');
+    Route::get('purchases_bookpdf/{coin}/{date_begin}/{date_end}','Report2Controller@purchases_book_pdf')->name('reports.purchases_book_pdf');
 
-    Route::get('inventory','ReportController@index_inventory')->name('reports.inventory');
-    Route::post('storeinventory','ReportController@store_inventory')->name('reports.store_inventory');
-    Route::get('inventorypdf/{coin}/{date_begin}/{date_end}/{name?}','ReportController@inventory_pdf')->name('reports.inventory_pdf');
+    Route::get('inventory','Report2Controller@index_inventory')->name('reports.inventory');
+    Route::post('storeinventory','Report2Controller@store_inventory')->name('reports.store_inventory');
+    Route::get('inventorypdf/{coin}/{date_begin}/{date_end}/{name?}','Report2Controller@inventory_pdf')->name('reports.inventory_pdf');
 
-    Route::get('operating_margin','ReportController@index_operating_margin')->name('reports.operating_margin');
-    Route::post('storeoperating_margin','ReportController@store_operating_margin')->name('reports.store_operating_margin');
-    Route::get('operating_marginpdf/{coin}/{date_begin}/{date_end}','ReportController@operating_margin_pdf')->name('reports.operating_margin_pdf');
+    Route::get('operating_margin','Report2Controller@index_operating_margin')->name('reports.operating_margin');
+    Route::post('storeoperating_margin','Report2Controller@store_operating_margin')->name('reports.store_operating_margin');
+    Route::get('operating_marginpdf/{coin}/{date_begin}/{date_end}','Report2Controller@operating_margin_pdf')->name('reports.operating_margin_pdf');
 
-    Route::get('clients','ReportController@index_clients')->name('reports.clients');
-    Route::post('storeclients','ReportController@store_clients')->name('reports.store_clients');
-    Route::get('clientspdf/{date_begin}/{date_end}/{name?}','ReportController@clients_pdf')->name('reports.clients_pdf');
+    Route::get('clients','Report2Controller@index_clients')->name('reports.clients');
+    Route::post('storeclients','Report2Controller@store_clients')->name('reports.store_clients');
+    Route::get('clientspdf/{date_begin}/{date_end}/{name?}','Report2Controller@clients_pdf')->name('reports.clients_pdf');
 
-    Route::get('providers','ReportController@index_providers')->name('reports.providers');
-    Route::post('storeproviders','ReportController@store_providers')->name('reports.store_providers');
-    Route::get('providerspdf/{date_begin}/{date_end}/{name?}','ReportController@providers_pdf')->name('reports.providers_pdf');
+    Route::get('providers','Report2Controller@index_providers')->name('reports.providers');
+    Route::post('storeproviders','Report2Controller@store_providers')->name('reports.store_providers');
+    Route::get('providerspdf/{date_begin}/{date_end}/{name?}','Report2Controller@providers_pdf')->name('reports.providers_pdf');
 
-    Route::get('employees','ReportController@index_employees')->name('reports.employees');
-    Route::post('storeemployees','ReportController@store_employees')->name('reports.store_employees');
-    Route::get('employeespdf/{date_begin}/{date_end}/{name?}','ReportController@employees_pdf')->name('reports.employees_pdf');
+    Route::get('employees','Report2Controller@index_employees')->name('reports.employees');
+    Route::post('storeemployees','Report2Controller@store_employees')->name('reports.store_employees');
+    Route::get('employeespdf/{date_begin}/{date_end}/{name?}','Report2Controller@employees_pdf')->name('reports.employees_pdf');
 
-    Route::get('employees','ReportController@index_employees')->name('reports.employees');
-    Route::post('storeemployees','ReportController@store_employees')->name('reports.store_employees');
-    Route::get('employeespdf/{date_begin}/{date_end}/{name?}','ReportController@employees_pdf')->name('reports.employees_pdf');
+    Route::get('employees','Report2Controller@index_employees')->name('reports.employees');
+    Route::post('storeemployees','Report2Controller@store_employees')->name('reports.store_employees');
+    Route::get('employeespdf/{date_begin}/{date_end}/{name?}','Report2Controller@employees_pdf')->name('reports.employees_pdf');
 
-    Route::get('sales','ReportController@index_sales')->name('reports.sales');
-    Route::post('storesales','ReportController@store_sales')->name('reports.store_sales');
-    Route::get('salespdf/{coin}/{date_begin}/{date_end}/{name?}','ReportController@sales_pdf')->name('reports.sales_pdf');
+    Route::get('sales','Report2Controller@index_sales')->name('reports.sales');
+    Route::post('storesales','Report2Controller@store_sales')->name('reports.store_sales');
+    Route::get('salespdf/{coin}/{date_begin}/{date_end}/{name?}','Report2Controller@sales_pdf')->name('reports.sales_pdf');
 /*
-    Route::get('accounts_receivable_note/{typeperson}/{id_client?}','ReportController@index_accounts_receivable_note')->name('reports.accounts_receivable_note'); // dacson (report note delivery)
-    Route::post('storeaccounts_receivable_note','ReportController@store_accounts_receivable_note')->name('reports.store_accounts_receivable_note'); // dacson (report note delivery)
-    Route::get('accounts_receivable_note_pdf/{coin}/{date_end?}/{date_begin?}/{typeinvoice}/{typeperson}','ReportController@accounts_receivable_note_pdf')->name('reports.accounts_receivable_note_pdf');
+    Route::get('accounts_receivable_note/{typeperson}/{id_client?}','Report2Controller@index_accounts_receivable_note')->name('reports.accounts_receivable_note'); // dacson (report note delivery)
+    Route::post('storeaccounts_receivable_note','Report2Controller@store_accounts_receivable_note')->name('reports.store_accounts_receivable_note'); // dacson (report note delivery)
+    Route::get('accounts_receivable_note_pdf/{coin}/{date_end?}/{date_begin?}/{typeinvoice}/{typeperson}','Report2Controller@accounts_receivable_note_pdf')->name('reports.accounts_receivable_note_pdf');
 */
 });
 

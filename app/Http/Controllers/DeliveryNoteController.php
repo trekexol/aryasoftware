@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Client;
+use App\Http\Controllers\UserAccess\UserAccessController;
 use App\Quotation;
 use App\QuotationProduct;
 use Carbon\Carbon;
@@ -13,19 +14,33 @@ use Illuminate\Support\Facades\Auth;
 class DeliveryNoteController extends Controller
 {
 
+    public $userAccess;
+    public $modulo = 'Cotizacion';
+
+    public function __construct(){
+
+        $this->middleware('auth');
+        $this->userAccess = new UserAccessController();
+    }
+ 
+
     public function index()
     {
-        $user       =   auth()->user();
-        $users_role =   $user->role_id;
+        if($this->userAccess->validate_user_access($this->modulo)){
+            $user       =   auth()->user();
+            $users_role =   $user->role_id;
+            
+            $quotations = Quotation::on(Auth::user()->database_name)->orderBy('number_delivery_note' ,'DESC')
+                                    ->where('date_delivery_note','<>',null)
+                                    ->where('date_billing',null)
+                                    ->whereIn('status',[1,'M'])
+                                    ->get();
         
-         $quotations = Quotation::on(Auth::user()->database_name)->orderBy('number_delivery_note' ,'DESC')
-                                 ->where('date_delivery_note','<>',null)
-                                 ->where('date_billing',null)
-                                 ->whereIn('status',[1,'M'])
-                                 ->get();
-       
- 
-        return view('admin.quotations.indexdeliverynote',compact('quotations'));
+    
+            return view('admin.quotations.indexdeliverynote',compact('quotations'));
+        }else{
+            return redirect('/home')->withDanger('No tiene Acceso al modulo de '.$this->modulo);
+        }
     }
  
 

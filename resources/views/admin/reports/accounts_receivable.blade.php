@@ -65,14 +65,16 @@
         $total_por_cobrar += $por_cobrar;
         $total_por_facturar += $quotation->amount_with_iva;
       }
-      $tipo = '';
-    if ($quotation->number_invoice > 0){
-    $tipo = 'Factura';
-    }
 
-    if ($quotation->number_delivery_note > 0) {
-    $tipo = 'Nota de Entrega';
-    }
+      $tipo = '';
+      if ($quotation->number_delivery_note > 0) {
+        $tipo = 'Nota de Entrega';
+      }
+      if ($quotation->number_invoice > 0){
+        $tipo = 'Factura';
+      }
+
+      
     
     ?>
     <tr>

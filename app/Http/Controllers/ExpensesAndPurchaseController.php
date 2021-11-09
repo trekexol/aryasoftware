@@ -20,31 +20,39 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Anticipo;
 use App\Company;
+use App\Http\Controllers\UserAccess\UserAccessController;
 use App\IslrConcept;
 use Illuminate\Support\Facades\Auth;
 
 class ExpensesAndPurchaseController extends Controller
 {
  
+    public $userAccess;
+    public $modulo = 'Cotizacion';
+
     public function __construct(){
 
-       $this->middleware('auth');
+        $this->middleware('auth');
+        $this->userAccess = new UserAccessController();
     }
+ 
 
    public function index()
    {
-       $user       =   auth()->user();
-       $users_role =   $user->role_id;
-       
+        if($this->userAccess->validate_user_access($this->modulo)){
+            $user       =   auth()->user();
+            $users_role =   $user->role_id;
+            
 
-        $expensesandpurchases = ExpensesAndPurchase::on(Auth::user()->database_name)->orderBy('id' ,'DESC')
-                                                    ->where('amount_with_iva','=',null)
-                                                    ->where('status',1)
-                                                    ->get();
+                $expensesandpurchases = ExpensesAndPurchase::on(Auth::user()->database_name)->orderBy('id' ,'DESC')
+                                                            ->where('amount_with_iva','=',null)
+                                                            ->where('status',1)
+                                                            ->get();
 
-       
-
-       return view('admin.expensesandpurchases.index',compact('expensesandpurchases'));
+            return view('admin.expensesandpurchases.index',compact('expensesandpurchases'));
+        }else{
+            return redirect('/home')->withDanger('No tiene Acceso al modulo de '.$this->modulo);
+        }
    }
 
 

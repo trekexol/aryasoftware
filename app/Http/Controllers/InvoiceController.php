@@ -8,6 +8,7 @@ use App\Client;
 use App\Company;
 use App\DetailVoucher;
 use App\HeaderVoucher;
+use App\Http\Controllers\UserAccess\UserAccessController;
 use App\Inventory;
 use App\Quotation;
 use App\QuotationPayment;
@@ -21,19 +22,30 @@ use App\Multipayment;
 
 class InvoiceController extends Controller
 {
+    public $userAccess;
+    public $modulo = 'Factura';
+
+    public function __construct(){
+
+        $this->middleware('auth');
+        $this->userAccess = new UserAccessController();
+    }
+ 
     
  
     public function index()
     {
-        $user       =   auth()->user();
-        $users_role =   $user->role_id;
-        
-         $quotations = Quotation::on(Auth::user()->database_name)->orderBy('number_invoice' ,'desc')
-                                        ->where('date_billing','<>',null)
-                                        ->get();
-        
- 
-        return view('admin.invoices.index',compact('quotations'));
+        if($this->userAccess->validate_user_access($this->modulo)){
+           
+            $quotations = Quotation::on(Auth::user()->database_name)->orderBy('number_invoice' ,'desc')
+                                            ->where('date_billing','<>',null)
+                                            ->get();
+            
+    
+            return view('admin.invoices.index',compact('quotations'));
+        }else{
+            return redirect('/home')->withDanger('No tiene Acceso al modulo de '.$this->modulo);
+        }
     }
 
     public function movementsinvoice($id_invoice,$coin = null)

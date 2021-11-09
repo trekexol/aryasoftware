@@ -55,12 +55,12 @@
                                     <label for="balance_previus" class="col-md-4 col-form-label text-md-right">Saldo Anterior</label>
         
                                     <div class="col-md-4">
-                                            @if($var->coin != null)
-                                                <input id="balance_previus" type="text" class="form-control @error('balance_previus') is-invalid @enderror" name="balance_previus" value="{{ $var->balance_previus / $var->rate }}" maxlength="60" required autocomplete="balance_previus">
-                                            @else
-                                                <input id="balance_previus" type="text" class="form-control @error('balance_previus') is-invalid @enderror" name="balance_previus" value="{{ $var->balance_previus }}" maxlength="60" required autocomplete="balance_previus">
-                                            @endif
-                                        
+                                        @if(isset($var->coin))
+                                            <input id="balance_previus" type="text" class="form-control @error('balance_previus') is-invalid @enderror" name="balance_previus" value="{{ number_format(($var->balance_previus ?? 0) / ($var->rate ?? 1), 2, ',', '.')}}"  required autocomplete="balance_previus">
+                                        @else
+                                            <input id="balance_previus" type="text" class="form-control @error('balance_previus') is-invalid @enderror" name="balance_previus" value="{{ number_format(($var->balance_previus ?? 0), 2, ',', '.')}}"  required autocomplete="balance_previus">
+                                        @endif
+                                    
                                         @error('balance_previus')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>

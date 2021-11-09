@@ -19,6 +19,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Anticipo;
 use App\Company;
+use App\Http\Controllers\UserAccess\UserAccessController;
 use App\IslrConcept;
 use App\MultipaymentExpense;
 use Illuminate\Support\Facades\Auth;
@@ -27,74 +28,81 @@ use Illuminate\Support\Facades\Auth;
 class ExpensesMultipaymentController extends Controller
 {
 
+    public $userAccess;
+    public $modulo = 'Cotizacion';
+
     public function __construct(){
 
         $this->middleware('auth');
+        $this->userAccess = new UserAccessController();
     }
-
+ 
     
     public function multipayment(Request $request)
     {
-        $expense = null;
+        if($this->userAccess->validate_user_access($this->modulo)){
+            $expense = null;
 
-        //Recorre el request y almacena los valores despues del segundo valor que le llegue, asi guarda los id de las facturas a procesar
-        $array = $request->all();
-        $count = 0;
-        $facturas_a_procesar = [];
+            //Recorre el request y almacena los valores despues del segundo valor que le llegue, asi guarda los id de las facturas a procesar
+            $array = $request->all();
+            $count = 0;
+            $facturas_a_procesar = [];
 
-        $total_facturas = new ExpensesAndPurchase;
-        $total_facturas->setConnection(Auth::user()->database_name);
-        
-        foreach ($array as $key => $id_expense) {
+            $total_facturas = new ExpensesAndPurchase;
+            $total_facturas->setConnection(Auth::user()->database_name);
+            
+            foreach ($array as $key => $id_expense) {
 
-            if($count >= 2){
-                array_push($facturas_a_procesar, $id_expense);
-                //$expense = $this->calcularfactura($id_expense);
-                $expense = ExpensesAndPurchase::on(Auth::user()->database_name)->findOrFail($id_expense);
-                $expense = $this->calculate($expense);
+                if($count >= 2){
+                    array_push($facturas_a_procesar, $id_expense);
+                    //$expense = $this->calcularfactura($id_expense);
+                    $expense = ExpensesAndPurchase::on(Auth::user()->database_name)->findOrFail($id_expense);
+                    $expense = $this->calculate($expense);
 
-                $total_facturas->anticipo += $expense->anticipo;
-                $total_facturas->retencion_iva += $expense->retencion_iva;
-                $total_facturas->retencion_islr += $expense->retencion_islr;
-                $total_facturas->base_imponible += $expense->base_imponible;
-                $total_facturas->amount += $expense->amount;
-                $total_facturas->amount_iva += $expense->amount_iva;
-                $total_facturas->amount_with_iva += $expense->amount + $expense->amount_iva - $expense->anticipo - $expense->retencion_iva - $expense->retencion_islr;
-               
+                    $total_facturas->anticipo += $expense->anticipo;
+                    $total_facturas->retencion_iva += $expense->retencion_iva;
+                    $total_facturas->retencion_islr += $expense->retencion_islr;
+                    $total_facturas->base_imponible += $expense->base_imponible;
+                    $total_facturas->amount += $expense->amount;
+                    $total_facturas->amount_iva += $expense->amount_iva;
+                    $total_facturas->amount_with_iva += $expense->amount + $expense->amount_iva - $expense->anticipo - $expense->retencion_iva - $expense->retencion_islr;
+                
+                }
+                
+                $count ++;
             }
             
-            $count ++;
+            if(empty($facturas_a_procesar)){
+                return redirect('expensesandpurchases/indexhistorial')->withDanger('Debe seleccionar facturar para Pagar!');
+            }
+            $date = Carbon::now();
+            $datenow = $date->format('Y-m-d');    
+
+            $accounts_bank = DB::connection(Auth::user()->database_name)->table('accounts')->where('code_one', 1)
+                        ->where('code_two', 1)
+                        ->where('code_three', 1)
+                        ->where('code_four', 2)
+                        ->where('code_five', '<>',0)
+                        ->where('description','not like', 'Punto de Venta%')
+                        ->get();
+            $accounts_efectivo = DB::connection(Auth::user()->database_name)->table('accounts')->where('code_one', 1)
+                        ->where('code_two', 1)
+                        ->where('code_three', 1)
+                        ->where('code_four', 1)
+                        ->where('code_five', '<>',0)
+                        ->get();
+            $accounts_punto_de_venta = DB::connection(Auth::user()->database_name)->table('accounts')->where('description','LIKE', 'Punto de Venta%')
+                        ->get();
+
+            
+            
+            return view('admin.expensesandpurchases.create_multipayment',compact('total_facturas',
+                    'accounts_bank', 'accounts_efectivo', 'accounts_punto_de_venta'
+                    ,'datenow','facturas_a_procesar'));
+            
+        }else{
+            return redirect('/home')->withDanger('No tiene Acceso al modulo de '.$this->modulo);
         }
-         
-        if(empty($facturas_a_procesar)){
-            return redirect('expensesandpurchases/indexhistorial')->withDanger('Debe seleccionar facturar para Pagar!');
-       }
-        $date = Carbon::now();
-        $datenow = $date->format('Y-m-d');    
-
-        $accounts_bank = DB::connection(Auth::user()->database_name)->table('accounts')->where('code_one', 1)
-                    ->where('code_two', 1)
-                    ->where('code_three', 1)
-                    ->where('code_four', 2)
-                    ->where('code_five', '<>',0)
-                    ->where('description','not like', 'Punto de Venta%')
-                    ->get();
-        $accounts_efectivo = DB::connection(Auth::user()->database_name)->table('accounts')->where('code_one', 1)
-                    ->where('code_two', 1)
-                    ->where('code_three', 1)
-                    ->where('code_four', 1)
-                    ->where('code_five', '<>',0)
-                    ->get();
-        $accounts_punto_de_venta = DB::connection(Auth::user()->database_name)->table('accounts')->where('description','LIKE', 'Punto de Venta%')
-                    ->get();
-
-        
-        
-        return view('admin.expensesandpurchases.create_multipayment',compact('total_facturas',
-                 'accounts_bank', 'accounts_efectivo', 'accounts_punto_de_venta'
-                ,'datenow','facturas_a_procesar'));
-         
-         
     }
 
     public function storemultipayment(Request $request)

@@ -10,6 +10,7 @@ use App\Company;
 use App\DetailVoucher;
 use App\ExpensesAndPurchase;
 use App\HeaderVoucher;
+use App\Http\Controllers\UserAccess\UserAccessController;
 use App\Modelo;
 use App\Provider;
 use App\Quotation;
@@ -21,24 +22,33 @@ use Illuminate\Support\Facades\Auth;
 class AnticipoController extends Controller
 {
  
+    public $userAccess;
+    public $modulo = 'Cotizacion';
+
     public function __construct(){
 
-       $this->middleware('auth');
-   }
+        $this->middleware('auth');
+        $this->userAccess = new UserAccessController();
+    }
+ 
 
    public function index()
    {
-       $user       =   auth()->user();
-       $users_role =   $user->role_id;
-       
-       
-        $anticipos = Anticipo::on(Auth::user()->database_name)
-        ->whereIn('status',[1,'M'])->where('id_client','<>',null)
-        ->orderBy('id','desc')->get();
-        
-        $control = 'index';
+        if($this->userAccess->validate_user_access($this->modulo)){
+            $user       =   auth()->user();
+            $users_role =   $user->role_id;
+            
+            
+                $anticipos = Anticipo::on(Auth::user()->database_name)
+                ->whereIn('status',[1,'M'])->where('id_client','<>',null)
+                ->orderBy('id','desc')->get();
+                
+                $control = 'index';
 
-       return view('admin.anticipos.index',compact('anticipos','control'));
+            return view('admin.anticipos.index',compact('anticipos','control'));
+        }else{
+            return redirect('/home')->withDanger('No tiene Acceso al modulo de '.$this->modulo);
+        }
    }
 
    public function index_provider()
