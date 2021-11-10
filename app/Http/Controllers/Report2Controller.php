@@ -2981,7 +2981,7 @@ class Report2Controller extends Controller
    
     public function select_client()
     {
-        dd("h");
+        
         $clients    = Client::on(Auth::user()->database_name)->get();
     
         return view('admin.reports.selectclient',compact('clients'));
