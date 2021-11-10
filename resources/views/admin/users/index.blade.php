@@ -13,11 +13,10 @@
             <h2>Usuarios Registrados</h2>
         </div>
        
-        @if (Auth::user()->role_id  == '1' || Auth::user()->role_id  == '2' )
-       <!-- <div class="col-md-6">
+        @if (Auth::user()->role_id  == '1')
+        <div class="col-md-6">
             <a href="{{ route('users.create')}}" class="btn btn-primary btn-lg float-md-right" role="button" aria-pressed="true">Registrar Usuario</a>
-         
-        </div> -->
+        </div> 
         @endif
        
             

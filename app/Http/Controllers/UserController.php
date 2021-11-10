@@ -44,33 +44,46 @@ class UserController extends Controller
     public function create()
     {
 
-       /* $personregister         = Person::on(Auth::user()->database_name)->find($id);
-        $estados                = Estado::on(Auth::user()->database_name)->orderBY('descripcion','asc')->pluck('descripcion','id')->toArray();
-        $municipios             = Municipio::on(Auth::user()->database_name)->orderBY('descripcion','asc')->pluck('descripcion','id')->toArray();
-       */ $roles                  = Role::on(Auth::user()->database_name)->orderBY('descripcion','asc')->pluck('descripcion','id')->toArray();
-
-        return view('admin.users.create',compact('roles'));
+        return view('admin.users.create');
     }
 
     public function store(Request $request)
     {
-        //
+        
         $data = request()->validate([
             'email'         =>'required|max:255|unique:users,email',
             'name'         =>'required|max:160',
-            'password'         =>'required|max:255|confirmed|min:6',
-            
+            'password'         =>'required|max:20|confirmed|min:6',
+            'password_confirmation' => 'required_with:password|same:password|min:6'
            
         ]);
+
+        $user_conected  =   auth()->user();
 
         $users = new User();
         $users->setConnection(Auth::user()->database_name);
 
-        $users->name = request('name');
-        $users->email = request('email');
-        $users->password = Hash::make(request('password'));
-        $users->role_id = request('roles_id');
-        $users->status =  request('status');
+        $users->name        = request('name');
+        $users->email       = request('email');
+        $users->password    = Hash::make(request('password'));
+        $users->role_id     = request('roles_id');
+        $users->status      = request('status');
+        $users->id_user_register    = $user_conected->id;
+
+        $users->save();
+
+        $users = new User();
+        $users->setConnection('logins');
+
+        $users->name        = request('name');
+        $users->email       = request('email');
+        $users->password    = Hash::make(request('password'));
+        $users->role_id     = request('roles_id');
+        $users->status      = request('status');
+        
+        $users->id_user_register    = $user_conected->id;
+        $users->id_company      = $user_conected->id_company;
+        $users->database_name   = $user_conected->database_name;
 
         $users->save();
         return redirect('/users')->withSuccess('Registro Exitoso!');
