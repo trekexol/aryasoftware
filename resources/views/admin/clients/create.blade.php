@@ -9,7 +9,7 @@
     @include('admin.layouts.danger')    {{-- EDITAR --}}
     @include('admin.layouts.delete')    {{-- DELELTE --}}
     {{-- VALIDACIONES-RESPUESTA --}}
-    
+
 @if ($errors->any())
         <div class="alert alert-danger">
             <ul>
@@ -29,10 +29,10 @@
                     <form method="POST" action="{{ route('clients.store') }}" enctype="multipart/form-data">
                         @csrf
                         <input id="id_user" type="hidden" class="form-control @error('id_user') is-invalid @enderror" name="id_user" value="{{ Auth::user()->id }}" required autocomplete="id_user">
-                        
+
                         <div class="form-group row">
                             <label for="type_code" class="col-md-2 col-form-label text-md-right">Código, Cédula / Rif:</label>
-    
+
                                 <div class="col-md-1">
                                     <select class="form-control" name="type_code" id="type_code">
                                         <option value="J-">J-</option>
@@ -43,7 +43,7 @@
                                 </div>
                                 <div class="col-md-3">
                                     <input id="cedula_rif" type="text" class="form-control @error('cedula_rif') is-invalid @enderror" name="cedula_rif" value="{{ old('cedula_rif') }}" required autocomplete="cedula_rif">
-    
+
                                     @error('cedula_rif')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -59,7 +59,7 @@
                                 @foreach($vendors as $vendor)
                                     <option value="{{ $vendor->id }}">{{ $vendor->name }}</option>
                                 @endforeach
-                              
+
                             </select>
                             </div>
                         </div>
@@ -88,7 +88,7 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                           
+
                             <label for="city" class="col-md-2 col-form-label text-md-right">Ciudad</label>
 
                             <div class="col-md-4">
@@ -112,8 +112,8 @@
                                 @enderror
                             </div>
                         </div>
-                       
-                        
+
+
                         <div class="form-group row">
                             <label for="phone1" class="col-md-2 col-form-label text-md-right">Teléfono</label>
 
@@ -145,12 +145,12 @@
                             <div class="form-check">
                                 <input class="form-check-input position-static" type="checkbox" id="has_credit" name="has_credit" onclick="calc();" value="option1" aria-label="...">
                               </div>
-                              
+
                               <label id="days_credit_label" for="days_credit_label" class="col-md-2 col-form-label text-md-right">Dias de Crédito</label>
 
                               <div class="col-md-2">
                                   <input id="days_credit" type="text" class="form-control @error('days_credit') is-invalid @enderror" name="days_credit" value="{{ old('days_credit') }}"  autocomplete="days_credit">
-  
+
                                   @error('days_credit')
                                       <span class="invalid-feedback" role="alert">
                                           <strong>{{ $message }}</strong>
@@ -171,8 +171,8 @@
                                     </span>
                                 @enderror
                             </div>
-                              
-                             
+
+
                         </div>
 
                         <div class="form-group row">
@@ -187,12 +187,12 @@
                                     </span>
                                 @enderror
                             </div>
-                              
+
                               <label for="percentage_retencion_islr" class="col-md-2 col-form-label text-md-right">Porcentaje Retención de ISLR</label>
 
                               <div class="col-md-3">
                                   <input id="percentage_retencion_islr" type="text" class="form-control @error('percentage_retencion_islr') is-invalid @enderror" name="percentage_retencion_islr" value="{{ old('percentage_retencion_islr') }}"  autocomplete="percentage_retencion_islr">
-  
+
                                   @error('percentage_retencion_islr')
                                       <span class="invalid-feedback" role="alert">
                                           <strong>{{ $message }}</strong>
@@ -200,13 +200,30 @@
                                   @enderror
                               </div>
                         </div>
-                        
 
-                       
 
-                       
-                        
+
+
+
+
                         <br>
+                        <div class="col-sm-3  dropdown mb-4">
+                            <button class="btn btn-dark" type="button"
+                                    id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="false"
+                                    aria-expanded="false">
+                                <i class="fas fa-bars"></i>
+                                Opciones
+                            </button>
+                            <div class="dropdown-menu animated--fade-in" aria-labelledby="dropdownMenuButton">
+                                <a href="{{ route('export.clientscreate') }}" class="dropdown-item bg-dark text-white h5">Descargar Plantilla Excel </a>
+                            </div>
+                            <form id="fileForm" method="POST" action="{{ route('clientsimport') }}" enctype="multipart/form-data" >
+                                @csrf
+                                <input id="file" type="file" value="import" accept=".xlsx" name="file" class="file">
+                                <button class="btn btn-success">Import User Data</button>
+                            </form>
+                        </div>
+
                         <div class="form-group row mb-0">
                             <div class="col-md-3">
                             </div>
@@ -214,7 +231,7 @@
                                 <button type="submit" class="btn btn-primary">
                                    Registrar Cliente
                                 </button>
-                                
+
                             </div>
                             <div class="col-md-3">
                                 <a href="{{ route('clients') }}" name="danger" type="button" class="btn btn-danger">Cancelar</a>
@@ -228,7 +245,30 @@
 </div>
 @endsection
 @section('validacion')
-    <script>    
+    <script>
+        $("#file").on('change',function(){
+
+            var file = document.getElementById("file").value;
+
+        alert(file);
+
+            /*Extrae la extencion del archivo*/
+            var basename = file.split(/[\\/]/).pop(),  // extract file name from full path ...
+                // (supports `\\` and `/` separators)
+                pos = basename.lastIndexOf(".");       // get last position of `.`
+
+            if (basename === "" || pos < 1) {
+                alert("El archivo no tiene extension");
+            }
+            /*-------------------------------*/
+
+            if(basename.slice(pos + 1) == 'xlsx'){
+                document.getElementById("fileForm").submit();
+            }else{
+                alert("Solo puede cargar archivos .xlsx");
+            }
+
+        });
 	$(function(){
         soloAlfaNumerico('code_client');
         soloAlfaNumerico('razon_social');
@@ -238,7 +278,7 @@
         soloAlfaNumerico('direction');
         sololetras('seller');
     });
-        
+
         $("#days_credit_label").hide();
         $("#days_credit").hide();
         document.getElementById('days_credit').value = 0;
@@ -246,11 +286,11 @@
 
     function calc()
     {
-        if (document.getElementById('has_credit').checked) 
+        if (document.getElementById('has_credit').checked)
         {
             $("#days_credit_label").show();
             $("#days_credit").show();
-            
+
             document.getElementById('days_credit').value = 0;
         } else {
             $("#days_credit_label").hide();
@@ -261,27 +301,27 @@
 
         $(document).ready(function () {
             $("#cedula_rif").mask('00000000000000', { reverse: true });
-            
+
         });
         $(document).ready(function () {
             $("#phone1").mask('0000 000-0000', { reverse: true });
-            
+
         });
         $(document).ready(function () {
             $("#phone2").mask('0000 000-0000', { reverse: true });
-            
+
         });
         $(document).ready(function () {
             $("#amount_max_credit").mask('000.000.000.000.000.000,00', { reverse: true });
-            
+
         });
         $(document).ready(function () {
             $("#percentage_retencion_iva").mask('000', { reverse: true });
-            
+
         });
         $(document).ready(function () {
             $("#percentage_retencion_islr").mask('000', { reverse: true });
-            
+
         });
     </script>
 @endsection

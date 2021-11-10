@@ -50,54 +50,69 @@
   @include('admin.layouts.danger')    {{-- EDITAR --}}
   @include('admin.layouts.delete')    {{-- DELELTE --}}
   {{-- VALIDACIONES-RESPUESTA --}}
+<div class="col-sm-3  dropdown mb-4">
+    <button class="btn btn-dark" type="button"
+            id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="false"
+            aria-expanded="false">
+        <i class="fas fa-bars"></i>
+        Opciones
+    </button>
+    <div class="dropdown-menu animated--fade-in" aria-labelledby="dropdownMenuButton">
+        <a href="{{ route('export.clientlist') }}" class="dropdown-item bg-dark text-white h4">Descargar Lista de Clientes Excel </a>
+        <a href="{{ route('export.clientscreate') }}" class="dropdown-item bg-dark text-white h5">Descargar Plantilla Excel </a>
+        <form id="fileForm" method="POST" action="{{ route('clientsimport') }}" enctype="multipart/form-data" >
+            @csrf
+            <input id="file" type="file" value="import" accept=".xlsx" name="file" class="file">
+            <button class="dropdown-item bg-success text-white h4">Importar Plantilla</button>
+        </form>
+    </div>
+
+
+</div>
 <!-- DataTales Example -->
 <div class="card shadow mb-4">
-   
+
     <div class="card-body">
         <div class="table-responsive">
             <table class="table table-light2 table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <thead>
-                <tr> 
-                   
+                <tr>
                     <th>Nombre</th>
                     <th>Cedula o Rif</th>
                     <th>Dirección</th>
                     <th>Telefono</th>
-                  
                     <th>Dias de Crédito</th>
-                   
                     <th>Vendedor</th>
-                    
                     <th></th>
                 </tr>
                 </thead>
-                
+
                 <tbody>
                     @if (empty($clients))
-                    @else  
+                    @else
                         @foreach ($clients as $client)
                             <tr>
-                               
+
                                 <td>{{$client->name}}</td>
                                 <td>{{$client->type_code}} {{$client->cedula_rif}}</td>
                                 <td>{{$client->direction}}</td>
                                 <td>{{$client->phone1}}</td>
                                 <td>{{$client->days_credit}}</td>
-                               
+
 
                                 @if (isset($client->vendors['name']))
                                     <td>{{$client->vendors['name']}}</td>
                                 @else
                                     <td></td>
                                 @endif
-                                
 
-                                
+
+
                                 <td>
                                     <a href="clients/{{$client->id }}/edit" title="Editar"><i class="fa fa-edit"></i></a>
                                 </td>
-                            </tr>     
-                        @endforeach   
+                            </tr>
+                        @endforeach
                     @endif
                 </tbody>
             </table>
@@ -106,7 +121,7 @@
 </div>
 
 
-    
+
 @endsection
 @section('javascript')
 
@@ -116,5 +131,5 @@
         "order": [],
         'aLengthMenu': [[50, 100, 150, -1], [50, 100, 150, "All"]]
     });
-    </script> 
+    </script>
 @endsection

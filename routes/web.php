@@ -890,8 +890,16 @@ Route::group(["prefix"=>'export'],function(){
     Route::get('expense/{id}','ExcelController@export')->name('export');
     Route::get('expenseguideaccount','ExcelController@export_guide_account')->name('export.guideaccount');
     Route::get('expenseguideinventory','ExcelController@export_guide_inventory')->name('export.guideinventory');
-
     Route::post('expenseimport','ExcelController@import')->name('import');
+    //---------------------------------CLIENTES-----------------------------------------//
+    Route::get('clientlist','ExcelController@clientlist')->name('export.clientlist');
+    Route::get('clientscreate','ExcelController@clientscreate')->name('export.clientscreate');
+    Route::post('clientsimport','ExcelController@clientsimport')->name('clientsimport');
+
+
+
+
+
   });
 
   Route::group(["prefix"=>'orders'],function(){
