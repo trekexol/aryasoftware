@@ -62,6 +62,60 @@
                                         @endif
                                       </div>
                                 </div>
+                                @if (isset($invoices_to_pay) && (count($invoices_to_pay)>0))
+                                <div class="form-group row">
+                                    <label for="clients" class="col-md-3 col-form-label text-md-right">Factura/Nota de E.</label>
+                                    <div class="col-md-5">
+                                        <select  id="id_quotation"  name="id_quotation" class="form-control" width="20">
+                                            @if (empty($anticipo->id_quotation) || (isset($client)))
+                                                <option selected value="">Anticipo al Cliente</option>
+                                            @else
+                                                <option selected value="{{ $anticipo->quotations['id'] }}">Numero 
+                                                    {{($anticipo->quotations['number_invoice'] != null) ? 'Factura' : ''}}
+                                                    {{($anticipo->quotations['number_delivery_note'] != null) ? 'Nota Entrega' : ''}}
+                                                    {{($anticipo->quotations['number_order'] != null) ? 'Pedido' : ''}}: 
+                                                    {{ $anticipo->quotations['number_invoice'] ?? $anticipo->quotations['number_delivery_note'] ?? $anticipo->quotations['number_order'] }}</option>
+                                                <option disabled>------------------------------</option>
+                                            @endif
+                                           
+                                            @foreach($invoices_to_pay as $invoice)
+                                                
+                                                <?php
+                                                    if (isset($invoice->number_invoice)){
+                                                        $num_fac = 'Factura: '.$invoice->number_invoice;
+                                                    }else if (isset($invoice->number_delivery_note)){
+                                                        $num_fac = 'Nota de Entrega: '.$invoice->number_delivery_note;
+                                                    }else if (isset($invoice->number_order)){
+                                                        $num_fac = 'Pedido: '.$invoice->number_order;
+                                                    }
+                                                ?>
+                                                <option  value="{{$invoice->id}}"> {{$num_fac ?? ''}} - Ctrl/Serie: {{ $invoice->serie ?? ''}} - {{ $invoice->observation ?? ''}}</option>
+                                            
+                                               @endforeach
+        
+                                        </select>
+                                    </div>
+                                </div>
+                                @elseif(isset($expenses_to_pay) && (count($expenses_to_pay)>0))
+                                <div class="form-group row">
+                                    <label for="clients" class="col-md-3 col-form-label text-md-right">Factura/Nota de E.</label>
+                                    <div class="col-md-5">
+                                        <select  id="id_expense"  name="id_expense" class="form-control" width="20">
+                                        @if (empty($anticipo->id_expense) || (isset($provider)))
+                                            <option selected value="">Anticipo al Cliente</option>
+                                        @else
+                                            <option selected value="{{ $anticipo->expenses['id'] }}">Numero Compra: {{$anticipo->expenses['id'] ?? ''}} - Ctrl/Serie: {{ $anticipo->expenses['serie'] ?? ''}}</option>
+                                            <option disabled>------------------------------</option>
+                                        @endif
+                                            @foreach($expenses_to_pay as $invoice)
+                                                <option  value="{{$invoice->id}}"> - Ctrl/Serie: {{ $invoice->serie ?? ''}} - {{ $invoice->observation ?? ''}}</option>
+                                            @endforeach
+        
+                                        </select>
+                                    </div>
+                                </div>
+                                @endif
+                                
                                 <div class="form-group row">
                                     <label for="clients" class="col-md-3 col-form-label text-md-right">Cuentas</label>
                                     <div class="col-md-5">

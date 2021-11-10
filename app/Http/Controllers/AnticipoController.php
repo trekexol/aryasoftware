@@ -473,19 +473,31 @@ class AnticipoController extends Controller
    {
         $anticipo = Anticipo::on(Auth::user()->database_name)->find($id);
 
+        $invoices_to_pay = null;
+        $expenses_to_pay = null;
+
         if(isset($id_client) && ($id_client != -1)){
             $client = Client::on(Auth::user()->database_name)->find($id_client);
+            $invoices_to_pay = Quotation::on(Auth::user()->database_name)->whereIn('status',['1','P'])->where('id_client',$id_client)->get();
+           
         }else{
             $client = null;
+            if(isset($anticipo->id_client)){
+                $invoices_to_pay = Quotation::on(Auth::user()->database_name)->whereIn('status',['1','P'])->where('id_client',$anticipo->id_client)->get();
+            }
         }
 
         if(isset($id_provider) && ($id_provider != -1)){
             $provider = Provider::on(Auth::user()->database_name)->find($id_provider);
+            $expenses_to_pay = ExpensesAndPurchase::on(Auth::user()->database_name)->whereIn('status',['1','P'])->where('id_provider',$id_provider)->get();
+            
         }else{
             $provider = null;
+            if(isset($anticipo->id_provider)){
+                $expenses_to_pay = ExpensesAndPurchase::on(Auth::user()->database_name)->whereIn('status',['1','P'])->where('id_provider',$anticipo->id_provider)->get();
+            }
         }
-        
-        
+
         $accounts = DB::connection(Auth::user()->database_name)->table('accounts')->where('code_one', 1)
                                             ->where('code_two', 1)
                                             ->where('code_three',1)
@@ -510,7 +522,7 @@ class AnticipoController extends Controller
             
         }
       
-        return view('admin.anticipos.edit',compact('anticipo','accounts','datenow','bcv','client','provider'));
+        return view('admin.anticipos.edit',compact('anticipo','accounts','datenow','bcv','client','provider','invoices_to_pay','expenses_to_pay'));
   
    }
 
@@ -523,7 +535,7 @@ class AnticipoController extends Controller
     */
    public function update(Request $request, $id)
    {
-
+       
         $data = request()->validate([
                 
             'date_begin'         =>'required',
@@ -537,12 +549,17 @@ class AnticipoController extends Controller
 
         ]);
 
-        
-
-
         $var = Anticipo::on(Auth::user()->database_name)->findOrFail($id);
 
-       
+        if(request('id_quotation') != null){
+            $var->id_quotation = request('id_quotation');
+        }
+
+        if(request('id_expense') != null){
+            $var->id_expense = request('id_expense');
+           
+        }
+
         $var->date = request('date_begin');
 
         if(request('id_client') != -1){
@@ -579,6 +596,7 @@ class AnticipoController extends Controller
             $var->status = request('status');
         }
     
+        //Actualiza los movimientos contables del anticipo
         DB::connection(Auth::user()->database_name)->table('detail_vouchers as d')
                         ->join('header_vouchers as h', 'h.id', '=', 'd.id_header_voucher')
                         ->where('h.id_anticipo',$var->id)
@@ -590,7 +608,7 @@ class AnticipoController extends Controller
                         ->where('h.id_anticipo',$var->id)
                         ->where('d.debe',0)
                         ->update([ 'd.haber' => $var->amount , 'd.tasa' => $var->rate]);
-
+        //------------------
         
        
         $var->save();
