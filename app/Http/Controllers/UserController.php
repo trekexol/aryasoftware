@@ -95,9 +95,8 @@ class UserController extends Controller
     {
 
         $user   = User::on(Auth::user()->database_name)->find($id);
-        $roles  = Role::on(Auth::user()->database_name)->get();
 
-        return view('admin.users.edit',compact('user','roles'));
+        return view('admin.users.edit',compact('user'));
     }
 
    

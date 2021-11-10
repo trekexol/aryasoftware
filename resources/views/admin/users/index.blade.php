@@ -67,10 +67,10 @@
                         @else
                             <td>Inactivo</td>
                         @endif
-                    <td>
-                      <!-- <a href="{{route('users.edit',$user->id) }}" title="Editar"><i class="fa fa-edit"></i></a>  
-                      -->
-                    </td>
+                        <td class="text-center">
+                            <a href="{{ route('users.edit',$user->id) }}"  title="Editar"><i class="fa fa-edit"></i></a>
+                            <a href="#" class="delete" data-id-user={{$user->id}} data-toggle="modal" data-target="#deleteModal" title="Eliminar"><i class="fa fa-trash text-danger"></i></a>  
+                        </td>
                     @endif
                     </tr>
                     @endforeach
@@ -80,6 +80,34 @@
         </div>
     </div>
 </div>
+
+<!-- Delete Warning Modal -->
+<div class="modal modal-danger fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Eliminar</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            <form action="{{ route('users.delete') }}" method="post">
+                @csrf
+                @method('DELETE')
+                <input id="id_user_modal" type="hidden" class="form-control @error('id_user_modal') is-invalid @enderror" name="id_user_modal" readonly required autocomplete="id_user_modal">
+                       
+                <h5 class="text-center">Seguro que desea eliminar?</h5>
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-danger">Eliminar</button>
+            </div>
+            </form>
+        </div>
+    </div>
+  </div>
 
 @endsection
 @section('javascript')

@@ -1532,11 +1532,12 @@ class FacturarController extends Controller
                 }else{
                     $quotation->anticipo =  $anticipo;
                     $global->associate_anticipos_quotation($quotation);
+                    $quotation->status = "C";
                 }
                 
                 if(isset($account_anticipo_cliente)){
                     $this->add_movement($bcv,$header_voucher->id,$account_anticipo_cliente->id,$quotation->id,$user_id,$quotation->anticipo,0);
-                    $global->add_payment($quotation,$account_anticipo_cliente->id,8,$quotation->anticipo,$bcv);
+                    $global->add_payment($quotation,$account_anticipo_cliente->id,3,$quotation->anticipo,$bcv);
                 }
              }else{
                  $quotation->anticipo = 0;
@@ -1598,6 +1599,7 @@ class FacturarController extends Controller
             $quotation->iva_percentage = $iva_percentage;
             $quotation->retencion_iva = $retencion_iva;
             $quotation->retencion_islr = $retencion_islr;
+            $quotation->status = "C";
             
             $quotation->save();
 
