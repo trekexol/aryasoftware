@@ -29,7 +29,7 @@
                 <tr> 
                     <th></th>
                    
-                    <th>Nombre</th>
+                    <th>Nombre h</th>
                     <th>Cedula o Rif</th>
                     <th>Dirección</th>
                     <th>Ciudad</th>
