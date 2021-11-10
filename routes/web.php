@@ -44,25 +44,14 @@ Route::group(["prefix"=>'users'],function(){
     Route::post('store', 'UserController@store')->name('users.store');
 
     Route::get('{id}/edit','UserController@edit')->name('users.edit');
-    Route::delete('{id}/delete','UserController@destroy')->name('users.delete');
+    Route::delete('delete','UserController@destroy')->name('users.delete');
     Route::patch('{id}/update','UserController@update')->name('users.update');
 
+    Route::get('createassignmodules/{id_user}','UserController@createAssignModules')->name('users.createAssignModules');
+    Route::post('assignmodules', 'UserController@assignModules')->name('users.assignModules');
 
 });
 
-/*MODULO DE FACTURACION
-Route::group(["prefix"=>'billings'],function(){
-    Route::get('/','billings\BillController@index')->name('billings');
-    Route::get('clients','billings\ClientController@index')->name('clients');
-    Route::get('clients/create','billings\ClientController@create')->name('clients.create');
-    Route::get('vendors','billings\VendorController@index')->name('vendors');
-    Route::get('vendors/create','billings\VendorController@create')->name('vendors.create');
-   });
------------------------------------- */
-
-//Tablas Referenciales
-
-//Route::resource('salarytypes', 'SalarytypesController');
 
 Route::group(["prefix"=>'salarytypes'],function(){
     Route::get('/','SalarytypeController@index')->name('salarytypes');

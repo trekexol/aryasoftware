@@ -119,6 +119,12 @@
         'aLengthMenu': [[50, 100, 150, -1], [50, 100, 150, "All"]]
     });
 
+    $(document).on('click','.delete',function(){
+         
+         let id_user = $(this).attr('data-id-user');
+ 
+         $('#id_user_modal').val(id_user);
+     });
     </script> 
 
 @endsection

@@ -43,8 +43,14 @@ class UserController extends Controller
 
     public function create()
     {
-
         return view('admin.users.create');
+    }
+
+    public function createAssignModules($id_user)
+    {
+        $user   = User::on(Auth::user()->database_name)->find($id_user);
+        
+        return view('admin.users.create',compact('user'));
     }
 
     public function store(Request $request)
@@ -116,9 +122,7 @@ class UserController extends Controller
             'Roles'     =>'max:2',
             'password'  =>'max:255|confirmed',
             'status'     =>'max:2',
-        ]);//verifica que el usuario existe
-
-        
+        ]);
 
         if(isset($password)){
             $password = Hash::make(request('password'));
@@ -141,10 +145,8 @@ class UserController extends Controller
         }else{
             $user->status = request('status');
         }
-       
-
+    
         $user->save();
-
 
         return redirect('/users')->withSuccess('Registro Guardado Exitoso!');
 
