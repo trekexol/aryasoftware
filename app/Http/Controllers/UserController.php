@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Modulo;
 use Illuminate\Http\Request;
 
 use App\User;
@@ -12,9 +13,13 @@ use Illuminate\Support\Facades\Hash;
 
 
 use App\Permission\Models\Role;
+use App\UserAccess;
 
 class UserController extends Controller
 {
+    
+    public $conection_logins = "logins"; 
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -49,8 +54,15 @@ class UserController extends Controller
     public function createAssignModules($id_user)
     {
         $user   = User::on(Auth::user()->database_name)->find($id_user);
-        
-        return view('admin.users.create',compact('user'));
+        if($user->role_id == '1'){
+            return redirect('/users')->withDelete('Este Usuario es de tipo Administrador, si quiere asignarle modulos debe editarlo a usuario!');
+        }
+        $modulos   = Modulo::on($this->conection_logins)->get();
+
+        $user_access   = UserAccess::on($this->conection_logins)->where('id_user',$user->id)->get();
+
+
+        return view('admin.users.selectmodulos',compact('modulos','user','user_access'));
     }
 
     public function store(Request $request)
@@ -66,43 +78,93 @@ class UserController extends Controller
 
         $user_conected  =   auth()->user();
 
-        $users = new User();
-        $users->setConnection(Auth::user()->database_name);
-
-        $users->name        = request('name');
-        $users->email       = request('email');
-        $users->password    = Hash::make(request('password'));
-        $users->role_id     = request('roles_id');
-        $users->status      = request('status');
-        $users->id_user_register    = $user_conected->id;
-
-        $users->save();
-
-        $users = new User();
-        $users->setConnection('logins');
-
-        $users->name        = request('name');
-        $users->email       = request('email');
-        $users->password    = Hash::make(request('password'));
-        $users->role_id     = request('roles_id');
-        $users->status      = request('status');
+        $user_login = new User();
+        $user_login->setConnection($this->conection_logins);
+        $user_login->name        = request('name');
+        $user_login->email       = request('email');
+        $user_login->password    = Hash::make(request('password'));
+        $user_login->role_id     = request('roles_id');
+        $user_login->status      = request('status');
         
-        $users->id_user_register    = $user_conected->id;
-        $users->id_company      = $user_conected->id_company;
-        $users->database_name   = $user_conected->database_name;
+        $user_login->id_user_register    = $user_conected->id;
+        $user_login->id_company      = $user_conected->id_company;
+        $user_login->database_name   = $user_conected->database_name;
 
-        $users->save();
-        return redirect('/users')->withSuccess('Registro Exitoso!');
+        $user_login->save();
+
+
+        $user = new User();
+        $user->setConnection(Auth::user()->database_name);
+        $user->id          = $user_login->id;
+        $user->name        = request('name');
+        $user->email       = request('email');
+        $user->password    = Hash::make(request('password'));
+        $user->role_id     = request('roles_id');
+        $user->status      = request('status');
+        $user->id_user_register    = $user_conected->id;
+
+        $user->save();
+
+       
+        if($user->role_id != '1'){
+            
+            return redirect('/users/createassignmodules/'.$user->id.'')->withSuccess('Registro de Usuario Exitoso!');
+           
+        }else{
+            return redirect('/users')->withSuccess('Registro Exitoso!');
+        }
+        
     }
 
+    public function assignModules(Request $request)
+    {
+       
+        //convierte a array
+        $modulos_news = explode(",", $request->modulos_news);
 
+        $modulos_olds = explode(",", $request->modulos_olds);
+
+        $diferencias = array_diff($modulos_news,$modulos_olds);
+        
+        if(empty($diferencias) || (isset($diferencias[0]) && $diferencias[0] == "")){
+            $diferencias = array_diff($modulos_olds,$modulos_news);
+        }
+        
+        if(count($diferencias) > 0){
+            foreach($diferencias as $diferencia){
+                $combo_exist = UserAccess::on($this->conection_logins)->where('id_user',$request->id_user)->where('modulo',$diferencia)->first();
+                
+                if(isset($combo_exist)){
+                    UserAccess::on($this->conection_logins)->where('id_user',$request->id_user)->where('modulo',$diferencia)->delete();
+                }else{
+                    $var = new UserAccess();
+                    $var->setConnection($this->conection_logins);
+                    $var->id_user = $request->id_user;
+                    $var->modulo = $diferencia;
+
+                    $var->save();
+                    
+                }
+            }
+        }
+
+        return redirect('/users')->withSuccess('Registro de Asignaciones Exitosa!');
+    }
 
     public function edit($id)
     {
-
         $user   = User::on(Auth::user()->database_name)->find($id);
+        $roles   = Role::on(Auth::user()->database_name)->get();
 
-        return view('admin.users.edit',compact('user'));
+        $user_conected  =   auth()->user();
+
+        if($user_conected->role_id != '1'){
+            return redirect('/users')->withDanger('Debes ser Administrador!');
+        }else{
+            return view('admin.users.edit',compact('user','roles'));
+        }
+
+        
     }
 
    
@@ -147,6 +209,39 @@ class UserController extends Controller
         }
     
         $user->save();
+        
+
+        //en logins
+
+        $users =  User::on($this->conection_logins)->find($id);
+
+        $user_rol = $users->role_id;
+        $user_status = $users->status;
+
+        if(isset($password)){
+            $password = Hash::make(request('password'));
+        }else{
+            $password = $users->password;
+        }
+        $user          = User::on($this->conection_logins)->findOrFail($id);
+        $user->name         = request('name');
+        $user->email        = request('email');
+        $user->password     = $password;
+
+        if(request('Roles') == null){
+            $user->role_id = $user_rol;
+        }else{
+            $user->role_id = request('Roles');
+        }
+
+        if(request('status') == null){
+            $user->status = $user_status;
+        }else{
+            $user->status = request('status');
+        }
+    
+        $user->save();
+      
 
         return redirect('/users')->withSuccess('Registro Guardado Exitoso!');
 
@@ -155,11 +250,15 @@ class UserController extends Controller
 
     public function destroy(Request $request)
     {
-        //find the Division
-        $user = User::on(Auth::user()->database_name)->find($request->user_id);
-
-        //Elimina el Division
-        $user->delete();
+        $user = User::on(Auth::user()->database_name)->find($request->id_user_modal);
+        if(isset($user)){
+            $user->delete();
+        }
+        
+        $user = User::on($this->conection_logins)->find($request->id_user_modal);
+        if(isset($user)){
+            $user->delete();
+        }
         return redirect('users')->withDelete('Registro Eliminado Exitoso!');
     }
 

@@ -68,6 +68,7 @@
                             <td>Inactivo</td>
                         @endif
                         <td class="text-center">
+                            <a href="{{ route('users.createAssignModules',$user->id)}}" title="Seleccionar"><i class="fa fa-check"></i></a>
                             <a href="{{ route('users.edit',$user->id) }}"  title="Editar"><i class="fa fa-edit"></i></a>
                             <a href="#" class="delete" data-id-user={{$user->id}} data-toggle="modal" data-target="#deleteModal" title="Eliminar"><i class="fa fa-trash text-danger"></i></a>  
                         </td>

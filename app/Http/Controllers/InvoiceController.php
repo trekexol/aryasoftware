@@ -23,7 +23,7 @@ use App\Multipayment;
 class InvoiceController extends Controller
 {
     public $userAccess;
-    public $modulo = 'Factura';
+    public $modulo = 'Cotizacion';
 
     public function __construct(){
 
