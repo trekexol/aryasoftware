@@ -205,18 +205,27 @@ class AccountController extends Controller
 
         $user       =   auth()->user();
         $users_role =   $user->role_id;
+        $detailvouchers = null;
+        $var = null;
+        $type = null;
+
         if($users_role == '1'){
              
             if($type == 'header_voucher'){
                 $detailvouchers = DetailVoucher::on(Auth::user()->database_name)->where('id_header_voucher',$id)->orderBy('id','desc')->get();
                 
                 $var = null;
-                $type = $detailvouchers[0]['headers']->description;;
+                $type = $detailvouchers[0]['headers']->description;
             }
-            if($type == 'invoice'){
+            else if($type == 'invoice'){
                 $detailvouchers = DetailVoucher::on(Auth::user()->database_name)->where('id_invoice',$id)->get();
                 $var = Quotation::on(Auth::user()->database_name)->find($id);
                 $type = 'Factura';
+            }else{
+                $detailvouchers = DetailVoucher::on(Auth::user()->database_name)->where('id_header_voucher',$id)->orderBy('id','desc')->get();
+                
+                $var = null;
+                $type = $detailvouchers[0]['headers']->description;
             }
             
          }else if($users_role == '2'){
