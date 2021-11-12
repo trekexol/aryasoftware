@@ -55,12 +55,12 @@
                     @if(isset($var->id_invoice))
                         <td>Factura</td>
                         <td>
-                        <a href="{{ route('accounts.header_movements',[$var->id_invoice,'invoice',$account->id]) }}" title="Crear">{{ $var->id_invoice }}</a>
+                        <a href="{{ route('accounts.header_movements',[$var->id_header_voucher,'header_voucher',$account->id]) }}" title="Crear">{{ $var->id_invoice }}</a>
                         </td>
                     @elseif(isset($var->id_expense))
                         <td>Gasto o Compra</td>
                         <td>
-                        <a href="{{ route('accounts.header_movements',[$var->id_expense,'expense',$account->id]) }}" title="Crear">{{ $var->id_expense }}</a>
+                        <a href="{{ route('accounts.header_movements',[$var->id_header_voucher,'header_voucher',$account->id]) }}" title="Crear">{{ $var->id_expense }}</a>
                         </td>
                     @elseif(isset($var->id_header_voucher)) 
                         <td>Otro</td>
